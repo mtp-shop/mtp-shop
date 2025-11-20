@@ -4,12 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TPS TEMPLE | Premium Assets</title>
-    
-    <!-- PASTE THE CODE HERE -->
-    <link rel="icon" type="image/png" href="https://media.discordapp.net/attachments/1320099120714612827/1420858047776952330/408b4f914cc603196194de1784604d89.png?ex=692017ec&is=691ec66c&hm=4d7e913e63d1870e16cca0a22ecf8c106bd01388eea7ae35c7117c34654c9f97&=&format=webp&quality=lossless">
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <!-- ... rest of your code ... -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
         /* --- CSS VARIABLES --- */
@@ -76,7 +73,6 @@
             justify-content: center; 
             align-items: center; 
             text-align: center;
-            /* FIXED PADDING TO PREVENT OVERLAP */
             padding-top: 140px; 
             padding-bottom: 60px;
             padding-left: 20px;
@@ -86,7 +82,7 @@
         .hero-logo {
             width: 150px; 
             height: auto;
-            margin-bottom: 25px; /* Space between logo and text */
+            margin-bottom: 25px; 
             filter: drop-shadow(0 0 20px rgba(79, 70, 229, 0.4));
         }
 
@@ -181,8 +177,10 @@
         .modal-title { font-size: 2.5rem; font-weight: 900; font-style: italic; margin: 0 0 10px 0; text-transform: uppercase; line-height: 1; }
         .modal-price { font-size: 1.5rem; color: #fff; margin-bottom: 30px; }
         .btn-row { display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px; }
-        .btn-cart { background-color: var(--accent); color: white; border: none; padding: 18px; font-size: 1rem; font-weight: 600; border-radius: 4px; cursor: pointer; transition: 0.2s; }
+        
+        .btn-cart { background-color: var(--accent); color: white; border: none; padding: 18px; font-size: 1rem; font-weight: 600; border-radius: 4px; cursor: pointer; transition: 0.2s; width: 100%; }
         .btn-cart:hover { background-color: var(--accent-hover); }
+        
         .info-text { font-size: 0.9rem; color: #ccc; margin-bottom: 10px; font-style: italic; }
 
         @media (max-width: 800px) {
@@ -208,37 +206,22 @@
     </nav>
 
     <header>
-        <!-- LOGO -->
         <img src="https://media.discordapp.net/attachments/1320099120714612827/1420858047776952330/408b4f914cc603196194de1784604d89.png?ex=692017ec&is=691ec66c&hm=4d7e913e63d1870e16cca0a22ecf8c106bd01388eea7ae35c7117c34654c9f97&=&format=webp&quality=lossless" alt="Logo" class="hero-logo">
-
         <h1>TPS TEMPLE</h1>
         <p class="subtitle">High-End Visuals & Assets for Personal Use.</p>
-        
         <a href="#intros" class="hero-btn">SHOP NOW</a>
 
-        <!-- REVIEWS -->
         <div class="reviews-container">
             <div class="review-card">
-                <div class="review-header">
-                    <img src="https://cdn.discordapp.com/avatars/548492782432550913/37b2471ed371d4eeb7c0641650797ee8.webp?size=1024" class="discord-pfp">
-                    <div class="reviewer-info"><span class="reviewer-name">@Mathias</span><span class="stars">★★★★★</span></div>
-                </div>
+                <div class="review-header"><img src="https://cdn.discordapp.com/avatars/548492782432550913/37b2471ed371d4eeb7c0641650797ee8.webp?size=1024" class="discord-pfp"><div class="reviewer-info"><span class="reviewer-name">@Mathias</span><span class="stars">★★★★★</span></div></div>
                 <p class="review-text">"10/10 fast support and nice stuff you get, Buy from this man you will never regret it."</p>
             </div>
-
             <div class="review-card">
-                <div class="review-header">
-                    <img src="https://cdn.discordapp.com/avatars/812503046374293525/768ae47a6dbc5022e077e899cb0597b4.webp?size=1024" class="discord-pfp">
-                    <div class="reviewer-info"><span class="reviewer-name">@Cshadydjango</span><span class="stars">★★★★★</span></div>
-                </div>
+                <div class="review-header"><img src="https://cdn.discordapp.com/avatars/812503046374293525/768ae47a6dbc5022e077e899cb0597b4.webp?size=1024" class="discord-pfp"><div class="reviewer-info"><span class="reviewer-name">@Cshadydjango</span><span class="stars">★★★★★</span></div></div>
                 <p class="review-text">"10/10 fast and easy. Definitely will be returning for more."</p>
             </div>
-
             <div class="review-card">
-                <div class="review-header">
-                    <img src="https://cdn.discordapp.com/avatars/1078371560781529139/e225b70014c20061936ace207925adf0.webp?size=1024" class="discord-pfp">
-                    <div class="reviewer-info"><span class="reviewer-name">@Ryze</span><span class="stars">★★★★★</span></div>
-                </div>
+                <div class="review-header"><img src="https://cdn.discordapp.com/avatars/1078371560781529139/e225b70014c20061936ace207925adf0.webp?size=1024" class="discord-pfp"><div class="reviewer-info"><span class="reviewer-name">@Ryze</span><span class="stars">★★★★★</span></div></div>
                 <p class="review-text">"GOATED 10/10 got me right and shi is tuffff."</p>
             </div>
         </div>
@@ -246,7 +229,6 @@
         <a href="https://discord.com/channels/1316535768717463644/1316537153500745809" target="_blank" class="see-more-btn">
             See more reviews <i class="fas fa-external-link-alt"></i>
         </a>
-
     </header>
 
     <div class="container">
@@ -256,23 +238,12 @@
             <div class="section-header"><h2 class="section-title">Custom <span>Intros</span></h2></div>
             <div class="grid">
                 <div class="card" onclick="openModal(this)">
-                    <div class="card-img-container">
-                        <div class="tag">POPULAR</div>
-                        <img src="https://media.discordapp.net/attachments/1351615087953055764/1441140109125877852/gfx_resized_less_squished.png?ex=6920b5d1&is=691f6451&hm=2faedd5c1f08f4b6799477dbac1a2d61776c6069453a57c8904b242ebbb89a82&=&format=webp&quality=lossless" class="product-img">
-                    </div>
-                    <div class="card-info">
-                        <h3 class="product-title">Basic Intro</h3>
-                        <p class="price product-price">£10.00</p>
-                    </div>
+                    <div class="card-img-container"><div class="tag">POPULAR</div><img src="https://media.discordapp.net/attachments/1351615087953055764/1441140109125877852/gfx_resized_less_squished.png?ex=6920b5d1&is=691f6451&hm=2faedd5c1f08f4b6799477dbac1a2d61776c6069453a57c8904b242ebbb89a82&=&format=webp&quality=lossless" class="product-img"></div>
+                    <div class="card-info"><h3 class="product-title">Basic Intro</h3><p class="price product-price">£10.00</p></div>
                 </div>
                 <div class="card" onclick="openModal(this)">
-                    <div class="card-img-container">
-                        <img src="https://media.discordapp.net/attachments/1351615087953055764/1441140109125877852/gfx_resized_less_squished.png?ex=6920b5d1&is=691f6451&hm=2faedd5c1f08f4b6799477dbac1a2d61776c6069453a57c8904b242ebbb89a82&=&format=webp&quality=lossless" class="product-img">
-                    </div>
-                    <div class="card-info">
-                        <h3 class="product-title">Character Intro</h3>
-                        <p class="price product-price">£17.00</p>
-                    </div>
+                    <div class="card-img-container"><img src="https://media.discordapp.net/attachments/1351615087953055764/1441140109125877852/gfx_resized_less_squished.png?ex=6920b5d1&is=691f6451&hm=2faedd5c1f08f4b6799477dbac1a2d61776c6069453a57c8904b242ebbb89a82&=&format=webp&quality=lossless" class="product-img"></div>
+                    <div class="card-info"><h3 class="product-title">Character Intro</h3><p class="price product-price">£17.00</p></div>
                 </div>
             </div>
         </div>
@@ -282,33 +253,16 @@
             <div class="section-header"><h2 class="section-title">Custom <span>Chains</span></h2></div>
             <div class="grid">
                 <div class="card" onclick="openModal(this)">
-                    <div class="card-img-container">
-                        <div class="tag">BEST SELLER</div>
-                        <img src="https://media.discordapp.net/attachments/1351615087953055764/1441140109125877852/gfx_resized_less_squished.png?ex=6920b5d1&is=691f6451&hm=2faedd5c1f08f4b6799477dbac1a2d61776c6069453a57c8904b242ebbb89a82&=&format=webp&quality=lossless" class="product-img">
-                    </div>
-                    <div class="card-info">
-                        <h3 class="product-title">1x Pendant Iced Chain</h3>
-                        <p class="price product-price">£20.00</p>
-                    </div>
+                    <div class="card-img-container"><div class="tag">BEST SELLER</div><img src="https://media.discordapp.net/attachments/1351615087953055764/1441140109125877852/gfx_resized_less_squished.png?ex=6920b5d1&is=691f6451&hm=2faedd5c1f08f4b6799477dbac1a2d61776c6069453a57c8904b242ebbb89a82&=&format=webp&quality=lossless" class="product-img"></div>
+                    <div class="card-info"><h3 class="product-title">1x Pendant Iced Chain</h3><p class="price product-price">£20.00</p></div>
                 </div>
                 <div class="card" onclick="openModal(this)">
-                    <div class="card-img-container">
-                        <img src="https://media.discordapp.net/attachments/1351615087953055764/1441140109125877852/gfx_resized_less_squished.png?ex=6920b5d1&is=691f6451&hm=2faedd5c1f08f4b6799477dbac1a2d61776c6069453a57c8904b242ebbb89a82&=&format=webp&quality=lossless" class="product-img">
-                    </div>
-                    <div class="card-info">
-                        <h3 class="product-title">2x Pendant Iced Chain</h3>
-                        <p class="price product-price">£30.00</p>
-                    </div>
+                    <div class="card-img-container"><img src="https://media.discordapp.net/attachments/1351615087953055764/1441140109125877852/gfx_resized_less_squished.png?ex=6920b5d1&is=691f6451&hm=2faedd5c1f08f4b6799477dbac1a2d61776c6069453a57c8904b242ebbb89a82&=&format=webp&quality=lossless" class="product-img"></div>
+                    <div class="card-info"><h3 class="product-title">2x Pendant Iced Chain</h3><p class="price product-price">£30.00</p></div>
                 </div>
                 <div class="card" onclick="openModal(this)">
-                    <div class="card-img-container">
-                        <div class="tag">NEW</div>
-                        <img src="https://media.discordapp.net/attachments/1351615087953055764/1441140109125877852/gfx_resized_less_squished.png?ex=6920b5d1&is=691f6451&hm=2faedd5c1f08f4b6799477dbac1a2d61776c6069453a57c8904b242ebbb89a82&=&format=webp&quality=lossless" class="product-img">
-                    </div>
-                    <div class="card-info">
-                        <h3 class="product-title">3x+ Pendant Iced Chain</h3>
-                        <p class="price product-price">£50.00</p>
-                    </div>
+                    <div class="card-img-container"><div class="tag">NEW</div><img src="https://media.discordapp.net/attachments/1351615087953055764/1441140109125877852/gfx_resized_less_squished.png?ex=6920b5d1&is=691f6451&hm=2faedd5c1f08f4b6799477dbac1a2d61776c6069453a57c8904b242ebbb89a82&=&format=webp&quality=lossless" class="product-img"></div>
+                    <div class="card-info"><h3 class="product-title">3x+ Pendant Iced Chain</h3><p class="price product-price">£50.00</p></div>
                 </div>
             </div>
         </div>
@@ -318,32 +272,16 @@
             <div class="section-header"><h2 class="section-title">GFX & <span>Banners</span></h2></div>
             <div class="grid">
                 <div class="card" onclick="openModal(this)">
-                    <div class="card-img-container">
-                        <div class="tag">ANIMATED</div>
-                        <img src="https://media.discordapp.net/attachments/1351615087953055764/1441140109125877852/gfx_resized_less_squished.png?ex=6920b5d1&is=691f6451&hm=2faedd5c1f08f4b6799477dbac1a2d61776c6069453a57c8904b242ebbb89a82&=&format=webp&quality=lossless" class="product-img">
-                    </div>
-                    <div class="card-info">
-                        <h3 class="product-title">Animated GFX</h3>
-                        <p class="price product-price">£15.00</p>
-                    </div>
+                    <div class="card-img-container"><div class="tag">ANIMATED</div><img src="https://media.discordapp.net/attachments/1351615087953055764/1441140109125877852/gfx_resized_less_squished.png?ex=6920b5d1&is=691f6451&hm=2faedd5c1f08f4b6799477dbac1a2d61776c6069453a57c8904b242ebbb89a82&=&format=webp&quality=lossless" class="product-img"></div>
+                    <div class="card-info"><h3 class="product-title">Animated GFX</h3><p class="price product-price">£15.00</p></div>
                 </div>
                 <div class="card" onclick="openModal(this)">
-                    <div class="card-img-container">
-                        <img src="https://media.discordapp.net/attachments/1351615087953055764/1441140109125877852/gfx_resized_less_squished.png?ex=6920b5d1&is=691f6451&hm=2faedd5c1f08f4b6799477dbac1a2d61776c6069453a57c8904b242ebbb89a82&=&format=webp&quality=lossless" class="product-img">
-                    </div>
-                    <div class="card-info">
-                        <h3 class="product-title">Static GFX</h3>
-                        <p class="price product-price">£8.00</p>
-                    </div>
+                    <div class="card-img-container"><img src="https://media.discordapp.net/attachments/1351615087953055764/1441140109125877852/gfx_resized_less_squished.png?ex=6920b5d1&is=691f6451&hm=2faedd5c1f08f4b6799477dbac1a2d61776c6069453a57c8904b242ebbb89a82&=&format=webp&quality=lossless" class="product-img"></div>
+                    <div class="card-info"><h3 class="product-title">Static GFX</h3><p class="price product-price">£8.00</p></div>
                 </div>
                 <div class="card" onclick="openModal(this)">
-                    <div class="card-img-container">
-                        <img src="https://media.discordapp.net/attachments/1351615087953055764/1441140109125877852/gfx_resized_less_squished.png?ex=6920b5d1&is=691f6451&hm=2faedd5c1f08f4b6799477dbac1a2d61776c6069453a57c8904b242ebbb89a82&=&format=webp&quality=lossless" class="product-img">
-                    </div>
-                    <div class="card-info">
-                        <h3 class="product-title">Banner</h3>
-                        <p class="price product-price">£10.00</p>
-                    </div>
+                    <div class="card-img-container"><img src="https://media.discordapp.net/attachments/1351615087953055764/1441140109125877852/gfx_resized_less_squished.png?ex=6920b5d1&is=691f6451&hm=2faedd5c1f08f4b6799477dbac1a2d61776c6069453a57c8904b242ebbb89a82&=&format=webp&quality=lossless" class="product-img"></div>
+                    <div class="card-info"><h3 class="product-title">Banner</h3><p class="price product-price">£10.00</p></div>
                 </div>
             </div>
         </div>
@@ -353,33 +291,16 @@
             <div class="section-header"><h2 class="section-title">Clothing <span>Pack</span></h2></div>
             <div class="grid">
                 <div class="card" onclick="openModal(this)">
-                    <div class="card-img-container">
-                        <div class="tag">NEW</div>
-                        <img src="https://media.discordapp.net/attachments/1351615087953055764/1441140109125877852/gfx_resized_less_squished.png?ex=6920b5d1&is=691f6451&hm=2faedd5c1f08f4b6799477dbac1a2d61776c6069453a57c8904b242ebbb89a82&=&format=webp&quality=lossless" class="product-img">
-                    </div>
-                    <div class="card-info">
-                        <h3 class="product-title">1x Custom Clothing</h3>
-                        <p class="price product-price">£8.00</p>
-                    </div>
+                    <div class="card-img-container"><div class="tag">NEW</div><img src="https://media.discordapp.net/attachments/1351615087953055764/1441140109125877852/gfx_resized_less_squished.png?ex=6920b5d1&is=691f6451&hm=2faedd5c1f08f4b6799477dbac1a2d61776c6069453a57c8904b242ebbb89a82&=&format=webp&quality=lossless" class="product-img"></div>
+                    <div class="card-info"><h3 class="product-title">1x Custom Clothing</h3><p class="price product-price">£8.00</p></div>
                 </div>
                 <div class="card" onclick="openModal(this)">
-                    <div class="card-img-container">
-                        <img src="https://media.discordapp.net/attachments/1351615087953055764/1441140109125877852/gfx_resized_less_squished.png?ex=6920b5d1&is=691f6451&hm=2faedd5c1f08f4b6799477dbac1a2d61776c6069453a57c8904b242ebbb89a82&=&format=webp&quality=lossless" class="product-img">
-                    </div>
-                    <div class="card-info">
-                        <h3 class="product-title">3x Custom Clothing</h3>
-                        <p class="price product-price">£20.00</p>
-                    </div>
+                    <div class="card-img-container"><img src="https://media.discordapp.net/attachments/1351615087953055764/1441140109125877852/gfx_resized_less_squished.png?ex=6920b5d1&is=691f6451&hm=2faedd5c1f08f4b6799477dbac1a2d61776c6069453a57c8904b242ebbb89a82&=&format=webp&quality=lossless" class="product-img"></div>
+                    <div class="card-info"><h3 class="product-title">3x Custom Clothing</h3><p class="price product-price">£20.00</p></div>
                 </div>
                 <div class="card" onclick="openModal(this)">
-                    <div class="card-img-container">
-                        <div class="tag">SALE</div>
-                        <img src="https://media.discordapp.net/attachments/1351615087953055764/1441140109125877852/gfx_resized_less_squished.png?ex=6920b5d1&is=691f6451&hm=2faedd5c1f08f4b6799477dbac1a2d61776c6069453a57c8904b242ebbb89a82&=&format=webp&quality=lossless" class="product-img">
-                    </div>
-                    <div class="card-info">
-                        <h3 class="product-title">5x+ Clothing Bundle</h3>
-                        <p class="price product-price">£45+</p>
-                    </div>
+                    <div class="card-img-container"><div class="tag">SALE</div><img src="https://media.discordapp.net/attachments/1351615087953055764/1441140109125877852/gfx_resized_less_squished.png?ex=6920b5d1&is=691f6451&hm=2faedd5c1f08f4b6799477dbac1a2d61776c6069453a57c8904b242ebbb89a82&=&format=webp&quality=lossless" class="product-img"></div>
+                    <div class="card-info"><h3 class="product-title">5x+ Clothing Bundle</h3><p class="price product-price">£45+</p></div>
                 </div>
             </div>
         </div>

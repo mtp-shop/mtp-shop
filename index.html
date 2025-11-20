@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MTP Shop | FiveM & GFX</title>
+    <style>
+        /* --- CSS STYLES --- */
+        :root {
+            --primary: #7289da; /* Discord Blue/Purple */
+            --dark: #121212;
+            --card-bg: #1e1e1e;
+            --text: #ffffff;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--dark);
+            color: var(--text);
+        }
+
+        /* Header / Hero Section */
+        header {
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://c4.wallpaperflare.com/wallpaper/348/520/1004/grand-theft-auto-grand-theft-auto-v-video-games-rockstar-games-wallpaper-preview.jpg');
+            background-size: cover;
+            background-position: center;
+            height: 60vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            border-bottom: 4px solid var(--primary);
+        }
+
+        h1 { font-size: 3.5rem; margin: 0; text-transform: uppercase; letter-spacing: 2px; }
+        p.subtitle { font-size: 1.2rem; color: #cccccc; margin-top: 10px; }
+
+        .btn {
+            margin-top: 20px;
+            padding: 12px 30px;
+            background-color: var(--primary);
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 5px;
+            transition: 0.3s;
+            display: inline-block;
+        }
+        .btn:hover { background-color: #5b6eae; transform: scale(1.05); }
+
+        /* Product Grid */
+        .container { max-width: 1100px; margin: 50px auto; padding: 0 20px; }
+        .section-title { text-align: center; margin-bottom: 40px; font-size: 2rem; border-bottom: 2px solid var(--primary); display: inline-block; padding-bottom: 10px; }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            overflow: hidden;
+            transition: 0.3s;
+            border: 1px solid #333;
+        }
+        .card:hover { transform: translateY(-5px); border-color: var(--primary); }
+        
+        .card-img {
+            height: 200px;
+            background-color: #252525;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #555;
+            font-size: 1.5rem; /* Placeholder for actual images */
+        }
+
+        .card-content { padding: 20px; }
+        .card h3 { margin: 0 0 10px 0; }
+        .price { color: var(--primary); font-weight: bold; font-size: 1.2rem; }
+        .buy-btn {
+            display: block;
+            width: 100%;
+            text-align: center;
+            padding: 10px 0;
+            margin-top: 15px;
+            background-color: #333;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .buy-btn:hover { background-color: var(--primary); }
+
+        /* Footer */
+        footer { text-align: center; padding: 40px; background-color: #0a0a0a; margin-top: 50px; color: #666; }
+    </style>
+</head>
+<body>
+
+    <!-- HERO SECTION -->
+    <header>
+        <h1>MTP SHOP</h1>
+        <p class="subtitle">High Quality FiveM Chains, Intros, and GFX</p>
+        <a href="https://discord.gg/YOUR_INVITE_HERE" class="btn">Join Discord Server</a>
+    </header>
+
+    <!-- PRODUCTS SECTION -->
+    <div class="container">
+        <div style="text-align: center;">
+            <h2 class="section-title">Featured Assets</h2>
+        </div>
+
+        <div class="grid">
+            
+            <!-- ITEM 1 -->
+            <div class="card">
+                <!-- Replace text inside div with <img src="image.jpg"> later -->
+                <div class="card-img">CUSTOM CHAIN</div> 
+                <div class="card-content">
+                    <h3>Iced Out Chain v1</h3>
+                    <p>Optimized for FiveM. No texture flickering.</p>
+                    <div class="price">$15.00</div>
+                    <a href="#" class="buy-btn">Purchase</a>
+                </div>
+            </div>
+
+            <!-- ITEM 2 -->
+            <div class="card">
+                <div class="card-img">SERVER LOGO</div>
+                <div class="card-content">
+                    <h3>Animated Discord Logo</h3>
+                    <p>GIF format. High resolution + Source file.</p>
+                    <div class="price">$10.00</div>
+                    <a href="#" class="buy-btn">Purchase</a>
+                </div>
+            </div>
+
+            <!-- ITEM 3 -->
+            <div class="card">
+                <div class="card-img">INTRO VIDEO</div>
+                <div class="card-content">
+                    <h3>4K Server Intro</h3>
+                    <p>Cinematic shots + Music sync. 30 Seconds.</p>
+                    <div class="price">$30.00</div>
+                    <a href="#" class="buy-btn">Purchase</a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>&copy; 2024 MTP Shop. All rights reserved.</p>
+    </footer>
+
+</body>
+</html>

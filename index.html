@@ -3,160 +3,456 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MTP Shop | FiveM & GFX</title>
+    <title>TPS TEMPLE | Premium Assets</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
     <style>
-        /* --- CSS STYLES --- */
+        /* --- CSS VARIABLES --- */
         :root {
-            --primary: #7289da; /* Discord Blue/Purple */
-            --dark: #121212;
-            --card-bg: #1e1e1e;
-            --text: #ffffff;
+            --bg-overlay: rgba(0, 0, 0, 0.85);
+            --card-bg: rgba(20, 20, 20, 0.6);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --accent: #4F46E5;
+            --accent-hover: #4338ca;
+            --text-main: #ffffff;
+            --text-dim: #aaaaaa;
         }
 
-        body {
-            margin: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--dark);
-            color: var(--text);
-        }
-
-        /* Header / Hero Section */
-        header {
-            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://c4.wallpaperflare.com/wallpaper/348/520/1004/grand-theft-auto-grand-theft-auto-v-video-games-rockstar-games-wallpaper-preview.jpg');
-            background-size: cover;
-            background-position: center;
-            height: 60vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            border-bottom: 4px solid var(--primary);
-        }
-
-        h1 { font-size: 3.5rem; margin: 0; text-transform: uppercase; letter-spacing: 2px; }
-        p.subtitle { font-size: 1.2rem; color: #cccccc; margin-top: 10px; }
-
-        .btn {
-            margin-top: 20px;
-            padding: 12px 30px;
-            background-color: var(--primary);
-            color: white;
-            text-decoration: none;
-            font-weight: bold;
-            border-radius: 5px;
-            transition: 0.3s;
-            display: inline-block;
-        }
-        .btn:hover { background-color: #5b6eae; transform: scale(1.05); }
-
-        /* Product Grid */
-        .container { max-width: 1100px; margin: 50px auto; padding: 0 20px; }
-        .section-title { text-align: center; margin-bottom: 40px; font-size: 2rem; border-bottom: 2px solid var(--primary); display: inline-block; padding-bottom: 10px; }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-        }
-
-        .card {
-            background-color: var(--card-bg);
-            border-radius: 10px;
-            overflow: hidden;
-            transition: 0.3s;
-            border: 1px solid #333;
-        }
-        .card:hover { transform: translateY(-5px); border-color: var(--primary); }
+        * { box-sizing: border-box; }
         
-        .card-img {
-            height: 200px;
-            background-color: #252525;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #555;
-            font-size: 1.5rem; /* Placeholder for actual images */
+        body {
+            margin: 0; font-family: 'Inter', sans-serif; color: var(--text-main);
+            overflow-x: hidden;
+            background-image: url('https://media.discordapp.net/attachments/1351615087953055764/1441121328517218465/gfx.png?ex=6920a453&is=691f52d3&hm=87a6318e737683b02a2304b1bde6fccbfaba77ff92d89645e6c2ae2c8ff972bd&=&format=webp&quality=lossless'); 
+            background-size: cover; background-position: center; background-attachment: fixed;
+            min-height: 100vh;
         }
 
-        .card-content { padding: 20px; }
-        .card h3 { margin: 0 0 10px 0; }
-        .price { color: var(--primary); font-weight: bold; font-size: 1.2rem; }
-        .buy-btn {
-            display: block;
-            width: 100%;
+        body::before {
+            content: ""; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: var(--bg-overlay); z-index: -1; backdrop-filter: blur(5px);
+        }
+
+        html { scroll-behavior: smooth; }
+
+        /* --- NAVIGATION --- */
+        nav {
+            position: fixed; top: 0; left: 0; width: 100%;
+            background: rgba(5, 5, 5, 0.9); backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--card-border);
+            display: flex; justify-content: center; padding: 15px 0; z-index: 1000;
+        }
+
+        .nav-links { display: flex; gap: 30px; align-items: center; }
+
+        nav a {
+            color: var(--text-dim); text-decoration: none; font-size: 0.85rem;
+            font-weight: 500; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s;
+        }
+        nav a:hover { color: white; }
+
+        /* Discord Link Style */
+        .discord-link {
+            color: #5865F2 !important;
+            font-weight: 800;
+        }
+        .discord-link:hover { text-shadow: 0 0 10px #5865F2; }
+
+        .cart-link {
+            border: 1px solid var(--accent); padding: 8px 20px; border-radius: 30px;
+            color: white; font-weight: bold; display: flex; align-items: center; gap: 8px;
+        }
+        .cart-link:hover { background: var(--accent); }
+
+        /* --- HERO SECTION --- */
+        header {
+            min-height: 100vh;
+            display: flex; flex-direction: column;
+            justify-content: center; 
+            align-items: center; 
             text-align: center;
-            padding: 10px 0;
-            margin-top: 15px;
-            background-color: #333;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
+            /* FIXED PADDING TO PREVENT OVERLAP */
+            padding-top: 140px; 
+            padding-bottom: 60px;
+            padding-left: 20px;
+            padding-right: 20px;
         }
-        .buy-btn:hover { background-color: var(--primary); }
 
-        /* Footer */
-        footer { text-align: center; padding: 40px; background-color: #0a0a0a; margin-top: 50px; color: #666; }
+        .hero-logo {
+            width: 150px; 
+            height: auto;
+            margin-bottom: 25px; /* Space between logo and text */
+            filter: drop-shadow(0 0 20px rgba(79, 70, 229, 0.4));
+        }
+
+        h1 { font-size: 4.5rem; margin: 0; color: white; font-weight: 900; letter-spacing: -2px; font-style: italic; line-height: 1; }
+        .subtitle { color: #ccc; margin-top: 15px; font-size: 1.2rem; }
+
+        /* BUTTONS */
+        .hero-btn {
+            margin-top: 35px;
+            padding: 15px 50px;
+            background: var(--accent);
+            color: white;
+            font-weight: 800;
+            text-decoration: none;
+            border-radius: 50px;
+            letter-spacing: 2px;
+            box-shadow: 0 0 20px rgba(79, 70, 229, 0.4);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .hero-btn:hover {
+            background: var(--accent-hover);
+            transform: translateY(-5px);
+            box-shadow: 0 0 40px rgba(79, 70, 229, 0.7);
+        }
+
+        .see-more-btn {
+            margin-top: 30px;
+            font-size: 0.9rem;
+            color: #aaa;
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: 0.3s;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .see-more-btn:hover { color: var(--accent); border-bottom: 1px solid var(--accent); }
+
+        /* --- REVIEWS --- */
+        .reviews-container {
+            margin-top: 60px;
+            display: flex; gap: 20px; flex-wrap: wrap;
+            justify-content: center; max-width: 1000px;
+        }
+
+        .review-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 15px 20px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            width: 300px;
+            text-align: left;
+            display: flex; flex-direction: column; gap: 10px;
+            transition: 0.3s;
+        }
+        .review-card:hover { background: rgba(255, 255, 255, 0.1); transform: translateY(-5px); }
+
+        .review-header { display: flex; align-items: center; gap: 10px; }
+        .discord-pfp { width: 40px; height: 40px; border-radius: 50%; background: #333; border: 2px solid #222; }
+        .reviewer-info { display: flex; flex-direction: column; }
+        .reviewer-name { font-size: 0.9rem; font-weight: 700; color: white; }
+        .stars { color: #FFD700; font-size: 0.8rem; letter-spacing: 1px; }
+        .review-text { font-size: 0.85rem; color: #ccc; line-height: 1.4; font-style: italic; }
+
+        /* --- LAYOUT --- */
+        .container { max-width: 1300px; margin: 0 auto; padding: 50px 30px; }
+        .section-header { border-bottom: 1px solid var(--card-border); margin-bottom: 40px; padding-bottom: 10px; margin-top: 80px; }
+        .section-title { font-size: 1.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin: 0; }
+        .section-title span { color: var(--accent); }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; }
+
+        /* --- CARDS --- */
+        .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; overflow: hidden; transition: 0.3s; cursor: pointer; }
+        .card:hover { transform: translateY(-8px); border-color: rgba(255,255,255,0.3); box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+        .card-img-container { height: 300px; width: 100%; overflow: hidden; background: #0a0a0a; position: relative; }
+        .card-img-container img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
+        .card:hover img { transform: scale(1.05); }
+        .tag { position: absolute; top: 15px; left: 15px; background: rgba(0,0,0,0.8); color: white; padding: 6px 12px; font-size: 0.7rem; font-weight: bold; border-radius: 4px; border: 1px solid rgba(255,255,255,0.2); }
+        .card-info { padding: 25px; }
+        .card h3 { margin: 0 0 8px 0; font-size: 1.2rem; }
+        .price { font-weight: bold; color: white; font-size: 1.1rem; }
+
+        /* --- MODAL --- */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); backdrop-filter: blur(8px); z-index: 9999; display: none; justify-content: center; align-items: center; padding: 20px; }
+        .modal-content { background: #111; width: 100%; max-width: 1000px; display: grid; grid-template-columns: 1.2fr 1fr; gap: 40px; padding: 40px; border-radius: 12px; border: 1px solid #333; position: relative; }
+        .close-btn { position: absolute; top: 20px; right: 25px; font-size: 2rem; color: #666; cursor: pointer; transition: 0.2s; }
+        .close-btn:hover { color: white; }
+        .modal-img-wrapper { width: 100%; height: 500px; background: #050505; border-radius: 8px; overflow: hidden; }
+        .modal-img-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+        .modal-details { display: flex; flex-direction: column; justify-content: center; }
+        .modal-title { font-size: 2.5rem; font-weight: 900; font-style: italic; margin: 0 0 10px 0; text-transform: uppercase; line-height: 1; }
+        .modal-price { font-size: 1.5rem; color: #fff; margin-bottom: 30px; }
+        .btn-row { display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px; }
+        .btn-cart { background-color: var(--accent); color: white; border: none; padding: 18px; font-size: 1rem; font-weight: 600; border-radius: 4px; cursor: pointer; transition: 0.2s; }
+        .btn-cart:hover { background-color: var(--accent-hover); }
+        .info-text { font-size: 0.9rem; color: #ccc; margin-bottom: 10px; font-style: italic; }
+
+        @media (max-width: 800px) {
+            .modal-content { grid-template-columns: 1fr; padding: 20px; height: 90vh; overflow-y: scroll; }
+            .modal-img-wrapper { height: 300px; }
+            .reviews-container { flex-direction: column; align-items: center; }
+            h1 { font-size: 3rem; }
+        }
+        footer { padding: 50px; text-align: center; margin-top: 100px; border-top: 1px solid #333; background: #000; }
     </style>
 </head>
 <body>
 
-    <!-- HERO SECTION -->
+    <nav>
+        <div class="nav-links">
+            <a href="#intros">Intros</a>
+            <a href="#chains">Chains</a>
+            <a href="#gfx">GFX</a>
+            <a href="#clothing">Clothing</a>
+            <a href="https://discord.gg/5M9dwMQn5d" target="_blank" class="discord-link">Discord</a>
+            <a href="cart.html" class="cart-link">Cart <i class="fas fa-shopping-cart"></i></a>
+        </div>
+    </nav>
+
     <header>
-        <h1>MTP SHOP</h1>
-        <p class="subtitle">High Quality FiveM Chains, Intros, and GFX</p>
-        <a href="https://discord.gg/YOUR_INVITE_HERE" class="btn">Join Discord Server</a>
+        <!-- LOGO -->
+        <img src="https://media.discordapp.net/attachments/1320099120714612827/1420858047776952330/408b4f914cc603196194de1784604d89.png?ex=692017ec&is=691ec66c&hm=4d7e913e63d1870e16cca0a22ecf8c106bd01388eea7ae35c7117c34654c9f97&=&format=webp&quality=lossless" alt="Logo" class="hero-logo">
+
+        <h1>TPS TEMPLE</h1>
+        <p class="subtitle">High-End Visuals & Assets for Personal Use.</p>
+        
+        <a href="#intros" class="hero-btn">SHOP NOW</a>
+
+        <!-- REVIEWS -->
+        <div class="reviews-container">
+            <div class="review-card">
+                <div class="review-header">
+                    <img src="https://cdn.discordapp.com/avatars/548492782432550913/37b2471ed371d4eeb7c0641650797ee8.webp?size=1024" class="discord-pfp">
+                    <div class="reviewer-info"><span class="reviewer-name">@Mathias</span><span class="stars">★★★★★</span></div>
+                </div>
+                <p class="review-text">"10/10 fast support and nice stuff you get, Buy from this man you will never regret it."</p>
+            </div>
+
+            <div class="review-card">
+                <div class="review-header">
+                    <img src="https://cdn.discordapp.com/avatars/812503046374293525/768ae47a6dbc5022e077e899cb0597b4.webp?size=1024" class="discord-pfp">
+                    <div class="reviewer-info"><span class="reviewer-name">@Cshadydjango</span><span class="stars">★★★★★</span></div>
+                </div>
+                <p class="review-text">"10/10 fast and easy. Definitely will be returning for more."</p>
+            </div>
+
+            <div class="review-card">
+                <div class="review-header">
+                    <img src="https://cdn.discordapp.com/avatars/1078371560781529139/e225b70014c20061936ace207925adf0.webp?size=1024" class="discord-pfp">
+                    <div class="reviewer-info"><span class="reviewer-name">@Ryze</span><span class="stars">★★★★★</span></div>
+                </div>
+                <p class="review-text">"GOATED 10/10 got me right and shi is tuffff."</p>
+            </div>
+        </div>
+        
+        <a href="https://discord.gg/5M9dwMQn5d" target="_blank" class="see-more-btn">
+            See more reviews <i class="fas fa-external-link-alt"></i>
+        </a>
+
     </header>
 
-    <!-- PRODUCTS SECTION -->
     <div class="container">
-        <div style="text-align: center;">
-            <h2 class="section-title">Featured Assets</h2>
+
+        <!-- 1. INTROS -->
+        <div id="intros">
+            <div class="section-header"><h2 class="section-title">Custom <span>Intros</span></h2></div>
+            <div class="grid">
+                <div class="card" onclick="openModal(this)">
+                    <div class="card-img-container">
+                        <div class="tag">POPULAR</div>
+                        <img src="https://media.discordapp.net/attachments/1351615087953055764/1441140109125877852/gfx_resized_less_squished.png?ex=6920b5d1&is=691f6451&hm=2faedd5c1f08f4b6799477dbac1a2d61776c6069453a57c8904b242ebbb89a82&=&format=webp&quality=lossless" class="product-img">
+                    </div>
+                    <div class="card-info">
+                        <h3 class="product-title">Basic Intro</h3>
+                        <p class="price product-price">£10.00</p>
+                    </div>
+                </div>
+                <div class="card" onclick="openModal(this)">
+                    <div class="card-img-container">
+                        <img src="https://media.discordapp.net/attachments/1351615087953055764/1441140109125877852/gfx_resized_less_squished.png?ex=6920b5d1&is=691f6451&hm=2faedd5c1f08f4b6799477dbac1a2d61776c6069453a57c8904b242ebbb89a82&=&format=webp&quality=lossless" class="product-img">
+                    </div>
+                    <div class="card-info">
+                        <h3 class="product-title">Character Intro</h3>
+                        <p class="price product-price">£17.00</p>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div class="grid">
-            
-            <!-- ITEM 1 -->
-            <div class="card">
-                <!-- Replace text inside div with <img src="image.jpg"> later -->
-                <div class="card-img">CUSTOM CHAIN</div> 
-                <div class="card-content">
-                    <h3>Iced Out Chain v1</h3>
-                    <p>Optimized for FiveM. No texture flickering.</p>
-                    <div class="price">$15.00</div>
-                    <a href="#" class="buy-btn">Purchase</a>
+        <!-- 2. CHAINS -->
+        <div id="chains">
+            <div class="section-header"><h2 class="section-title">Custom <span>Chains</span></h2></div>
+            <div class="grid">
+                <div class="card" onclick="openModal(this)">
+                    <div class="card-img-container">
+                        <div class="tag">BEST SELLER</div>
+                        <img src="https://media.discordapp.net/attachments/1351615087953055764/1441140109125877852/gfx_resized_less_squished.png?ex=6920b5d1&is=691f6451&hm=2faedd5c1f08f4b6799477dbac1a2d61776c6069453a57c8904b242ebbb89a82&=&format=webp&quality=lossless" class="product-img">
+                    </div>
+                    <div class="card-info">
+                        <h3 class="product-title">1x Pendant Iced Chain</h3>
+                        <p class="price product-price">£20.00</p>
+                    </div>
+                </div>
+                <div class="card" onclick="openModal(this)">
+                    <div class="card-img-container">
+                        <img src="https://media.discordapp.net/attachments/1351615087953055764/1441140109125877852/gfx_resized_less_squished.png?ex=6920b5d1&is=691f6451&hm=2faedd5c1f08f4b6799477dbac1a2d61776c6069453a57c8904b242ebbb89a82&=&format=webp&quality=lossless" class="product-img">
+                    </div>
+                    <div class="card-info">
+                        <h3 class="product-title">2x Pendant Iced Chain</h3>
+                        <p class="price product-price">£30.00</p>
+                    </div>
+                </div>
+                <div class="card" onclick="openModal(this)">
+                    <div class="card-img-container">
+                        <div class="tag">NEW</div>
+                        <img src="https://media.discordapp.net/attachments/1351615087953055764/1441140109125877852/gfx_resized_less_squished.png?ex=6920b5d1&is=691f6451&hm=2faedd5c1f08f4b6799477dbac1a2d61776c6069453a57c8904b242ebbb89a82&=&format=webp&quality=lossless" class="product-img">
+                    </div>
+                    <div class="card-info">
+                        <h3 class="product-title">3x+ Pendant Iced Chain</h3>
+                        <p class="price product-price">£50.00</p>
+                    </div>
                 </div>
             </div>
+        </div>
 
-            <!-- ITEM 2 -->
-            <div class="card">
-                <div class="card-img">SERVER LOGO</div>
-                <div class="card-content">
-                    <h3>Animated Discord Logo</h3>
-                    <p>GIF format. High resolution + Source file.</p>
-                    <div class="price">$10.00</div>
-                    <a href="#" class="buy-btn">Purchase</a>
+        <!-- 3. GFX -->
+        <div id="gfx">
+            <div class="section-header"><h2 class="section-title">GFX & <span>Banners</span></h2></div>
+            <div class="grid">
+                <div class="card" onclick="openModal(this)">
+                    <div class="card-img-container">
+                        <div class="tag">ANIMATED</div>
+                        <img src="https://media.discordapp.net/attachments/1351615087953055764/1441140109125877852/gfx_resized_less_squished.png?ex=6920b5d1&is=691f6451&hm=2faedd5c1f08f4b6799477dbac1a2d61776c6069453a57c8904b242ebbb89a82&=&format=webp&quality=lossless" class="product-img">
+                    </div>
+                    <div class="card-info">
+                        <h3 class="product-title">Animated GFX</h3>
+                        <p class="price product-price">£15.00</p>
+                    </div>
+                </div>
+                <div class="card" onclick="openModal(this)">
+                    <div class="card-img-container">
+                        <img src="https://media.discordapp.net/attachments/1351615087953055764/1441140109125877852/gfx_resized_less_squished.png?ex=6920b5d1&is=691f6451&hm=2faedd5c1f08f4b6799477dbac1a2d61776c6069453a57c8904b242ebbb89a82&=&format=webp&quality=lossless" class="product-img">
+                    </div>
+                    <div class="card-info">
+                        <h3 class="product-title">Static GFX</h3>
+                        <p class="price product-price">£8.00</p>
+                    </div>
+                </div>
+                <div class="card" onclick="openModal(this)">
+                    <div class="card-img-container">
+                        <img src="https://media.discordapp.net/attachments/1351615087953055764/1441140109125877852/gfx_resized_less_squished.png?ex=6920b5d1&is=691f6451&hm=2faedd5c1f08f4b6799477dbac1a2d61776c6069453a57c8904b242ebbb89a82&=&format=webp&quality=lossless" class="product-img">
+                    </div>
+                    <div class="card-info">
+                        <h3 class="product-title">Banner</h3>
+                        <p class="price product-price">£10.00</p>
+                    </div>
                 </div>
             </div>
+        </div>
 
-            <!-- ITEM 3 -->
-            <div class="card">
-                <div class="card-img">INTRO VIDEO</div>
-                <div class="card-content">
-                    <h3>4K Server Intro</h3>
-                    <p>Cinematic shots + Music sync. 30 Seconds.</p>
-                    <div class="price">$30.00</div>
-                    <a href="#" class="buy-btn">Purchase</a>
+        <!-- 4. CLOTHING -->
+        <div id="clothing">
+            <div class="section-header"><h2 class="section-title">Clothing <span>Pack</span></h2></div>
+            <div class="grid">
+                <div class="card" onclick="openModal(this)">
+                    <div class="card-img-container">
+                        <div class="tag">NEW</div>
+                        <img src="https://media.discordapp.net/attachments/1351615087953055764/1441140109125877852/gfx_resized_less_squished.png?ex=6920b5d1&is=691f6451&hm=2faedd5c1f08f4b6799477dbac1a2d61776c6069453a57c8904b242ebbb89a82&=&format=webp&quality=lossless" class="product-img">
+                    </div>
+                    <div class="card-info">
+                        <h3 class="product-title">1x Custom Clothing</h3>
+                        <p class="price product-price">£8.00</p>
+                    </div>
+                </div>
+                <div class="card" onclick="openModal(this)">
+                    <div class="card-img-container">
+                        <img src="https://media.discordapp.net/attachments/1351615087953055764/1441140109125877852/gfx_resized_less_squished.png?ex=6920b5d1&is=691f6451&hm=2faedd5c1f08f4b6799477dbac1a2d61776c6069453a57c8904b242ebbb89a82&=&format=webp&quality=lossless" class="product-img">
+                    </div>
+                    <div class="card-info">
+                        <h3 class="product-title">3x Custom Clothing</h3>
+                        <p class="price product-price">£20.00</p>
+                    </div>
+                </div>
+                <div class="card" onclick="openModal(this)">
+                    <div class="card-img-container">
+                        <div class="tag">SALE</div>
+                        <img src="https://media.discordapp.net/attachments/1351615087953055764/1441140109125877852/gfx_resized_less_squished.png?ex=6920b5d1&is=691f6451&hm=2faedd5c1f08f4b6799477dbac1a2d61776c6069453a57c8904b242ebbb89a82&=&format=webp&quality=lossless" class="product-img">
+                    </div>
+                    <div class="card-info">
+                        <h3 class="product-title">5x+ Clothing Bundle</h3>
+                        <p class="price product-price">£45+</p>
+                    </div>
                 </div>
             </div>
+        </div>
 
+    </div>
+
+    <footer><p>&copy; 2025 TPS TEMPLE. All rights reserved.</p></footer>
+
+    <!-- MODAL -->
+    <div class="modal-overlay" id="productModal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <div class="modal-img-wrapper">
+                <img id="modalImg" src="" alt="Product Image">
+            </div>
+            <div class="modal-details">
+                <h2 class="modal-title" id="modalTitle">PRODUCT TITLE</h2>
+                <p class="modal-price" id="modalPrice">£0.00</p>
+                <div class="btn-row">
+                    <button class="btn-cart" id="modalAddBtn" onclick="addToCart()">ADD TO CART</button>
+                </div>
+                <div style="margin-top: 20px;">
+                    <p class="info-text"><strong>MAKE A TICKET IN DISCORD</strong></p>
+                    <p class="info-text">Go to cart and copy the code and send in ticket.</p>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- FOOTER -->
-    <footer>
-        <p>&copy; 2024 MTP Shop. All rights reserved.</p>
-    </footer>
+    <script>
+        const modal = document.getElementById('productModal');
+        const modalImg = document.getElementById('modalImg');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalPrice = document.getElementById('modalPrice');
+        const modalAddBtn = document.getElementById('modalAddBtn');
+        let currentProduct = {};
 
+        function openModal(element) {
+            const imgSrc = element.querySelector('.product-img').src;
+            const title = element.querySelector('.product-title').innerText;
+            const price = element.querySelector('.product-price').innerText;
+            currentProduct = { title: title, price: price, img: imgSrc, qty: 1 };
+            modalImg.src = imgSrc;
+            modalTitle.innerText = title;
+            modalPrice.innerText = price;
+            modalAddBtn.innerText = "ADD TO CART";
+            modalAddBtn.style.background = ""; 
+            modalAddBtn.onclick = addToCart; 
+            modal.style.display = "flex";
+            document.body.style.overflow = "hidden";
+        }
+
+        function closeModal() {
+            modal.style.display = "none";
+            document.body.style.overflow = "auto";
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modal) closeModal();
+        }
+
+        function addToCart() {
+            let cart = JSON.parse(localStorage.getItem('mtpCart')) || [];
+            let existingItem = cart.find(item => item.title === currentProduct.title);
+            if (existingItem) {
+                existingItem.qty += 1;
+            } else {
+                cart.push(currentProduct);
+            }
+            localStorage.setItem('mtpCart', JSON.stringify(cart));
+            modalAddBtn.innerText = "VIEW CART →";
+            modalAddBtn.style.background = "#43a047"; 
+            modalAddBtn.onclick = function() {
+                window.location.href = 'cart.html';
+            };
+        }
+    </script>
 </body>
 </html>

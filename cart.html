@@ -6,7 +6,7 @@
     <title>Your Cart | TPS TEMPLE</title>
     
     <!-- YOUR ICON -->
-    <link rel="icon" type="image/png" href="https://media.discordapp.net/attachments/1117894908947206195/1441484519751418019/408b4f914cc603196194de1784604d89.png?ex=6921f692&is=6920a512&hm=cc6c652eda94af4bdd982853c08c1bd645aeec84166c0049bee57ab2ed0aa891&=&format=webp&quality=lossless">
+    <link rel="icon" type="image/png" href="logo.png">
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -15,14 +15,18 @@
         :root {
             --bg-overlay: rgba(0, 0, 0, 0.85);
             --card-bg: rgba(20, 20, 20, 0.8);
-            --accent: #4F46E5;
+            
+            /* --- CHANGED TO RED --- */
+            --accent: #FF2222;
+            --accent-hover: #B30000;
+            
             --text-main: #ffffff;
         }
 
         body {
             margin: 0; font-family: 'Inter', sans-serif; color: var(--text-main);
             background-color: #111;
-            background-image: url('https://media.discordapp.net/attachments/1351615087953055764/1441121328517218465/gfx.png?ex=6920a453&is=691f52d3&hm=87a6318e737683b02a2304b1bde6fccbfaba77ff92d89645e6c2ae2c8ff972bd&=&format=webp&quality=lossless'); 
+            background-image: url('background.png'); 
             background-size: cover; background-attachment: fixed; min-height: 100vh;
         }
 
@@ -64,7 +68,6 @@
         .remove-btn { background: none; border: none; color: #ff4444; cursor: pointer; font-size: 1.1rem; transition: 0.2s; padding: 5px; }
         .remove-btn:hover { transform: scale(1.1); color: #ff6666; }
 
-        /* --- NEW SUMMARY SECTION --- */
         .cart-summary {
             background: var(--card-bg); padding: 30px; border-radius: 8px; margin-top: 30px;
             border: 1px solid rgba(255,255,255,0.1);
@@ -78,7 +81,6 @@
         .summary-right { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
         .total-price { font-size: 2.2rem; font-weight: 800; color: var(--accent); margin: 0 0 5px 0; }
         
-        /* TWO BUTTONS */
         .action-btn {
             padding: 12px 30px; font-size: 0.9rem; font-weight: bold; border-radius: 5px; 
             cursor: pointer; transition: 0.3s; text-decoration: none; display: inline-block; text-align: center;
@@ -88,8 +90,8 @@
         .btn-copy { background: #333; color: white; border: 1px solid #555; }
         .btn-copy:hover { background: #444; }
 
-        .btn-discord { background: #5865F2; color: white; }
-        .btn-discord:hover { background: #4752C4; }
+        .btn-discord { background: var(--accent); color: white; }
+        .btn-discord:hover { background: var(--accent-hover); }
         
         .empty-msg { text-align: center; color: #777; font-size: 1.5rem; margin-top: 50px; display: none; }
         
@@ -120,12 +122,10 @@
                 <div style="font-size: 0.9rem; color:#888;">Subtotal</div>
                 <div class="total-price" id="totalPrice">£0.00</div>
                 
-                <!-- NEW BUTTONS -->
                 <button class="action-btn btn-copy" onclick="copyCode()" id="copyBtn">
                     <i class="fas fa-copy"></i> COPY ORDER CODE
                 </button>
                 
-                <!-- UPDATE YOUR DISCORD LINK HERE -->
                 <a href="https://discord.com/channels/1316535768717463644/1316548466704650294" target="_blank" class="action-btn btn-discord">
                     <i class="fab fa-discord"></i> OPEN TICKET
                 </a>
@@ -210,7 +210,6 @@
             orderText += `\n**TOTAL:** ${total}`;
             navigator.clipboard.writeText(orderText);
             
-            // Button feedback
             const btn = document.getElementById('copyBtn');
             btn.innerText = "COPIED! ✓";
             btn.style.background = "#43a047";

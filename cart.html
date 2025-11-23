@@ -18,11 +18,9 @@
             --bg-dark: #050505;
             --glass-bg: rgba(255, 255, 255, 0.03);
             --glass-border: rgba(255, 255, 255, 0.08);
-            
             --accent: #ff1f1f;
             --accent-glow: rgba(255, 31, 31, 0.4);
             --accent-hover: #b30000;
-            
             --text-main: #ffffff;
             --font-head: 'Montserrat', sans-serif;
             --font-body: 'Poppins', sans-serif;
@@ -174,7 +172,7 @@
             setTimeout(() => {
                 document.getElementById('loader').style.opacity = '0';
                 setTimeout(() => { document.getElementById('loader').style.display = 'none'; }, 500);
-            }, 1000); // Shorter load time for cart
+            }, 1000); 
         });
 
         let cart = JSON.parse(localStorage.getItem('mtpCart')) || [];

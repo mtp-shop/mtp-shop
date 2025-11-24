@@ -4,12 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your Cart | TPS TEMPLE</title>
-    
     <link rel="icon" type="image/png" href="logo.png">
-    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,700;1,900&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,700;1,900&family=Poppins:wght@300;400;600&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
@@ -19,10 +17,10 @@
             --glass-border: rgba(255, 255, 255, 0.08);
             --accent: #ff1f1f;
             --accent-glow: rgba(255, 31, 31, 0.4);
-            --accent-hover: #b30000;
             --text-main: #ffffff;
             --font-head: 'Montserrat', sans-serif;
             --font-body: 'Poppins', sans-serif;
+            --font-tech: 'Space Mono', monospace; 
         }
 
         body {
@@ -32,63 +30,39 @@
             background-size: cover; background-attachment: fixed; min-height: 100vh;
         }
 
-        /* --- 1. TAB TITLE ALERT IS JS ONLY --- */
-        /* --- 5. SCROLL PROGRESS BAR --- */
         #scroll-progress { position: fixed; top: 0; left: 0; height: 3px; background: var(--accent); width: 0%; z-index: 10001; transition: width 0.1s; }
+        
+        /* FEATURE: MOUSE TRAIL */
+        .trail-dot { position: absolute; width: 6px; height: 6px; background: rgba(255,255,255,0.3); border-radius: 50%; pointer-events: none; z-index: 9998; animation: fadeTrail 0.8s linear forwards; }
+        @keyframes fadeTrail { 0% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(0.2); } }
 
-        /* SCROLLBAR */
         ::-webkit-scrollbar { width: 10px; }
         ::-webkit-scrollbar-track { background: #0a0a0a; }
         ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 5px; }
         ::-webkit-scrollbar-thumb:hover { background: #ff4444; }
 
-        /* LOADER */
-        #loader {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #050505; z-index: 99999;
-            display: flex; justify-content: center; align-items: center;
-            transition: opacity 0.5s ease;
-        }
-        .loader-content { width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
-        .loader-logo { width: 100px; margin-bottom: 20px; animation: pulse 1.5s infinite; margin-left: auto; margin-right: auto; }
-        .loading-bar { width: 150px; height: 3px; background: #222; border-radius: 2px; overflow: hidden; margin: 0 auto; }
+        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #050505; z-index: 99999; display: flex; justify-content: center; align-items: center; transition: opacity 0.5s ease; }
+        .loader-content { width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .loader-logo { width: 100px; margin-bottom: 20px; animation: pulse 1.5s infinite; }
+        .loading-bar { width: 150px; height: 3px; background: #222; border-radius: 2px; overflow: hidden; }
         .loading-progress { width: 0%; height: 100%; background: var(--accent); animation: load 1.5s ease-in-out forwards; }
         @keyframes load { 0% { width: 0%; } 100% { width: 100%; } }
         @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
 
-        nav {
-            position: fixed; top: 0; width: 100%;
-            background: rgba(5, 5, 5, 0.8); backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            display: flex; justify-content: center; padding: 15px 0; z-index: 100;
-        }
-        nav a { 
-            color: #aaa; text-decoration: none; font-weight: 700; margin: 0 15px; transition: 0.3s; 
-            font-family: var(--font-head); text-transform: uppercase; letter-spacing: 0.5px;
-        }
+        nav { position: fixed; top: 0; width: 100%; background: rgba(5, 5, 5, 0.8); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: center; padding: 15px 0; z-index: 100; }
+        nav a { color: #aaa; text-decoration: none; font-weight: 700; margin: 0 15px; transition: 0.3s; font-family: var(--font-head); text-transform: uppercase; letter-spacing: 0.5px; }
         nav a:hover { color: var(--accent); }
 
         .container { max-width: 900px; margin: 100px auto; padding: 20px; }
         h1 { font-size: 3rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; margin-bottom: 30px; font-family: var(--font-head); letter-spacing: -1px; text-transform: uppercase; font-weight: 900; font-style: italic; }
 
-        /* --- 2. GLITCH HOVER (Applying to cart items) --- */
-        .cart-item {
-            display: flex; align-items: center; justify-content: space-between;
-            background: var(--glass-bg); border: 1px solid var(--glass-border);
-            padding: 20px; margin-bottom: 15px; backdrop-filter: blur(10px);
-            border-radius: 12px; transition: 0.3s;
-        }
+        .cart-item { display: flex; align-items: center; justify-content: space-between; background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 20px; margin-bottom: 15px; backdrop-filter: blur(10px); border-radius: 12px; transition: 0.3s; }
         .cart-item:hover { border-color: rgba(255,255,255,0.2); transform: translateX(5px); }
-        /* Simple Glitch on Hover for Cart Images */
-        .cart-item:hover .item-img {
-             filter: drop-shadow(-2px 0 red) drop-shadow(2px 0 cyan);
-             transform: scale(1.05); transition: 0.2s;
-        }
-
+        .cart-item:hover .item-img { filter: drop-shadow(-2px 0 red) drop-shadow(2px 0 cyan); transform: scale(1.05); transition: 0.2s; }
         .item-left { display: flex; align-items: center; gap: 20px; }
         .item-img { width: 80px; height: 80px; object-fit: cover; background: #000; display: block; border: 1px solid #333; border-radius: 8px; }
         .item-info h3 { margin: 0 0 5px 0; font-size: 1.2rem; font-family: var(--font-head); font-weight: 800; font-style: italic; }
-        .item-info p { margin: 0; color: var(--accent); font-weight: bold; }
+        .item-info p { margin: 0; color: var(--accent); font-weight: bold; font-family: var(--font-tech); }
         .item-right { display: flex; align-items: center; gap: 15px; }
         .qty-controls { display: flex; align-items: center; background: rgba(0,0,0,0.5); border: 1px solid #333; border-radius: 6px; }
         .qty-btn { background: none; border: none; color: #fff; width: 35px; height: 35px; cursor: pointer; font-weight: bold; transition: 0.2s; }
@@ -116,6 +90,32 @@
         .btn-discord:hover { background: var(--accent-hover); box-shadow: 0 0 40px rgba(255, 31, 31, 0.4); transform: translateY(-3px); }
         .empty-msg { text-align: center; color: #777; font-size: 1.5rem; margin-top: 50px; display: none; font-family: var(--font-head); }
         @media (max-width: 600px) { .cart-summary { flex-direction: column; text-align: center; gap: 30px; } .summary-right { width: 100%; align-items: center; } }
+
+        /* --- FEATURE: FLOATING DISCORD WIDGET --- */
+        .discord-widget {
+            position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px;
+            background: #5865F2; border-radius: 50%; display: flex; justify-content: center; align-items: center;
+            color: white; font-size: 1.8rem; z-index: 9990; cursor: pointer; text-decoration: none;
+            box-shadow: 0 10px 30px rgba(88, 101, 242, 0.4); transition: 0.3s;
+            animation: bob 3s ease-in-out infinite;
+        }
+        .discord-widget:hover { transform: translateY(-5px) scale(1.1); box-shadow: 0 15px 40px rgba(88, 101, 242, 0.6); }
+        @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+        /* --- FEATURE: GLASSMORPHISM FOOTER --- */
+        footer { 
+            background: rgba(5, 5, 5, 0.6); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255,255,255,0.1); padding: 80px 20px 40px; margin-top: 100px; 
+        }
+        .footer-content { max-width: 1000px; margin: 0 auto; display: flex; justify-content: space-evenly; flex-wrap: wrap; gap: 40px; text-align: left; }
+        .footer-col { min-width: 200px; }
+        .footer-col p { color: #666; font-size: 0.9rem; line-height: 1.6; max-width: 250px; }
+        .footer-col h4 { color: white; font-family: var(--font-head); font-weight: 900; font-style: italic; margin-bottom: 20px; font-size: 1.1rem; letter-spacing: 1px; }
+        .footer-col a { display: block; color: #888; text-decoration: none; margin-bottom: 10px; font-size: 0.9rem; transition: 0.3s; }
+        .footer-col a:hover { color: var(--accent); transform: translateX(5px); }
+        .social-btn { display: inline-flex; align-items: center; gap: 10px; }
+        .copyright { text-align: center; color: #444; margin-top: 60px; pt-top: 20px; border-top: 1px solid #111; font-size: 0.8rem; padding-top: 20px; }
+        @media (max-width: 768px) { .footer-content { flex-direction: column; text-align: center; align-items: center; } .footer-col { text-align: center; } }
     </style>
 </head>
 <body>
@@ -123,6 +123,9 @@
     
     <!-- SCROLL PROGRESS -->
     <div id="scroll-progress"></div>
+
+    <!-- WIDGET -->
+    <a href="https://discord.gg/Vc7fjmbXAe" target="_blank" class="discord-widget"><i class="fab fa-discord"></i></a>
 
     <nav><a href="index.html">← Back to Shop</a></nav>
     
@@ -156,6 +159,29 @@
         <div id="emptyCart" class="empty-msg">Your cart is empty.<br><a href="index.html" style="font-size:1rem; color:var(--accent); text-decoration:none;">Go Back to Shop</a></div>
     </div>
 
+    <footer>
+        <div class="footer-content">
+            <div class="footer-col">
+                <img src="logo.png" style="width: 80px; margin-bottom:15px; opacity:0.7;">
+                <p>Premium digital assets for creators. Elevate your content today.</p>
+            </div>
+            <div class="footer-col">
+                <h4>EXPLORE</h4>
+                <a href="index.html#intros">Intros</a>
+                <a href="index.html#chains">Chains</a>
+                <a href="index.html#gfx">GFX</a>
+            </div>
+            <div class="footer-col">
+                <h4>SOCIALS</h4>
+                <a href="https://discord.gg/Vc7fjmbXAe" target="_blank" class="social-btn"><i class="fab fa-discord"></i> Discord</a>
+                <a href="https://youtube.com/@tps_temple" target="_blank" class="social-btn"><i class="fab fa-youtube"></i> YouTube</a>
+            </div>
+        </div>
+        <div class="copyright">
+            &copy; 2025 TPS TEMPLE. All rights reserved.
+        </div>
+    </footer>
+
     <script>
         /* 1. TAB TITLE ALERT */
         let originalTitle = document.title;
@@ -173,6 +199,18 @@
             let scrolled = (winScroll / height) * 100;
             document.getElementById("scroll-progress").style.width = scrolled + "%";
         };
+
+        /* FEATURE: MOUSE TRAIL */
+        document.addEventListener('mousemove', (e) => {
+            if(Math.random() > 0.5) { 
+                const dot = document.createElement('div');
+                dot.className = 'trail-dot';
+                dot.style.left = e.pageX + 'px';
+                dot.style.top = e.pageY + 'px';
+                document.body.appendChild(dot);
+                setTimeout(() => dot.remove(), 800);
+            }
+        });
 
         let cart = JSON.parse(localStorage.getItem('mtpCart')) || [];
         const cartContainer = document.getElementById('cartItems');

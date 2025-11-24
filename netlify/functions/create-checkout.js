@@ -44,15 +44,18 @@ exports.handler = async (event) => {
     });
 
     const session = await stripe.checkout.sessions.create({
-      // --- CHANGE START ---
-      // We removed "payment_method_types: ['card']"
-      // And added this to let your Dashboard control the methods:
-      automatic_payment_methods: { enabled: true },
-      // --- CHANGE END ---
-      
+      // --- FIX IS HERE ---
+      // We removed "automatic_payment_methods" because it caused the crash.
+      // We manually list 'card'. 
+      // NOTE: Apple Pay & Google Pay AUTOMATICALLY show up under 'card' 
+      // if the customer has them set up on their device.
+      payment_method_types: ['card'], 
+      // -------------------
+
       line_items: line_items,
       mode: 'payment',
       invoice_creation: { enabled: true },
+      allow_promotion_codes: false, 
       success_url: `${siteUrl}/index.html?payment=success`,
       cancel_url: `${siteUrl}/cart.html?payment=cancelled`,
     });

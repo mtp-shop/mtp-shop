@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Cart | TPS TEMPLE</title>
+    <title>Your Cart | TPS TEMPLE | COMPLETE YOUR ORDER | </title>
     <link rel="icon" type="image/png" href="logo.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -28,11 +28,12 @@
             background-color: #050505;
             background-image: linear-gradient(to bottom, rgba(0,0,0,0.8), rgba(0,0,0,0.95)), url('background.png'); 
             background-size: cover; background-attachment: fixed; min-height: 100vh;
+            display: flex; flex-direction: column; 
+            transition: filter 0.1s;
         }
 
         #scroll-progress { position: fixed; top: 0; left: 0; height: 3px; background: var(--accent); width: 0%; z-index: 10001; transition: width 0.1s; }
         
-        /* FEATURE: MOUSE TRAIL */
         .trail-dot { position: absolute; width: 6px; height: 6px; background: rgba(255,255,255,0.3); border-radius: 50%; pointer-events: none; z-index: 9998; animation: fadeTrail 0.8s linear forwards; }
         @keyframes fadeTrail { 0% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(0.2); } }
 
@@ -41,24 +42,25 @@
         ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 5px; }
         ::-webkit-scrollbar-thumb:hover { background: #ff4444; }
 
-        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #050505; z-index: 99999; display: flex; justify-content: center; align-items: center; transition: opacity 0.5s ease; }
-        .loader-content { width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .loader-logo { width: 100px; margin-bottom: 20px; animation: pulse 1.5s infinite; }
-        .loading-bar { width: 150px; height: 3px; background: #222; border-radius: 2px; overflow: hidden; }
-        .loading-progress { width: 0%; height: 100%; background: var(--accent); animation: load 1.5s ease-in-out forwards; }
-        @keyframes load { 0% { width: 0%; } 100% { width: 100%; } }
-        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
-
         nav { position: fixed; top: 0; width: 100%; background: rgba(5, 5, 5, 0.8); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: center; padding: 15px 0; z-index: 100; }
+        .nav-logo { height: 35px; transition: 0.3s; }
+        .nav-logo:hover { transform: scale(1.1); }
         nav a { color: #aaa; text-decoration: none; font-weight: 700; margin: 0 15px; transition: 0.3s; font-family: var(--font-head); text-transform: uppercase; letter-spacing: 0.5px; }
         nav a:hover { color: var(--accent); }
 
-        .container { max-width: 900px; margin: 100px auto; padding: 20px; }
+        /* LIVE DOT STATUS */
+        .live-dot {
+            width: 8px; height: 8px; background-color: #00ff88; border-radius: 50%;
+            display: inline-block; margin-left: 5px;
+            box-shadow: 0 0 10px #00ff88; animation: pulse-green 1.5s infinite;
+        }
+        @keyframes pulse-green { 0% { opacity: 0.5; transform: scale(0.9); } 50% { opacity: 1; transform: scale(1.2); } 100% { opacity: 0.5; transform: scale(0.9); } }
+
+        .container { max-width: 900px; width: 100%; margin: 120px auto 40px; padding: 20px; flex: 1; }
         h1 { font-size: 3rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; margin-bottom: 30px; font-family: var(--font-head); letter-spacing: -1px; text-transform: uppercase; font-weight: 900; font-style: italic; }
 
         .cart-item { display: flex; align-items: center; justify-content: space-between; background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 20px; margin-bottom: 15px; backdrop-filter: blur(10px); border-radius: 12px; transition: 0.3s; }
         .cart-item:hover { border-color: rgba(255,255,255,0.2); transform: translateX(5px); }
-        .cart-item:hover .item-img { filter: drop-shadow(-2px 0 red) drop-shadow(2px 0 cyan); transform: scale(1.05); transition: 0.2s; }
         .item-left { display: flex; align-items: center; gap: 20px; }
         .item-img { width: 80px; height: 80px; object-fit: cover; background: #000; display: block; border: 1px solid #333; border-radius: 8px; }
         .item-info h3 { margin: 0 0 5px 0; font-size: 1.2rem; font-family: var(--font-head); font-weight: 800; font-style: italic; }
@@ -88,24 +90,20 @@
         .btn-copy:hover { background: white; color: black; border-color: white; }
         .btn-discord { background: var(--accent); color: white; margin-top: 10px; box-shadow: 0 0 20px rgba(255, 31, 31, 0.2); }
         .btn-discord:hover { background: var(--accent-hover); box-shadow: 0 0 40px rgba(255, 31, 31, 0.4); transform: translateY(-3px); }
+        
         .empty-msg { text-align: center; color: #777; font-size: 1.5rem; margin-top: 50px; display: none; font-family: var(--font-head); }
-        @media (max-width: 600px) { .cart-summary { flex-direction: column; text-align: center; gap: 30px; } .summary-right { width: 100%; align-items: center; } }
-
-        /* --- FEATURE: FLOATING DISCORD WIDGET --- */
-        .discord-widget {
-            position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px;
-            background: #5865F2; border-radius: 50%; display: flex; justify-content: center; align-items: center;
-            color: white; font-size: 1.8rem; z-index: 9990; cursor: pointer; text-decoration: none;
-            box-shadow: 0 10px 30px rgba(88, 101, 242, 0.4); transition: 0.3s;
-            animation: bob 3s ease-in-out infinite;
+        
+        @media (max-width: 600px) { 
+            .cart-summary { flex-direction: column; text-align: center; gap: 30px; } 
+            .summary-right { width: 100%; align-items: center; } 
+            .cart-item { flex-direction: column; text-align: center; }
+            .item-left { flex-direction: column; margin-bottom: 15px; }
         }
-        .discord-widget:hover { transform: translateY(-5px) scale(1.1); box-shadow: 0 15px 40px rgba(88, 101, 242, 0.6); }
-        @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 
-        /* --- FEATURE: GLASSMORPHISM FOOTER --- */
+        /* --- FOOTER --- */
         footer { 
             background: rgba(5, 5, 5, 0.6); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border-top: 1px solid rgba(255,255,255,0.1); padding: 80px 20px 40px; margin-top: 100px; 
+            border-top: 1px solid rgba(255,255,255,0.1); padding: 80px 20px 40px; margin-top: auto; 
         }
         .footer-content { max-width: 1000px; margin: 0 auto; display: flex; justify-content: space-evenly; flex-wrap: wrap; gap: 40px; text-align: left; }
         .footer-col { min-width: 200px; }
@@ -114,20 +112,84 @@
         .footer-col a { display: block; color: #888; text-decoration: none; margin-bottom: 10px; font-size: 0.9rem; transition: 0.3s; }
         .footer-col a:hover { color: var(--accent); transform: translateX(5px); }
         .social-btn { display: inline-flex; align-items: center; gap: 10px; }
+        
+        .qr-img {
+            width: 80px; height: 80px;
+            border: 2px solid rgba(255,255,255,0.1); border-radius: 8px;
+            padding: 3px; background: white;
+            transition: 0.3s;
+        }
+        .qr-img:hover { transform: scale(1.05); box-shadow: 0 0 20px var(--accent-glow); border-color: var(--accent); }
+
         .copyright { text-align: center; color: #444; margin-top: 60px; pt-top: 20px; border-top: 1px solid #111; font-size: 0.8rem; padding-top: 20px; }
-        @media (max-width: 768px) { .footer-content { flex-direction: column; text-align: center; align-items: center; } .footer-col { text-align: center; } }
+        
+        @media (max-width: 768px) { 
+            .footer-content { flex-direction: column; text-align: center; align-items: center; } 
+            .footer-col { text-align: center; }
+            .footer-col:nth-child(1) { order: 4; margin-top: 30px; } 
+            .footer-col:nth-child(2) { order: 1; } 
+            .footer-col:nth-child(3) { order: 2; margin: 20px 0; } 
+            .footer-col:nth-child(4) { order: 3; } 
+        }
+
+        /* IDEA 11: NIGHT VISION STYLES */
+        .nv-active { filter: sepia(1) hue-rotate(90deg) contrast(1.5) brightness(0.8) grayscale(0.2); }
+        .nv-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: repeating-linear-gradient(0deg, rgba(0,0,0,0.15), rgba(0,0,0,0.15) 1px, transparent 1px, transparent 2px); pointer-events: none; z-index: 999999; display:none; mix-blend-mode: overlay; opacity: 0.7; }
+        .nv-grain { position: fixed; top:0; left:0; width:100%; height:100%; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.15'/%3E%3C/svg%3E"); pointer-events: none; z-index: 999998; display:none; opacity: 0.4; }
+        
+        /* IDEA 2: CUSTOM RIGHT CLICK MENU */
+        #custom-context-menu {
+            position: absolute; z-index: 99999; width: 200px;
+            background: rgba(10, 10, 10, 0.95); backdrop-filter: blur(10px);
+            border: 1px solid #333; border-radius: 8px;
+            padding: 5px 0; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        }
+        .ctx-item {
+            padding: 12px 20px; color: #ddd; font-size: 0.85rem; font-weight: 700;
+            cursor: pointer; transition: 0.2s; font-family: var(--font-head);
+            border-left: 2px solid transparent;
+        }
+        .ctx-item:hover { background: rgba(255,255,255,0.05); color: var(--accent); border-left-color: var(--accent); }
+        .ctx-line { height: 1px; background: #333; margin: 5px 0; }
+
+        /* IDEA 13: CONFETTI */
+        .confetti { position: fixed; width: 8px; height: 8px; pointer-events: none; animation: confettiFall 2s linear forwards; z-index: 9999; }
+        @keyframes confettiFall { 0% { opacity: 1; transform: translateY(0) rotate(0deg); } 100% { opacity: 0; transform: translateY(100vh) rotate(720deg); } }
+        
+        /* LOADER (For Cart Initial Load) */
+        #loader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #050505; z-index: 99999;
+            display: flex; justify-content: center; align-items: center;
+            opacity: 1; transition: opacity 0.5s ease;
+        }
+        .loader-content { width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .loader-logo { width: 100px; margin-bottom: 20px; animation: pulse 0.8s infinite; margin: 0 auto; }
+        .loading-bar { width: 150px; height: 3px; background: #222; border-radius: 2px; overflow: hidden; margin: 0 auto; }
+        .loading-progress { width: 0%; height: 100%; background: var(--accent); animation: load 0.5s ease-in-out forwards; }
+        @keyframes load { 0% { width: 0%; } 100% { width: 100%; } }
+        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
     </style>
 </head>
 <body>
+    <div class="nv-overlay" id="nvScan"></div>
+    <div class="nv-grain" id="nvGrain"></div>
+
     <div id="loader"><div class="loader-content"><img src="logo.png" class="loader-logo"><div class="loading-bar"><div class="loading-progress"></div></div></div></div>
+
+    <div id="custom-context-menu">
+        <div class="ctx-item" onclick="window.location.href='index.html'">HOME</div>
+        <div class="ctx-item" onclick="goToCart(event)">VIEW CART</div>
+        <div class="ctx-line"></div>
+        <div class="ctx-item" onclick="window.open('https://discord.gg/Vc7fjmbXAe')">DISCORD</div>
+    </div>
     
-    <!-- SCROLL PROGRESS -->
     <div id="scroll-progress"></div>
 
-    <!-- WIDGET -->
-    <a href="https://discord.gg/Vc7fjmbXAe" target="_blank" class="discord-widget"><i class="fab fa-discord"></i></a>
-
-    <nav><a href="index.html">← Back to Shop</a></nav>
+    <nav>
+        <a href="index.html"><img src="logo.png" alt="TPS" class="nav-logo"></a>
+        <a href="index.html">← Back to Shop</a>
+    </nav>
     
     <div class="container">
         <h1>Shopping Cart</h1>
@@ -171,6 +233,12 @@
                 <a href="index.html#chains">Chains</a>
                 <a href="index.html#gfx">GFX</a>
             </div>
+            
+            <div class="footer-col">
+                <h4>SCAN</h4>
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://mtp-shop.github.io/mtp-shop/&bgcolor=ffffff&color=000000" alt="QR Code" class="qr-img">
+            </div>
+
             <div class="footer-col">
                 <h4>SOCIALS</h4>
                 <a href="https://discord.gg/Vc7fjmbXAe" target="_blank" class="social-btn"><i class="fab fa-discord"></i> Discord</a>
@@ -183,14 +251,20 @@
     </footer>
 
     <script>
-        /* 1. TAB TITLE ALERT */
-        let originalTitle = document.title;
-        document.addEventListener('visibilitychange', () => {
-            document.title = document.hidden ? "Don't miss out! 👀" : originalTitle;
-        });
+        /* FEATURE: BROWSER TAB TICKER */
+        let docTitle = document.title + "  ///  ";
+        setInterval(() => {
+            docTitle = docTitle.substring(1) + docTitle.substring(0, 1);
+            document.title = docTitle;
+        }, 200);
 
-        /* LOADER */
-        window.addEventListener('load', () => { setTimeout(() => { document.getElementById('loader').style.opacity = '0'; setTimeout(() => { document.getElementById('loader').style.display = 'none'; }, 500); }, 1000); });
+        /* LOADER ON PAGE LOAD */
+        window.addEventListener('load', () => { 
+            setTimeout(() => { 
+                document.getElementById('loader').style.opacity = '0'; 
+                setTimeout(() => { document.getElementById('loader').style.display = 'none'; }, 500); 
+            }, 500); 
+        });
 
         /* 5. SCROLL PROGRESS */
         window.onscroll = function() {
@@ -257,9 +331,59 @@
             navigator.clipboard.writeText(orderText);
             const btn = document.getElementById('copyBtn');
             btn.innerText = "COPIED! ✓"; btn.style.background = "#fff"; btn.style.color = "#000";
+            
+            triggerConfetti(btn);
+
             setTimeout(() => { btn.innerHTML = '<i class="fas fa-copy"></i> COPY ORDER CODE'; btn.style.background = ""; btn.style.color = ""; }, 2000);
         }
         renderCart();
+
+        document.addEventListener('keydown', (e) => {
+            if(e.code === 'Space') {
+                document.body.classList.add('nv-active');
+                document.getElementById('nvScan').style.display = 'block';
+                document.getElementById('nvGrain').style.display = 'block';
+            }
+        });
+        document.addEventListener('keyup', (e) => {
+            if(e.code === 'Space') {
+                document.body.classList.remove('nv-active');
+                document.getElementById('nvScan').style.display = 'none';
+                document.getElementById('nvGrain').style.display = 'none';
+            }
+        });
+
+        const ctxMenu = document.getElementById('custom-context-menu');
+        document.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            ctxMenu.style.display = 'block';
+            ctxMenu.style.left = `${e.pageX}px`;
+            ctxMenu.style.top = `${e.pageY}px`;
+        });
+        document.addEventListener('click', () => {
+            ctxMenu.style.display = 'none';
+        });
+
+        function triggerConfetti(element) {
+            const rect = element.getBoundingClientRect();
+            for(let i=0; i<50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'confetti';
+                particle.style.left = rect.left + rect.width/2 + 'px';
+                particle.style.top = rect.top + 'px';
+                particle.style.backgroundColor = ['#ff1f1f', '#ffffff', '#222'][Math.floor(Math.random() * 3)];
+                particle.style.transform = `rotate(${Math.random() * 360}deg)`;
+                const speedX = (Math.random() - 0.5) * 150;
+                const speedY = Math.random() * 500 + 200;
+                particle.animate([
+                    { transform: `translate(0,0)` },
+                    { transform: `translate(${speedX}px, ${speedY}px) rotate(${Math.random()*720}deg)` }
+                ], { duration: 1000 + Math.random() * 1000, fill: 'forwards' });
+                
+                document.body.appendChild(particle);
+                setTimeout(() => particle.remove(), 2000);
+            }
+        }
     </script>
 </body>
 </html>

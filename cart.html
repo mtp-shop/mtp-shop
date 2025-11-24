@@ -48,14 +48,6 @@
         nav a { color: #aaa; text-decoration: none; font-weight: 700; margin: 0 15px; transition: 0.3s; font-family: var(--font-head); text-transform: uppercase; letter-spacing: 0.5px; }
         nav a:hover { color: var(--accent); }
 
-        /* LIVE DOT STATUS */
-        .live-dot {
-            width: 8px; height: 8px; background-color: #00ff88; border-radius: 50%;
-            display: inline-block; margin-left: 5px;
-            box-shadow: 0 0 10px #00ff88; animation: pulse-green 1.5s infinite;
-        }
-        @keyframes pulse-green { 0% { opacity: 0.5; transform: scale(0.9); } 50% { opacity: 1; transform: scale(1.2); } 100% { opacity: 0.5; transform: scale(0.9); } }
-
         .container { max-width: 900px; width: 100%; margin: 120px auto 40px; padding: 20px; flex: 1; }
         h1 { font-size: 3rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; margin-bottom: 30px; font-family: var(--font-head); letter-spacing: -1px; text-transform: uppercase; font-weight: 900; font-style: italic; }
 
@@ -85,12 +77,18 @@
         .discount-btn:hover { background: #555; }
         .old-price { text-decoration: line-through; color: #666; font-size: 1.2rem; margin-right: 10px; display: none; }
 
-        .action-btn { padding: 15px 0; font-size: 0.9rem; font-weight: 800; border-radius: 8px; cursor: pointer; transition: 0.3s; text-decoration: none; display: block; text-align: center; width: 100%; border: none; text-transform: uppercase; letter-spacing: 1px; font-family: var(--font-head); font-style: italic; }
-        .btn-copy { background: transparent; color: white; border: 1px solid #444; }
-        .btn-copy:hover { background: white; color: black; border-color: white; }
-        .btn-discord { background: var(--accent); color: white; margin-top: 10px; box-shadow: 0 0 20px rgba(255, 31, 31, 0.2); }
-        .btn-discord:hover { background: var(--accent-hover); box-shadow: 0 0 40px rgba(255, 31, 31, 0.4); transform: translateY(-3px); }
-        
+        /* STRIPE BUTTON */
+        .stripe-btn {
+            width: 100%; padding: 15px; margin-top: 20px;
+            background: #635bff; color: white; /* Stripe Blurple */
+            font-family: var(--font-head); font-weight: 800; font-style: italic; font-size: 1rem;
+            border: none; border-radius: 8px; cursor: pointer;
+            transition: 0.3s; display: flex; justify-content: center; align-items: center; gap: 10px;
+            box-shadow: 0 5px 20px rgba(99, 91, 255, 0.3);
+        }
+        .stripe-btn:hover { background: #7a73ff; box-shadow: 0 5px 30px rgba(99, 91, 255, 0.5); transform: translateY(-2px); }
+        .stripe-btn i { font-size: 1.1rem; }
+
         .empty-msg { text-align: center; color: #777; font-size: 1.5rem; margin-top: 50px; display: none; font-family: var(--font-head); }
         
         @media (max-width: 600px) { 
@@ -170,6 +168,8 @@
         @keyframes load { 0% { width: 0%; } 100% { width: 100%; } }
         @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
     </style>
+    <!-- STRIPE SCRIPT -->
+    <script src="https://js.stripe.com/v3/"></script>
 </head>
 <body>
     <div class="nv-overlay" id="nvScan"></div>
@@ -196,11 +196,10 @@
         <div id="cartItems"></div>
         <div class="cart-summary" id="cartSummary" style="display:none;">
             <div class="summary-left">
-                <h3><i class="fas fa-info-circle"></i> CHECKOUT PROCESS</h3>
-                <p>1. Apply Promo Code (Optional).</p>
-                <p>2. Click "COPY ORDER CODE".</p>
-                <p>3. Click "OPEN TICKET" to join Discord.</p>
-                <p>4. Paste the code in a ticket to pay.</p>
+                <h3><i class="fas fa-info-circle"></i> PAYMENT</h3>
+                <p>1. Apply Promo Code if available.</p>
+                <p>2. Click Checkout to pay securely.</p>
+                <p>3. Instant delivery via email.</p>
             </div>
             <div class="summary-right">
                 <div class="discount-box">
@@ -214,8 +213,11 @@
                     <span id="oldPrice" class="old-price"></span>
                     <span class="total-price" id="totalPrice">£0.00</span>
                 </div>
-                <button class="action-btn btn-copy" onclick="copyCode()" id="copyBtn"><i class="fas fa-copy"></i> COPY ORDER CODE</button>
-                <a href="https://discord.com/channels/1316535768717463644/1316548466704650294" target="_blank" class="action-btn btn-discord"><i class="fab fa-discord"></i> OPEN TICKET</a>
+                
+                <!-- STRIPE BUTTON -->
+                <button id="checkout-button" class="stripe-btn">
+                    <i class="fas fa-credit-card"></i> PAY WITH STRIPE
+                </button>
             </div>
         </div>
         <div id="emptyCart" class="empty-msg">Your cart is empty.<br><a href="index.html" style="font-size:1rem; color:var(--accent); text-decoration:none;">Go Back to Shop</a></div>
@@ -293,6 +295,7 @@
         const totalEl = document.getElementById('totalPrice');
         const oldPriceEl = document.getElementById('oldPrice');
         let discountApplied = false;
+        let currentTotalValue = 0.00;
 
         function renderCart() {
             cartContainer.innerHTML = ''; let total = 0;
@@ -304,11 +307,14 @@
                 let html = `<div class="cart-item"><div class="item-left"><img src="${item.img}" class="item-img"><div class="item-info"><h3>${item.title}</h3><p>${item.price}</p></div></div><div class="item-right"><div class="qty-controls"><button class="qty-btn" onclick="changeQty(${index}, -1)">-</button><span class="qty-num">${item.qty}</span><button class="qty-btn" onclick="changeQty(${index}, 1)">+</button></div><button class="remove-btn" onclick="removeItem(${index})"><i class="fas fa-trash"></i></button></div></div>`;
                 cartContainer.innerHTML += html;
             });
+            
+            currentTotalValue = total; // Store base total
+            
             if(discountApplied) {
                 oldPriceEl.innerText = '£' + total.toFixed(2);
                 oldPriceEl.style.display = 'inline';
-                let newTotal = total * 0.80;
-                totalEl.innerText = '£' + newTotal.toFixed(2);
+                currentTotalValue = total * 0.80;
+                totalEl.innerText = '£' + currentTotalValue.toFixed(2);
                 totalEl.style.color = '#00ff88';
             } else {
                 totalEl.innerText = '£' + total.toFixed(2);
@@ -322,21 +328,73 @@
             const input = document.getElementById('promoInput').value.toUpperCase();
             if(input === "XMAS") { discountApplied = true; document.getElementById('discountMsg').style.display = "block"; renderCart(); } else { alert("Invalid Code"); }
         }
-        function copyCode() {
-            let orderText = "**🛒 NEW ORDER:**\n";
-            let total = totalEl.innerText;
-            cart.forEach(item => { orderText += `- ${item.title} (x${item.qty}) - ${item.price}\n`; });
-            if(discountApplied) orderText += "\n**DISCOUNT APPLIED (XMAS): 20% OFF**";
-            orderText += `\n**TOTAL:** ${total}`;
-            navigator.clipboard.writeText(orderText);
-            const btn = document.getElementById('copyBtn');
-            btn.innerText = "COPIED! ✓"; btn.style.background = "#fff"; btn.style.color = "#000";
-            
-            triggerConfetti(btn);
-
-            setTimeout(() => { btn.innerHTML = '<i class="fas fa-copy"></i> COPY ORDER CODE'; btn.style.background = ""; btn.style.color = ""; }, 2000);
-        }
+        
         renderCart();
+
+        /* STRIPE CHECKOUT LOGIC */
+        // *****************************************************************
+        // CRITICAL: Replace 'pk_live_REPLACE_WITH_YOUR_REAL_KEY' below 
+        // with your actual Public Key starting with pk_live_...
+        // *****************************************************************
+        const stripe = Stripe('pk_live_51LDw4PLHs0w9JjR8nBwavRWVfCsKh1Tz7YJfkjwjNN9edtqvpnVZ8axuOTVQfUAquAgdksq9jBHX8VKXll5Ft6ss008lzh2Gq3'); 
+
+        document.getElementById('checkout-button').addEventListener('click', async function() {
+            const btn = this;
+            const originalText = btn.innerHTML;
+            
+            // Get Cart Data
+            const cartData = JSON.parse(localStorage.getItem('mtpCart')) || [];
+            
+            if(cartData.length === 0) {
+                alert("Your cart is empty.");
+                return;
+            }
+
+            // 1. Visual Loading State
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> SECURE CHECKOUT...';
+            btn.style.background = "#444";
+            btn.style.pointerEvents = "none";
+
+            try {
+                // 2. Call your Netlify Function (The Backend)
+                // This endpoint creates the actual Stripe Session
+                const response = await fetch('/.netlify/functions/create-checkout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        cart: cartData,
+                        discountCode: discountApplied ? "XMAS" : "" 
+                    }),
+                });
+
+                const session = await response.json();
+
+                if (session.error) {
+                    throw new Error(session.error);
+                }
+
+                // 3. Redirect to the Real Stripe Payment Page
+                const result = await stripe.redirectToCheckout({
+                    sessionId: session.id,
+                });
+
+                if (result.error) {
+                    alert(result.error.message);
+                    resetBtn();
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                alert("System Error: Make sure the site is correctly deployed on Netlify with the backend functions.");
+                resetBtn();
+            }
+
+            function resetBtn() {
+                btn.innerHTML = originalText;
+                btn.style.background = "";
+                btn.style.pointerEvents = "all";
+            }
+        });
 
         document.addEventListener('keydown', (e) => {
             if(e.code === 'Space') {
@@ -363,27 +421,6 @@
         document.addEventListener('click', () => {
             ctxMenu.style.display = 'none';
         });
-
-        function triggerConfetti(element) {
-            const rect = element.getBoundingClientRect();
-            for(let i=0; i<50; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'confetti';
-                particle.style.left = rect.left + rect.width/2 + 'px';
-                particle.style.top = rect.top + 'px';
-                particle.style.backgroundColor = ['#ff1f1f', '#ffffff', '#222'][Math.floor(Math.random() * 3)];
-                particle.style.transform = `rotate(${Math.random() * 360}deg)`;
-                const speedX = (Math.random() - 0.5) * 150;
-                const speedY = Math.random() * 500 + 200;
-                particle.animate([
-                    { transform: `translate(0,0)` },
-                    { transform: `translate(${speedX}px, ${speedY}px) rotate(${Math.random()*720}deg)` }
-                ], { duration: 1000 + Math.random() * 1000, fill: 'forwards' });
-                
-                document.body.appendChild(particle);
-                setTimeout(() => particle.remove(), 2000);
-            }
-        }
     </script>
 </body>
 </html>

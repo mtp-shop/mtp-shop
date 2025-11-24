@@ -13,6 +13,9 @@ exports.handler = async (event) => {
 
   try {
     const { cart, discountCode } = JSON.parse(event.body);
+    
+    // Get the website URL (e.g., https://tpspayments.netlify.app)
+    const siteUrl = event.headers.origin;
 
     const line_items = cart.map(item => {
       let priceValue = parseFloat(item.price.replace('£', '').replace('+', ''));
@@ -23,12 +26,21 @@ exports.handler = async (event) => {
 
       const amountInPence = Math.round(priceValue * 100);
 
+      // FIX IMAGE URL FOR STRIPE
+      // If the image is just "product.png", combine it with the site URL
+      let imageUrl = item.img;
+      if (!imageUrl.startsWith('http')) {
+          // Cleans up any leading slash to avoid double slashes
+          const cleanPath = imageUrl.startsWith('/') ? imageUrl.substring(1) : imageUrl;
+          imageUrl = `${siteUrl}/${cleanPath}`;
+      }
+
       return {
         price_data: {
           currency: 'gbp',
           product_data: {
             name: item.title,
-            images: ['https://i.imgur.com/yW1iXw5.png'], // Generic logo or item.img
+            images: [imageUrl], // Use the fixed URL
           },
           unit_amount: amountInPence,
         },
@@ -40,11 +52,10 @@ exports.handler = async (event) => {
       payment_method_types: ['card'],
       line_items: line_items,
       mode: 'payment',
-      // THIS ENABLES EMAIL COLLECTION AND RECEIPTS
       invoice_creation: { enabled: true },
-      allow_promotion_codes: true, 
-      success_url: `${event.headers.origin}/index.html?payment=success`,
-      cancel_url: `${event.headers.origin}/cart.html?payment=cancelled`,
+      allow_promotion_codes: true,
+      success_url: `${siteUrl}/index.html?payment=success`,
+      cancel_url: `${siteUrl}/cart.html?payment=cancelled`,
     });
 
     return {

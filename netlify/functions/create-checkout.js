@@ -18,14 +18,12 @@ exports.handler = async (event) => {
     const line_items = cart.map(item => {
       let priceValue = parseFloat(item.price.replace('£', '').replace('+', ''));
       
-      // Custom Discount Logic (Applied before sending to Stripe)
       if(discountCode === "XMAS") {
           priceValue = priceValue * 0.8;
       }
 
       const amountInPence = Math.round(priceValue * 100);
 
-      // Image URL fix
       let imageUrl = item.img;
       if (!imageUrl.startsWith('http')) {
           const cleanPath = imageUrl.startsWith('/') ? imageUrl.substring(1) : imageUrl;
@@ -46,11 +44,15 @@ exports.handler = async (event) => {
     });
 
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
+      // --- CHANGE START ---
+      // We removed "payment_method_types: ['card']"
+      // And added this to let your Dashboard control the methods:
+      automatic_payment_methods: { enabled: true },
+      // --- CHANGE END ---
+      
       line_items: line_items,
       mode: 'payment',
       invoice_creation: { enabled: true },
-      // allow_promotion_codes: true,  <-- REMOVED THIS LINE
       success_url: `${siteUrl}/index.html?payment=success`,
       cancel_url: `${siteUrl}/cart.html?payment=cancelled`,
     });

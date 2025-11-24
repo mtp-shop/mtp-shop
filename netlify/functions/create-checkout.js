@@ -13,24 +13,21 @@ exports.handler = async (event) => {
 
   try {
     const { cart, discountCode } = JSON.parse(event.body);
-    
-    // Get the website URL (e.g., https://tpspayments.netlify.app)
     const siteUrl = event.headers.origin;
 
     const line_items = cart.map(item => {
       let priceValue = parseFloat(item.price.replace('£', '').replace('+', ''));
       
+      // Custom Discount Logic (Applied before sending to Stripe)
       if(discountCode === "XMAS") {
           priceValue = priceValue * 0.8;
       }
 
       const amountInPence = Math.round(priceValue * 100);
 
-      // FIX IMAGE URL FOR STRIPE
-      // If the image is just "product.png", combine it with the site URL
+      // Image URL fix
       let imageUrl = item.img;
       if (!imageUrl.startsWith('http')) {
-          // Cleans up any leading slash to avoid double slashes
           const cleanPath = imageUrl.startsWith('/') ? imageUrl.substring(1) : imageUrl;
           imageUrl = `${siteUrl}/${cleanPath}`;
       }
@@ -40,7 +37,7 @@ exports.handler = async (event) => {
           currency: 'gbp',
           product_data: {
             name: item.title,
-            images: [imageUrl], // Use the fixed URL
+            images: [imageUrl],
           },
           unit_amount: amountInPence,
         },
@@ -53,7 +50,7 @@ exports.handler = async (event) => {
       line_items: line_items,
       mode: 'payment',
       invoice_creation: { enabled: true },
-      allow_promotion_codes: true,
+      // allow_promotion_codes: true,  <-- REMOVED THIS LINE
       success_url: `${siteUrl}/index.html?payment=success`,
       cancel_url: `${siteUrl}/cart.html?payment=cancelled`,
     });

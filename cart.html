@@ -206,7 +206,7 @@
                     <input type="text" id="promoInput" class="discount-input" placeholder="Promo Code">
                     <button class="discount-btn" onclick="applyDiscount()">APPLY</button>
                 </div>
-                <div id="discountMsg" style="color: #00ff88; font-size: 0.9rem; margin-bottom: 15px; display:none; font-weight:bold;">CODE APPLIED: 20% OFF</div>
+                <div id="discountMsg" style="color: #00ff88; font-size: 0.9rem; margin-bottom: 15px; display:none; font-weight:bold;">CODE APPLIED</div>
 
                 <div style="font-size: 0.9rem; color:#888; font-weight:bold;">SUBTOTAL</div>
                 <div class="total-wrapper">
@@ -294,13 +294,24 @@
         const emptyMsg = document.getElementById('emptyCart');
         const totalEl = document.getElementById('totalPrice');
         const oldPriceEl = document.getElementById('oldPrice');
-        let discountApplied = false;
+        
+        // NEW: STORE THE SPECIFIC CODE STRING
+        let currentDiscountCode = ""; 
         let currentTotalValue = 0.00;
 
         function renderCart() {
-            cartContainer.innerHTML = ''; let total = 0;
-            if (cart.length === 0) { cartSummary.style.display = 'none'; emptyMsg.style.display = 'block'; return; } 
-            else { emptyMsg.style.display = 'none'; cartSummary.style.display = 'flex'; }
+            cartContainer.innerHTML = ''; 
+            let total = 0;
+            
+            if (cart.length === 0) { 
+                cartSummary.style.display = 'none'; 
+                emptyMsg.style.display = 'block'; 
+                return; 
+            } else { 
+                emptyMsg.style.display = 'none'; 
+                cartSummary.style.display = 'flex'; 
+            }
+            
             cart.forEach((item, index) => {
                 let priceNum = parseFloat(item.price.replace('£', '').replace('+', '').trim());
                 total += priceNum * item.qty;
@@ -308,25 +319,54 @@
                 cartContainer.innerHTML += html;
             });
             
-            currentTotalValue = total; // Store base total
-            
-            if(discountApplied) {
+            // LOGIC FOR DISCOUNT CALCULATIONS
+            if(currentDiscountCode === "1956") {
+                // 100% OFF
+                oldPriceEl.innerText = '£' + total.toFixed(2);
+                oldPriceEl.style.display = 'inline';
+                currentTotalValue = 0;
+                totalEl.innerText = '£0.00';
+                totalEl.style.color = '#00ff88'; // Green text
+            } 
+            else if(currentDiscountCode === "XMAS") {
+                // 20% OFF
                 oldPriceEl.innerText = '£' + total.toFixed(2);
                 oldPriceEl.style.display = 'inline';
                 currentTotalValue = total * 0.80;
                 totalEl.innerText = '£' + currentTotalValue.toFixed(2);
                 totalEl.style.color = '#00ff88';
-            } else {
+            } 
+            else {
+                // NO DISCOUNT
+                currentTotalValue = total;
                 totalEl.innerText = '£' + total.toFixed(2);
                 oldPriceEl.style.display = 'none';
-                totalEl.style.color = '#ff1f1f';
+                totalEl.style.color = '#ff1f1f'; // Red text
             }
         }
+        
         function changeQty(index, amount) { cart[index].qty += amount; if (cart[index].qty <= 0) removeItem(index); else { localStorage.setItem('mtpCart', JSON.stringify(cart)); renderCart(); } }
         function removeItem(index) { cart.splice(index, 1); localStorage.setItem('mtpCart', JSON.stringify(cart)); renderCart(); }
+        
         function applyDiscount() {
             const input = document.getElementById('promoInput').value.toUpperCase();
-            if(input === "XMAS") { discountApplied = true; document.getElementById('discountMsg').style.display = "block"; renderCart(); } else { alert("Invalid Code"); }
+            const msg = document.getElementById('discountMsg');
+            
+            if(input === "1956") { 
+                currentDiscountCode = "1956";
+                msg.innerText = "DEV CODE: 100% OFF APPLIED";
+                msg.style.display = "block";
+                renderCart();
+            } 
+            else if(input === "XMAS") { 
+                currentDiscountCode = "XMAS";
+                msg.innerText = "CODE APPLIED: 20% OFF";
+                msg.style.display = "block"; 
+                renderCart();
+            } 
+            else { 
+                alert("Invalid Code"); 
+            }
         }
         
         renderCart();
@@ -357,13 +397,13 @@
 
             try {
                 // 2. Call your Netlify Function (The Backend)
-                // This endpoint creates the actual Stripe Session
+                // We now send 'currentDiscountCode' (1956, XMAS, or empty)
                 const response = await fetch('/.netlify/functions/create-checkout', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
                         cart: cartData,
-                        discountCode: discountApplied ? "XMAS" : "" 
+                        discountCode: currentDiscountCode
                     }),
                 });
 

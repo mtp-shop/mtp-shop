@@ -18,7 +18,11 @@ exports.handler = async (event) => {
     const line_items = cart.map(item => {
       let priceValue = parseFloat(item.price.replace('£', '').replace('+', ''));
       
-      if(discountCode === "XMAS") {
+     // CHECK FOR 100% OFF CODE FIRST
+      if(discountCode === "1956") {
+          priceValue = 0; 
+      } 
+      else if(discountCode === "XMAS") {
           priceValue = priceValue * 0.8;
       }
 

@@ -18,7 +18,6 @@ exports.handler = async (event) => {
     // --- DEV MODE BYPASS (1956) ---
     if (discountCode === "1956") {
         console.log("Dev Mode 1956 Activated");
-
         try {
             await axios.post(process.env.DISCORD_WEBHOOK_URL, {
                 username: "TPS Shop Bot",
@@ -61,9 +60,9 @@ exports.handler = async (event) => {
       };
     });
 
+    // --- FIX IS HERE: CHANGED AUTOMATIC METHODS TO EXPLICIT LIST ---
     const session = await stripe.checkout.sessions.create({
-      // CHANGED: Removed ['card'] and added automatic methods
-      automatic_payment_methods: { enabled: true }, 
+      payment_method_types: ['card', 'paypal'], // If you have PayPal enabled in Stripe, change this to: ['card', 'paypal']
       line_items: line_items,
       mode: 'payment',
       invoice_creation: { enabled: true },

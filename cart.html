@@ -287,195 +287,211 @@
         </div>
     </footer>
 
-    <script>
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                document.getElementById('loader').style.opacity = '0';
-                setTimeout(() => { document.getElementById('loader').style.display = 'none'; }, 500);
-            }, 1000); 
+<script>
+    window.addEventListener('load', () => {
+        setTimeout(() => {
+            document.getElementById('loader').style.opacity = '0';
+            setTimeout(() => { document.getElementById('loader').style.display = 'none'; }, 500);
+        }, 1000); 
+    });
+
+    let cart = JSON.parse(localStorage.getItem('mtpCart')) || [];
+    const cartContainer = document.getElementById('cartItems');
+    const cartSummary = document.getElementById('cartSummary');
+    const emptyMsg = document.getElementById('emptyCart');
+    const totalEl = document.getElementById('totalPrice');
+    const oldPriceEl = document.getElementById('oldPrice');
+    const discountMsg = document.getElementById('discountMsg');
+    const checkoutBtn = document.getElementById('checkout-button');
+    
+    // Track which code is active
+    let activeCode = ""; 
+
+    function renderCart() {
+        cartContainer.innerHTML = '';
+        let total = 0;
+
+        if (!cart || cart.length === 0) {
+            cartSummary.style.display = 'none';
+            emptyMsg.style.display = 'block';
+            return;
+        } else {
+            emptyMsg.style.display = 'none';
+            cartSummary.style.display = 'flex';
+        }
+
+        cart.forEach((item, index) => {
+            let priceNum = parseFloat(item.price.replace('£', '').replace('+', '').trim());
+            total += priceNum * item.qty;
+
+            let html = `
+            <div class="cart-item">
+                <div class="item-left">
+                    <img src="${item.img}" class="item-img">
+                    <div class="item-info">
+                        <h3>${item.title}</h3>
+                        <p>${item.price}</p>
+                    </div>
+                </div>
+                <div class="item-right">
+                    <div class="qty-controls">
+                        <button class="qty-btn" onclick="changeQty(${index}, -1)">-</button>
+                        <span class="qty-num">${item.qty}</span>
+                        <button class="qty-btn" onclick="changeQty(${index}, 1)">+</button>
+                    </div>
+                    <button class="remove-btn" onclick="removeItem(${index})"><i class="fas fa-trash"></i></button>
+                </div>
+            </div>`;
+            cartContainer.innerHTML += html;
         });
 
-        let cart = JSON.parse(localStorage.getItem('mtpCart')) || [];
-        const cartContainer = document.getElementById('cartItems');
-        const cartSummary = document.getElementById('cartSummary');
-        const emptyMsg = document.getElementById('emptyCart');
-        const totalEl = document.getElementById('totalPrice');
-        const oldPriceEl = document.getElementById('oldPrice');
-        const discountMsg = document.getElementById('discountMsg');
-        const checkoutBtn = document.getElementById('checkout-button');
+        // --- DISCOUNT LOGIC ---
+        if (activeCode === "1956") {
+            // FREE BYPASS
+            oldPriceEl.innerText = '£' + total.toFixed(2);
+            oldPriceEl.style.display = 'inline';
+            totalEl.innerText = '£0.00';
+            totalEl.style.color = '#00ff88';
+            
+            checkoutBtn.innerHTML = '<i class="fas fa-lock-open"></i> DEV BYPASS';
+            checkoutBtn.style.background = "#00ff88";
+            checkoutBtn.style.color = "#000";
+            checkoutBtn.style.boxShadow = "0 0 20px rgba(0,255,136,0.4)";
+        } 
+        else if (activeCode === "195612") {
+            // STRIPE TEST MODE (30p)
+            oldPriceEl.innerText = '£' + total.toFixed(2);
+            oldPriceEl.style.display = 'inline';
+            
+            // Calculate 30p per item (or total 30p, backend logic applies per item usually)
+            // For visual, we just show 30p per item * quantity
+            let testTotal = cart.reduce((acc, item) => acc + (0.30 * item.qty), 0);
+            
+            totalEl.innerText = '£' + testTotal.toFixed(2);
+            totalEl.style.color = '#ffa500'; // Orange for Test
+            
+            checkoutBtn.innerHTML = '<i class="fas fa-vial"></i> PAY TEST (30p)';
+            checkoutBtn.style.background = "#ffa500";
+            checkoutBtn.style.color = "#000";
+            checkoutBtn.style.boxShadow = "0 0 20px rgba(255, 165, 0, 0.4)";
+        }
+        else if (activeCode === "XMAS") {
+            // 20% OFF
+            oldPriceEl.innerText = '£' + total.toFixed(2);
+            oldPriceEl.style.display = 'inline';
+            let newTotal = total * 0.80; 
+            totalEl.innerText = '£' + newTotal.toFixed(2);
+            totalEl.style.color = '#00ff88';
+            
+            checkoutBtn.innerHTML = '<i class="fas fa-credit-card"></i> PAY WITH STRIPE';
+            checkoutBtn.style.background = "#635bff";
+            checkoutBtn.style.color = "#fff";
+        } else {
+            // NORMAL
+            totalEl.innerText = '£' + total.toFixed(2);
+            oldPriceEl.style.display = 'none';
+            totalEl.style.color = '#ff1f1f'; 
+            
+            checkoutBtn.innerHTML = '<i class="fas fa-credit-card"></i> PAY WITH STRIPE';
+            checkoutBtn.style.background = "#635bff";
+            checkoutBtn.style.color = "#fff";
+            checkoutBtn.style.boxShadow = "0 5px 20px rgba(99, 91, 255, 0.3)";
+        }
+    }
+
+    function changeQty(index, amount) {
+        cart[index].qty += amount;
+        if (cart[index].qty <= 0) { removeItem(index); } 
+        else { localStorage.setItem('mtpCart', JSON.stringify(cart)); renderCart(); }
+    }
+
+    function removeItem(index) {
+        cart.splice(index, 1);
+        localStorage.setItem('mtpCart', JSON.stringify(cart));
+        renderCart();
+    }
+
+    function applyDiscount() {
+        const input = document.getElementById('promoInput').value.trim().toUpperCase();
         
-        let discountApplied = false;
-        let devMode = false;
-
-        function renderCart() {
-            cartContainer.innerHTML = '';
-            let total = 0;
-
-            // FIX: Check for empty cart correctly
-            if (!cart || cart.length === 0) {
-                cartSummary.style.display = 'none';
-                emptyMsg.style.display = 'block'; // Shows the new empty container
-                return;
-            } else {
-                emptyMsg.style.display = 'none';
-                cartSummary.style.display = 'flex';
-            }
-
-            cart.forEach((item, index) => {
-                let priceNum = parseFloat(item.price.replace('£', '').replace('+', '').trim());
-                total += priceNum * item.qty;
-
-                let html = `
-                <div class="cart-item">
-                    <div class="item-left">
-                        <img src="${item.img}" class="item-img">
-                        <div class="item-info">
-                            <h3>${item.title}</h3>
-                            <p>${item.price}</p>
-                        </div>
-                    </div>
-                    <div class="item-right">
-                        <div class="qty-controls">
-                            <button class="qty-btn" onclick="changeQty(${index}, -1)">-</button>
-                            <span class="qty-num">${item.qty}</span>
-                            <button class="qty-btn" onclick="changeQty(${index}, 1)">+</button>
-                        </div>
-                        <button class="remove-btn" onclick="removeItem(${index})"><i class="fas fa-trash"></i></button>
-                    </div>
-                </div>`;
-                cartContainer.innerHTML += html;
-            });
-
-            // --- DISCOUNT VISUAL LOGIC ---
-            if(devMode) {
-                oldPriceEl.innerText = '£' + total.toFixed(2);
-                oldPriceEl.style.display = 'inline';
-                totalEl.innerText = '£0.00';
-                totalEl.style.color = '#00ff88';
-                
-                checkoutBtn.innerHTML = '<i class="fas fa-lock-open"></i> DEV BYPASS';
-                checkoutBtn.style.background = "#00ff88";
-                checkoutBtn.style.color = "#000";
-                checkoutBtn.style.boxShadow = "0 0 20px rgba(0,255,136,0.4)";
-            } 
-            else if(discountApplied) {
-                oldPriceEl.innerText = '£' + total.toFixed(2);
-                oldPriceEl.style.display = 'inline';
-                let newTotal = total * 0.80; 
-                totalEl.innerText = '£' + newTotal.toFixed(2);
-                totalEl.style.color = '#00ff88';
-                
-                checkoutBtn.innerHTML = '<i class="fas fa-credit-card"></i> PAY WITH STRIPE';
-                checkoutBtn.style.background = "#635bff";
-                checkoutBtn.style.color = "#fff";
-                checkoutBtn.style.boxShadow = "0 5px 20px rgba(99, 91, 255, 0.3)";
-            } else {
-                totalEl.innerText = '£' + total.toFixed(2);
-                oldPriceEl.style.display = 'none';
-                totalEl.style.color = '#ff1f1f'; 
-                
-                checkoutBtn.innerHTML = '<i class="fas fa-credit-card"></i> PAY WITH STRIPE';
-                checkoutBtn.style.background = "#635bff";
-                checkoutBtn.style.color = "#fff";
-                checkoutBtn.style.boxShadow = "0 5px 20px rgba(99, 91, 255, 0.3)";
-            }
-        }
-
-        function changeQty(index, amount) {
-            cart[index].qty += amount;
-            if (cart[index].qty <= 0) { removeItem(index); } 
-            else { localStorage.setItem('mtpCart', JSON.stringify(cart)); renderCart(); }
-        }
-
-        function removeItem(index) {
-            cart.splice(index, 1);
-            localStorage.setItem('mtpCart', JSON.stringify(cart));
+        if(input === "1956") {
+            activeCode = "1956";
+            discountMsg.innerText = "DEV MODE: 100% OFF ACTIVATED";
+            discountMsg.style.display = "block";
+            discountMsg.style.color = "#00ff88";
+            renderCart();
+        } 
+        else if (input === "195612") {
+            activeCode = "195612";
+            discountMsg.innerText = "STRIPE TEST MODE: PRICE SET TO 30p";
+            discountMsg.style.display = "block";
+            discountMsg.style.color = "#ffa500";
             renderCart();
         }
+        else if(input === "XMAS") {
+            activeCode = "XMAS";
+            discountMsg.innerText = "CODE APPLIED: 20% OFF";
+            discountMsg.style.display = "block";
+            discountMsg.style.color = "#00ff88";
+            renderCart();
+        } 
+        else {
+            alert("Invalid Code");
+            activeCode = "";
+            discountMsg.style.display = "none";
+            renderCart();
+        }
+    }
 
-        function applyDiscount() {
-            const input = document.getElementById('promoInput').value.trim().toUpperCase();
-            
-            if(input === "1956") {
-                devMode = true;
-                discountApplied = false;
-                discountMsg.innerText = "DEV MODE: 100% OFF ACTIVATED";
-                discountMsg.style.display = "block";
-                discountMsg.style.color = "#00ff88";
-                renderCart();
+    // REPLACE WITH YOUR REAL PUBLIC KEY
+    const stripe = Stripe('pk_live_51LDw4PLHs0w9JjR8nBwavRWVfCsKh1Tz7YJfkjwjNN9edtqvpnVZ8axuOTVQfUAquAgdksq9jBHX8VKXll5Ft6ss008lzh2Gq3'); 
+
+    checkoutBtn.addEventListener('click', async function() {
+        const btn = this;
+        const originalText = btn.innerHTML;
+        
+        if(cart.length === 0) { alert("Cart is empty."); return; }
+
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> PROCESSING...';
+        btn.style.opacity = "0.8";
+        btn.style.pointerEvents = "none";
+
+        try {
+            const response = await fetch('/.netlify/functions/create-checkout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    cart: cart,
+                    discountCode: activeCode // Sends the current code (1956, 195612, or XMAS)
+                }),
+            });
+
+            const data = await response.json();
+
+            if (data.error) { throw new Error(data.error); }
+
+            if (data.bypassUrl) {
+                localStorage.removeItem('mtpCart');
+                window.location.href = data.bypassUrl;
             } 
-            else if(input === "XMAS") {
-                discountApplied = true;
-                devMode = false;
-                discountMsg.innerText = "CODE APPLIED: 20% OFF";
-                discountMsg.style.display = "block";
-                discountMsg.style.color = "#00ff88";
-                renderCart();
-            } 
-            else {
-                alert("Invalid Code");
-                discountMsg.style.display = "none";
-                discountApplied = false;
-                devMode = false;
-                renderCart();
+            else if (data.id) {
+                const result = await stripe.redirectToCheckout({ sessionId: data.id });
+                if (result.error) { alert(result.error.message); resetBtn(); }
             }
+
+        } catch (error) {
+            console.error('Error:', error);
+            alert("Checkout Error: " + error.message);
+            resetBtn();
         }
 
-        // REPLACE WITH YOUR REAL PUBLIC KEY
-        const stripe = Stripe('pk_live_51LDw4PLHs0w9JjR8nBwavRWVfCsKh1Tz7YJfkjwjNN9edtqvpnVZ8axuOTVQfUAquAgdksq9jBHX8VKXll5Ft6ss008lzh2Gq3'); 
-
-        checkoutBtn.addEventListener('click', async function() {
-            const btn = this;
-            const originalText = btn.innerHTML;
-            
-            if(cart.length === 0) { alert("Cart is empty."); return; }
-
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> PROCESSING...';
-            btn.style.opacity = "0.8";
-            btn.style.pointerEvents = "none";
-
-            let codeToSend = "";
-            if(devMode) codeToSend = "1956";
-            else if(discountApplied) codeToSend = "XMAS";
-
-            try {
-                const response = await fetch('/.netlify/functions/create-checkout', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        cart: cart,
-                        discountCode: codeToSend
-                    }),
-                });
-
-                const data = await response.json();
-
-                if (data.error) { throw new Error(data.error); }
-
-                if (data.bypassUrl) {
-                    localStorage.removeItem('mtpCart');
-                    window.location.href = data.bypassUrl;
-                } 
-                else if (data.id) {
-                    const result = await stripe.redirectToCheckout({ sessionId: data.id });
-                    if (result.error) { alert(result.error.message); resetBtn(); }
-                }
-
-            } catch (error) {
-                console.error('Error:', error);
-                alert("Checkout Error: " + error.message);
-                resetBtn();
-            }
-
-            function resetBtn() {
-                btn.innerHTML = originalText;
-                btn.style.opacity = "1";
-                btn.style.pointerEvents = "all";
-            }
-        });
-        
-        // Run on load
-        renderCart();
-    </script>
-</body>
-</html>
+        function resetBtn() {
+            btn.innerHTML = originalText;
+            btn.style.opacity = "1";
+            btn.style.pointerEvents = "all";
+        }
+    });
+    
+    // Run on load
+    renderCart();
+</script>

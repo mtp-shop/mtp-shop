@@ -11,8 +11,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,700;1,900&family=Poppins:wght@300;400;600&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-    
-    <!-- ICONS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <!-- STRIPE -->
@@ -39,6 +37,7 @@
             background-color: #050505;
             background-image: linear-gradient(to bottom, rgba(0,0,0,0.8), rgba(0,0,0,0.95)), url('background.png'); 
             background-size: cover; background-attachment: fixed; min-height: 100vh;
+            display: flex; flex-direction: column;
         }
 
         /* --- RED SCROLLBAR --- */
@@ -74,7 +73,8 @@
         }
         nav a:hover { color: var(--accent); }
 
-        .container { max-width: 900px; margin: 100px auto; padding: 20px; }
+        .container { max-width: 900px; width: 100%; margin: 120px auto 50px; padding: 20px; flex: 1; }
+        
         h1 { 
             font-size: 3rem; border-bottom: 1px solid rgba(255,255,255,0.1); 
             padding-bottom: 15px; margin-bottom: 30px; font-family: var(--font-head); 
@@ -118,7 +118,7 @@
         .summary-right { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 15px; width: 350px; }
         
         .total-price { font-size: 2.5rem; font-weight: 900; color: var(--accent); margin: 0 0 10px 0; font-family: var(--font-head); font-style: italic; }
-        .old-price { text-decoration: line-through; color: #666; font-size: 1.5rem; margin-right: 10px; display: none; }
+        .old-price { text-decoration: line-through; color: #666; font-size: 1.2rem; margin-right: 10px; display: none; }
 
         /* DISCOUNT INPUT */
         .discount-box { display: flex; gap: 10px; width: 100%; margin-bottom: 5px; }
@@ -130,26 +130,80 @@
         /* STRIPE BUTTON */
         .stripe-btn {
             width: 100%; padding: 15px; margin-top: 10px;
-            background: #635bff; color: white; /* Stripe Blurple */
+            background: #635bff; color: white; 
             font-family: var(--font-head); font-weight: 800; font-style: italic; font-size: 1rem;
             border: none; border-radius: 8px; cursor: pointer;
             transition: 0.3s; display: flex; justify-content: center; align-items: center; gap: 10px;
             box-shadow: 0 5px 20px rgba(99, 91, 255, 0.3);
         }
         .stripe-btn:hover { background: #7a73ff; box-shadow: 0 5px 30px rgba(99, 91, 255, 0.5); transform: translateY(-2px); }
-        .stripe-btn i { font-size: 1.1rem; }
-
-        .empty-msg { text-align: center; color: #777; font-size: 1.5rem; margin-top: 50px; display: none; font-family: var(--font-head); }
         
-        @media (max-width: 600px) {
+        /* --- FIXED EMPTY STATE --- */
+        .empty-container {
+            text-align: center; padding: 60px 20px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            display: none; /* JS toggles this */
+        }
+        .empty-icon { font-size: 4rem; color: #333; margin-bottom: 20px; }
+        .empty-title { font-size: 2rem; font-weight: 900; font-family: var(--font-head); font-style: italic; color: white; margin-bottom: 10px; }
+        .empty-sub { color: #888; margin-bottom: 30px; font-family: var(--font-body); }
+        .go-back-btn {
+            display: inline-block; padding: 12px 30px;
+            background: var(--accent); color: white;
+            font-weight: 800; font-family: var(--font-head); font-style: italic;
+            text-decoration: none; border-radius: 50px;
+            transition: 0.3s; box-shadow: 0 0 20px var(--accent-glow);
+        }
+        .go-back-btn:hover { transform: scale(1.05); background: white; color: black; }
+        
+        /* --- FOOTER --- */
+        footer { 
+            background: #020202; border-top: 1px solid rgba(255,255,255,0.1); 
+            padding: 80px 20px 40px; margin-top: auto; 
+        }
+        .footer-content { 
+            max-width: 1000px; margin: 0 auto; 
+            display: flex; justify-content: space-evenly; flex-wrap: wrap; gap: 40px; 
+            text-align: left; 
+        }
+        .footer-col { min-width: 200px; }
+        .footer-col p { color: #666; font-size: 0.9rem; line-height: 1.6; max-width: 250px; }
+        .footer-col h4 { 
+            color: white; font-family: var(--font-head); font-weight: 900; font-style: italic; 
+            margin-bottom: 20px; font-size: 1.1rem; letter-spacing: 1px; 
+        }
+        .footer-col a { 
+            display: block; color: #888; text-decoration: none; 
+            margin-bottom: 10px; font-size: 0.9rem; transition: 0.3s; 
+        }
+        .footer-col a:hover { color: var(--accent); transform: translateX(5px); }
+        .social-btn { display: inline-flex; align-items: center; gap: 10px; }
+        
+        .qr-img {
+            width: 80px; height: 80px;
+            border: 2px solid rgba(255,255,255,0.1); border-radius: 8px;
+            padding: 3px; background: white;
+            transition: 0.3s;
+        }
+        .qr-img:hover { transform: scale(1.05); box-shadow: 0 0 20px var(--accent-glow); border-color: var(--accent); }
+
+        .copyright { 
+            text-align: center; color: #444; margin-top: 60px; pt-top: 20px; 
+            border-top: 1px solid #111; font-size: 0.8rem; padding-top: 20px; 
+        }
+        
+        @media (max-width: 768px) {
             .cart-summary { flex-direction: column; text-align: center; gap: 30px; }
             .summary-right { width: 100%; align-items: center; }
+            .footer-content { flex-direction: column; text-align: center; align-items: center; } 
+            .footer-col { text-align: center; } 
         }
     </style>
 </head>
 <body>
 
-    <!-- LOADER -->
     <div id="loader">
         <div class="loader-content">
             <img src="logo.png" class="loader-logo">
@@ -161,45 +215,79 @@
 
     <div class="container">
         <h1>Shopping Cart</h1>
+        
+        <!-- Cart Items -->
         <div id="cartItems"></div>
 
+        <!-- Summary (Checkout) -->
         <div class="cart-summary" id="cartSummary" style="display:none;">
             <div class="summary-left">
-                <h3><i class="fas fa-info-circle"></i> SECURE CHECKOUT</h3>
+                <h3><i class="fas fa-shield-alt"></i> SECURE CHECKOUT</h3>
                 <p>1. Review your items.</p>
                 <p>2. Apply Promo Code if available.</p>
                 <p>3. Pay securely via Stripe.</p>
-                <p style="margin-top:10px; color: #666; font-size: 0.8rem;">Instant delivery via email & Discord.</p>
+                <p style="margin-top:10px; color: #666; font-size: 0.8rem;">Open Ticket In Discord If u Haven't Already.</p>
             </div>
             <div class="summary-right">
-                <!-- DISCOUNT -->
+                <!-- DISCOUNT INPUT -->
                 <div class="discount-box">
                     <input type="text" id="promoInput" class="discount-input" placeholder="Promo Code">
                     <button class="discount-btn" onclick="applyDiscount()">APPLY</button>
                 </div>
-                <div id="discountMsg">CODE APPLIED</div>
+                <div id="discountMsg"></div>
 
-                <div style="font-size: 0.9rem; color:#888; font-weight:bold; margin-top: 10px;">SUBTOTAL</div>
+                <div style="font-size: 0.9rem; color:#888; font-weight:bold;">SUBTOTAL</div>
                 <div class="total-wrapper">
                     <span id="oldPrice" class="old-price"></span>
                     <span class="total-price" id="totalPrice">£0.00</span>
                 </div>
                 
-                <!-- STRIPE BUTTON -->
+                <!-- STRIPE / DEV BUTTON -->
                 <button id="checkout-button" class="stripe-btn">
                     <i class="fas fa-credit-card"></i> PAY WITH STRIPE
                 </button>
             </div>
         </div>
         
-        <div id="emptyCart" class="empty-msg">
-            Your cart is empty.<br>
-            <a href="index.html" style="font-size:1rem; color:var(--accent); text-decoration:none;">Go Back to Shop</a>
+        <!-- Empty Cart Message -->
+        <div id="emptyCart" class="empty-container">
+            <div class="empty-icon"><i class="fas fa-shopping-basket"></i></div>
+            <div class="empty-title">YOUR CART IS EMPTY</div>
+            <div class="empty-sub">Looks like you haven't added anything yet.</div>
+            <a href="index.html" class="go-back-btn">RETURN TO SHOP</a>
         </div>
     </div>
 
+    <footer>
+        <div class="footer-content">
+            <div class="footer-col">
+                <img src="logo.png" style="width: 80px; margin-bottom:15px; opacity:0.7;">
+                <p>Premium digital assets for creators. Elevate your content today.</p>
+            </div>
+            <div class="footer-col">
+                <h4>EXPLORE</h4>
+                <a href="index.html#intros">Intros</a>
+                <a href="index.html#chains">Chains</a>
+                <a href="index.html#gfx">GFX</a>
+            </div>
+            
+            <div class="footer-col">
+                <h4>SCAN</h4>
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://tpstemple.netlify.app//&bgcolor=ffffff&color=000000" alt="QR Code" class="qr-img">
+            </div>
+
+            <div class="footer-col">
+                <h4>SOCIALS</h4>
+                <a href="https://discord.gg/Vc7fjmbXAe" target="_blank" class="social-btn"><i class="fab fa-discord"></i> Discord</a>
+                <a href="https://youtube.com/@tps_temple" target="_blank" class="social-btn"><i class="fab fa-youtube"></i> YouTube</a>
+            </div>
+        </div>
+        <div class="copyright">
+            &copy; 2025 TPS TEMPLE. All rights reserved.
+        </div>
+    </footer>
+
     <script>
-        /* LOADER LOGIC */
         window.addEventListener('load', () => {
             setTimeout(() => {
                 document.getElementById('loader').style.opacity = '0';
@@ -223,9 +311,10 @@
             cartContainer.innerHTML = '';
             let total = 0;
 
-            if (cart.length === 0) {
+            // FIX: Check for empty cart correctly
+            if (!cart || cart.length === 0) {
                 cartSummary.style.display = 'none';
-                emptyMsg.style.display = 'block';
+                emptyMsg.style.display = 'block'; // Shows the new empty container
                 return;
             } else {
                 emptyMsg.style.display = 'none';
@@ -257,43 +346,38 @@
                 cartContainer.innerHTML += html;
             });
 
-            // --- DISCOUNT LOGIC ---
+            // --- DISCOUNT VISUAL LOGIC ---
             if(devMode) {
-                // 1956 (100% Off)
                 oldPriceEl.innerText = '£' + total.toFixed(2);
                 oldPriceEl.style.display = 'inline';
                 totalEl.innerText = '£0.00';
-                totalEl.style.color = '#00ff88'; // Green
+                totalEl.style.color = '#00ff88';
                 
-                // Update Button Appearance for Dev Mode
                 checkoutBtn.innerHTML = '<i class="fas fa-lock-open"></i> DEV BYPASS';
                 checkoutBtn.style.background = "#00ff88";
                 checkoutBtn.style.color = "#000";
                 checkoutBtn.style.boxShadow = "0 0 20px rgba(0,255,136,0.4)";
             } 
             else if(discountApplied) {
-                // XMAS (20% Off)
                 oldPriceEl.innerText = '£' + total.toFixed(2);
                 oldPriceEl.style.display = 'inline';
                 let newTotal = total * 0.80; 
                 totalEl.innerText = '£' + newTotal.toFixed(2);
                 totalEl.style.color = '#00ff88';
                 
-                // Reset Button to Stripe
                 checkoutBtn.innerHTML = '<i class="fas fa-credit-card"></i> PAY WITH STRIPE';
                 checkoutBtn.style.background = "#635bff";
                 checkoutBtn.style.color = "#fff";
+                checkoutBtn.style.boxShadow = "0 5px 20px rgba(99, 91, 255, 0.3)";
             } else {
-                // Normal
                 totalEl.innerText = '£' + total.toFixed(2);
                 oldPriceEl.style.display = 'none';
-                totalEl.style.color = '#ff1f1f'; // Red
+                totalEl.style.color = '#ff1f1f'; 
                 
-                // Reset Button to Stripe
                 checkoutBtn.innerHTML = '<i class="fas fa-credit-card"></i> PAY WITH STRIPE';
                 checkoutBtn.style.background = "#635bff";
                 checkoutBtn.style.color = "#fff";
-                checkoutBtn.style.boxShadow = "";
+                checkoutBtn.style.boxShadow = "0 5px 20px rgba(99, 91, 255, 0.3)";
             }
         }
 
@@ -310,7 +394,7 @@
         }
 
         function applyDiscount() {
-            const input = document.getElementById('promoInput').value.toUpperCase();
+            const input = document.getElementById('promoInput').value.trim().toUpperCase();
             
             if(input === "1956") {
                 devMode = true;
@@ -330,63 +414,51 @@
             } 
             else {
                 alert("Invalid Code");
+                discountMsg.style.display = "none";
+                discountApplied = false;
+                devMode = false;
+                renderCart();
             }
         }
 
-        renderCart();
-
-        /* --- CHECKOUT LOGIC --- */
-        // 1. Initialize Stripe
-        // REPLACE THIS WITH YOUR PUBLIC KEY FROM STRIPE DASHBOARD
+        // REPLACE WITH YOUR REAL PUBLIC KEY
         const stripe = Stripe('pk_live_51LDw4PLHs0w9JjR8nBwavRWVfCsKh1Tz7YJfkjwjNN9edtqvpnVZ8axuOTVQfUAquAgdksq9jBHX8VKXll5Ft6ss008lzh2Gq3'); 
 
         checkoutBtn.addEventListener('click', async function() {
             const btn = this;
             const originalText = btn.innerHTML;
-            const cartData = JSON.parse(localStorage.getItem('mtpCart')) || [];
             
-            if(cartData.length === 0) { alert("Cart is empty."); return; }
+            if(cart.length === 0) { alert("Cart is empty."); return; }
 
-            // Visual Loading State
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> PROCESSING...';
-            btn.style.pointerEvents = "none";
             btn.style.opacity = "0.8";
+            btn.style.pointerEvents = "none";
 
-            // Determine Code
             let codeToSend = "";
             if(devMode) codeToSend = "1956";
             else if(discountApplied) codeToSend = "XMAS";
 
             try {
-                // 2. Call Netlify Backend
                 const response = await fetch('/.netlify/functions/create-checkout', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
-                        cart: cartData,
+                        cart: cart,
                         discountCode: codeToSend
                     }),
                 });
 
                 const data = await response.json();
 
-                if (data.error) {
-                    throw new Error(data.error);
-                }
+                if (data.error) { throw new Error(data.error); }
 
-                // 3. Handle Response
                 if (data.bypassUrl) {
-                    // Dev Mode -> Skip Stripe, Go to Success
                     localStorage.removeItem('mtpCart');
                     window.location.href = data.bypassUrl;
                 } 
                 else if (data.id) {
-                    // Normal -> Go to Stripe
                     const result = await stripe.redirectToCheckout({ sessionId: data.id });
-                    if (result.error) { 
-                        alert(result.error.message); 
-                        resetBtn(); 
-                    }
+                    if (result.error) { alert(result.error.message); resetBtn(); }
                 }
 
             } catch (error) {
@@ -397,10 +469,13 @@
 
             function resetBtn() {
                 btn.innerHTML = originalText;
-                btn.style.pointerEvents = "all";
                 btn.style.opacity = "1";
+                btn.style.pointerEvents = "all";
             }
         });
+        
+        // Run on load
+        renderCart();
     </script>
 </body>
 </html>

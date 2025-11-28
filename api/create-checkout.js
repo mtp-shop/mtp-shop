@@ -2,7 +2,7 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const axios = require('axios');
 
 export default async function handler(req, res) {
-  // 1. Handle CORS
+  // 1. Handle CORS (Essential for Vercel)
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
@@ -22,8 +22,9 @@ export default async function handler(req, res) {
 
   try {
     const { cart, discountCode } = req.body;
-    // Get dynamic origin
-    const origin = req.headers.origin || 'https://tpstemple.vercel.app';
+    
+    // Fix: Handle trailing slashes in origin
+    const origin = (req.headers.origin || 'https://tpstemple.vercel.app').replace(/\/$/, "");
 
     // --- DEV MODE BYPASS (1956) ---
     if (discountCode === "1956") {
@@ -87,7 +88,7 @@ export default async function handler(req, res) {
     return res.status(200).json({ id: session.id });
 
   } catch (error) {
-    console.error("Error:", error);
+    console.error("Server Error:", error);
     return res.status(500).json({ error: error.message });
   }
 }

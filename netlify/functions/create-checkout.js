@@ -18,6 +18,7 @@ exports.handler = async (event) => {
     // --- DEV MODE BYPASS (1956) ---
     if (discountCode === "1956") {
         console.log("Dev Mode 1956 Activated");
+
         try {
             await axios.post(process.env.DISCORD_WEBHOOK_URL, {
                 username: "TPS Shop Bot",
@@ -52,7 +53,8 @@ exports.handler = async (event) => {
           currency: 'gbp',
           product_data: {
             name: item.title,
-            images: ['https://placehold.co/400x400/000000/FFFFFF.png?text=TPS+Asset'], 
+            // FIX: Use the actual image from the cart instead of a placeholder
+            images: [item.img], 
           },
           unit_amount: Math.round(priceValue * 100),
         },
@@ -60,9 +62,9 @@ exports.handler = async (event) => {
       };
     });
 
-    // --- FIX IS HERE: CHANGED AUTOMATIC METHODS TO EXPLICIT LIST ---
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card', 'paypal'], // If you have PayPal enabled in Stripe, change this to: ['card', 'paypal']
+      // Enable Card + PayPal + Apple/Google Pay automatically based on dashboard settings
+      payment_method_types: ['card', 'paypal'], 
       line_items: line_items,
       mode: 'payment',
       invoice_creation: { enabled: true },

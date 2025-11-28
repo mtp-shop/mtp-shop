@@ -15,16 +15,15 @@ exports.handler = async (event) => {
   try {
     const { cart, discountCode } = JSON.parse(event.body);
 
-    // --- DEV MODE BYPASS (1956) ---
+    // --- DEV MODE BYPASS (1956) - FREE ---
     if (discountCode === "1956") {
         console.log("Dev Mode 1956 Activated");
-
         try {
             await axios.post(process.env.DISCORD_WEBHOOK_URL, {
                 username: "TPS Shop Bot",
                 embeds: [{
                     title: "🛠️ DEV BYPASS SUCCESS",
-                    description: "Code `1956` used.",
+                    description: "Code `1956` used (Bypass).",
                     color: 5763719, // Green
                     fields: [
                         { name: "Items", value: cart.map(i => `${i.qty}x ${i.title}`).join('\n') || "Unknown" },
@@ -46,24 +45,29 @@ exports.handler = async (event) => {
 
     const line_items = cart.map(item => {
       let priceValue = parseFloat(item.price.replace('£', '').replace('+', ''));
-      if(discountCode === "XMAS") priceValue = priceValue * 0.8;
+      
+      // HANDLE DISCOUNTS
+      if(discountCode === "XMAS") {
+          priceValue = priceValue * 0.8; // 20% Off
+      } 
+      else if (discountCode === "195612") {
+          priceValue = 0.30; // STRIPE TEST MODE: Minimum allowed is 30p
+      }
 
       return {
         price_data: {
           currency: 'gbp',
           product_data: {
             name: item.title,
-            // FIX: Use the actual image from the cart instead of a placeholder
             images: [item.img], 
           },
-          unit_amount: Math.round(priceValue * 100),
+          unit_amount: Math.round(priceValue * 100), // Convert to pence
         },
         quantity: item.qty,
       };
     });
 
     const session = await stripe.checkout.sessions.create({
-      // Enable Card + PayPal + Apple/Google Pay automatically based on dashboard settings
       payment_method_types: ['card', 'paypal'], 
       line_items: line_items,
       mode: 'payment',

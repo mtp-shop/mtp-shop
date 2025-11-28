@@ -13,16 +13,11 @@ exports.handler = async (event) => {
   }
 
   try {
-    console.log("Function started..."); 
     const { cart, discountCode } = JSON.parse(event.body);
 
     // --- DEV MODE BYPASS (1956) ---
     if (discountCode === "1956") {
-        console.log("Dev Mode detected. Attempting Discord alert...");
-
-        if (!process.env.DISCORD_WEBHOOK_URL) {
-            console.error("ERROR: DISCORD_WEBHOOK_URL is missing in Netlify settings.");
-        }
+        console.log("Dev Mode 1956 Activated");
 
         try {
             await axios.post(process.env.DISCORD_WEBHOOK_URL, {
@@ -38,19 +33,17 @@ exports.handler = async (event) => {
                     timestamp: new Date().toISOString()
                 }]
             });
-            console.log("Discord message sent successfully.");
-        } catch (err) {
-            console.error("Discord Failed:", err.message);
-        }
+        } catch (err) { console.error("Discord Error:", err.message); }
 
         return {
-            statusCode: 200,
-            headers,
+            statusCode: 200, headers,
             body: JSON.stringify({ bypassUrl: `${event.headers.origin}/index.html?payment=dev_success` }),
         };
     }
 
     // --- NORMAL STRIPE FLOW ---
+    const itemSummary = cart.map(i => `${i.qty}x ${i.title}`).join(', ');
+
     const line_items = cart.map(item => {
       let priceValue = parseFloat(item.price.replace('£', '').replace('+', ''));
       if(discountCode === "XMAS") priceValue = priceValue * 0.8;
@@ -69,27 +62,20 @@ exports.handler = async (event) => {
     });
 
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
+      // CHANGED: Removed ['card'] and added automatic methods
+      automatic_payment_methods: { enabled: true }, 
       line_items: line_items,
       mode: 'payment',
       invoice_creation: { enabled: true },
-      allow_promotion_codes: true, 
+      metadata: { items: itemSummary },
       success_url: `${event.headers.origin}/index.html?payment=success`,
       cancel_url: `${event.headers.origin}/cart.html?payment=cancelled`,
     });
 
-    return {
-      statusCode: 200,
-      headers,
-      body: JSON.stringify({ id: session.id }),
-    };
+    return { statusCode: 200, headers, body: JSON.stringify({ id: session.id }) };
 
   } catch (error) {
-    console.error("CRITICAL ERROR:", error);
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({ error: error.message }),
-    };
+    console.error("Error:", error);
+    return { statusCode: 500, headers, body: JSON.stringify({ error: error.message }) };
   }
 };

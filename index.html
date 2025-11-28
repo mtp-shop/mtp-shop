@@ -41,6 +41,40 @@
             min-height: 100vh;
         }
 
+        /* --- NEW FEATURE: LOCK SCREEN --- */
+        #lock-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #050505; z-index: 100000; /* Highest Layer */
+            display: flex; justify-content: center; align-items: center;
+            flex-direction: column;
+            transition: transform 0.8s cubic-bezier(0.77, 0, 0.175, 1), opacity 0.8s ease;
+        }
+        #lock-screen.unlocked { transform: translateY(-100%); opacity: 0; pointer-events: none; }
+        
+        .lock-content {
+            text-align: center; position: relative; padding: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.1); background: rgba(10, 10, 10, 0.5);
+            backdrop-filter: blur(10px); border-radius: 20px; box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
+        }
+        .lock-icon { font-size: 3rem; color: var(--text-dim); margin-bottom: 20px; animation: pulseLock 2s infinite; }
+        .lock-title { font-family: var(--font-head); font-weight: 900; font-style: italic; font-size: 2rem; margin: 0; letter-spacing: -1px; color: white; }
+        .lock-sub { font-family: var(--font-tech); color: var(--accent); font-size: 0.8rem; letter-spacing: 3px; margin-bottom: 30px; }
+        
+        .input-group { position: relative; width: 200px; margin: 0 auto 20px; }
+        #passcode {
+            background: transparent; border: none; outline: none; border-bottom: 2px solid #333;
+            width: 100%; color: white; font-family: var(--font-tech); font-size: 2rem;
+            text-align: center; letter-spacing: 15px; padding: 10px; transition: 0.3s;
+        }
+        #passcode:focus { border-color: var(--accent); }
+        
+        #lock-msg { font-family: var(--font-tech); font-size: 0.8rem; color: #555; height: 20px; font-weight: bold; }
+        
+        @keyframes shake-lock { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-10px); } 40%, 80% { transform: translateX(10px); } }
+        .access-denied { color: var(--accent) !important; animation: shake-lock 0.4s ease-in-out; }
+        .access-granted { color: #00ff88 !important; text-shadow: 0 0 10px #00ff88; }
+        @keyframes pulseLock { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+
         /* --- FEATURE: SCROLL PROGRESS BAR --- */
         #scroll-progress {
             position: fixed; top: 0; left: 0; height: 3px; background: var(--accent);
@@ -129,7 +163,6 @@
         .cart-link:hover { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 25px var(--accent-glow); }
 
         /* CART ANIMATIONS */
-        /* Initial Shake (Fast) */
         @keyframes shake-hard {
             0% { transform: translate(1px, 1px) rotate(0deg); }
             20% { transform: translate(-3px, 0px) rotate(1deg); }
@@ -138,21 +171,19 @@
             80% { transform: translate(-1px, -1px) rotate(1deg); }
             100% { transform: translate(1px, -2px) rotate(-1deg); }
         }
-        
-        /* Persistent Slow Interval Shake */
         @keyframes shake-interval {
             0% { transform: rotate(0deg); }
             2% { transform: rotate(5deg); }
             4% { transform: rotate(-5deg); }
             6% { transform: rotate(5deg); }
             8% { transform: rotate(0deg); }
-            100% { transform: rotate(0deg); } /* Waits here for the rest of the duration */
+            100% { transform: rotate(0deg); } 
         }
 
         .cart-shaking { animation: shake-hard 0.5s; background: var(--accent) !important; color: white !important; border-color: #fff !important; }
         
         .cart-persistent { 
-            animation: shake-interval 5s infinite ease-in-out; /* Shakes every 5 seconds */
+            animation: shake-interval 5s infinite ease-in-out;
             background: var(--accent) !important; 
             color: white !important; 
             font-weight: 900 !important;
@@ -367,6 +398,21 @@
     </style>
 </head>
 <body>
+    <!-- LOCK SCREEN -->
+    <div id="lock-screen">
+        <div class="lock-content">
+            <div class="lock-icon"><i class="fas fa-lock"></i></div>
+            <h2 class="lock-title">RESTRICTED ACCESS</h2>
+            <p class="lock-sub">AUTHENTICATION REQUIRED</p>
+            
+            <div class="input-group">
+                <input type="password" id="passcode" maxlength="4" placeholder="_ _ _ _" autocomplete="off">
+            </div>
+            
+            <div id="lock-msg">ENTER PASSCODE</div>
+        </div>
+    </div>
+
     <div class="nv-overlay" id="nvScan"></div>
     <div class="nv-grain" id="nvGrain"></div>
 
@@ -438,10 +484,8 @@
                 <div class="review-header"><img src="https://cdn.discordapp.com/avatars/1078371560781529139/e225b70014c20061936ace207925adf0.webp?size=1024" class="discord-pfp"><div class="reviewer-info"><span class="reviewer-name">@Ryze</span><div class="stars">★★★★★</div></div></div>
                 <p class="review-text">"GOATED 10/10 got me right and shi is tuffff."</p>
             </div>
-            <!-- ADDED PLACEHOLDERS -->
             <div class="review-card" data-tilt data-tilt-glare data-tilt-max-glare="0.1">
-                <div class="review-header"><img src="https://cdn.discordapp.com/avatars/1216332081756639252/44f82a16050500cad8ce62d9d76cd6dc.webp?size=1024" class="discord-pfp" style="background:#111;"><div class="reviewer-info"><span class="reviewer-name">@Trez
-</span><div class="stars">★★★★★</div></div></div>
+                <div class="review-header"><img src="https://cdn.discordapp.com/avatars/1216332081756639252/44f82a16050500cad8ce62d9d76cd6dc.webp?size=1024" class="discord-pfp" style="background:#111;"><div class="reviewer-info"><span class="reviewer-name">@Trez</span><div class="stars">★★★★★</div></div></div>
                 <p class="review-text">"100/10 Going To Bro Everytime !!!"</p>
             </div>
             <div class="review-card" data-tilt data-tilt-glare data-tilt-max-glare="0.1">
@@ -613,15 +657,68 @@
 
     <script>
         window.addEventListener('load', () => {
-            setTimeout(() => {
-                document.getElementById('loader').style.opacity = '0';
-                setTimeout(() => { document.getElementById('loader').style.display = 'none'; }, 500);
-                document.querySelectorAll('.blur-load').forEach((el, i) => {
-                    setTimeout(() => el.classList.add('blur-active'), i * 200);
-                });
-            }, 1000);
+            // Check if locked, otherwise run loader logic
+            const lockScreen = document.getElementById('lock-screen');
+            if (sessionStorage.getItem('tps_unlocked') === 'true') {
+                lockScreen.style.display = 'none';
+                // Only run loader fade out if unlocked
+                setTimeout(() => {
+                    document.getElementById('loader').style.opacity = '0';
+                    setTimeout(() => { document.getElementById('loader').style.display = 'none'; }, 500);
+                    document.querySelectorAll('.blur-load').forEach((el, i) => {
+                        setTimeout(() => el.classList.add('blur-active'), i * 200);
+                    });
+                }, 1000);
+            } else {
+                // If locked, loader stays active but hidden behind lock screen
+                // We'll hide loader immediately so it doesn't flash when unlocking
+                document.getElementById('loader').style.display = 'none';
+            }
             updateCartButton();
         });
+
+        /* --- LOCK SCREEN LOGIC --- */
+        const lockScreen = document.getElementById('lock-screen');
+        const passInput = document.getElementById('passcode');
+        const lockMsg = document.getElementById('lock-msg');
+        const correctPass = "0112";
+
+        if (sessionStorage.getItem('tps_unlocked') !== 'true') {
+            document.body.style.overflow = 'hidden';
+            passInput.focus();
+        }
+
+        passInput.addEventListener('input', (e) => {
+            const val = e.target.value;
+            if (val.length === 4) {
+                if (val === correctPass) {
+                    lockMsg.innerText = "ACCESS GRANTED";
+                    lockMsg.className = "access-granted";
+                    passInput.style.borderColor = "#00ff88";
+                    
+                    setTimeout(() => {
+                        lockScreen.classList.add('unlocked');
+                        document.body.style.overflow = 'auto';
+                        sessionStorage.setItem('tps_unlocked', 'true');
+                        // Trigger blur loads now that we are in
+                        document.querySelectorAll('.blur-load').forEach((el, i) => {
+                            setTimeout(() => el.classList.add('blur-active'), i * 200);
+                        });
+                    }, 800);
+                } else {
+                    lockMsg.innerText = "ACCESS DENIED";
+                    lockMsg.className = "access-denied";
+                    passInput.value = "";
+                    passInput.style.borderColor = "var(--accent)";
+                    setTimeout(() => {
+                        lockMsg.innerText = "ENTER PASSCODE";
+                        lockMsg.classList.remove('access-denied');
+                        passInput.style.borderColor = "#333";
+                    }, 1000);
+                }
+            }
+        });
+        lockScreen.addEventListener('click', () => { if(sessionStorage.getItem('tps_unlocked') !== 'true') passInput.focus(); });
 
         /* --- FEATURE: BROWSER TAB TICKER --- */
         let docTitle = document.title + "  ///  ";

@@ -2,7 +2,7 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const axios = require('axios');
 
 export default async function handler(req, res) {
-  // 1. Handle CORS (Allow your site to talk to this backend)
+  // 1. Handle CORS
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
@@ -11,7 +11,6 @@ export default async function handler(req, res) {
     'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
   );
 
-  // 2. Handle Options (Pre-flight check)
   if (req.method === 'OPTIONS') {
     res.status(200).end();
     return;
@@ -23,19 +22,19 @@ export default async function handler(req, res) {
 
   try {
     const { cart, discountCode } = req.body;
-    // Get the website URL automatically
-    const origin = req.headers.origin || 'https://tpstemple.vercel.app'; 
+    // Get dynamic origin
+    const origin = req.headers.origin || 'https://tpstemple.vercel.app';
 
     // --- DEV MODE BYPASS (1956) ---
     if (discountCode === "1956") {
         try {
-            if(process.env.DISCORD_WEBHOOK_URL) {
+            if (process.env.DISCORD_WEBHOOK_URL) {
                 await axios.post(process.env.DISCORD_WEBHOOK_URL, {
                     username: "TPS Shop Bot",
                     embeds: [{
                         title: "🛠️ DEV BYPASS SUCCESS",
                         description: "Code `1956` used.",
-                        color: 5763719, // Green
+                        color: 5763719,
                         fields: [
                             { name: "Items", value: cart.map(i => `${i.qty}x ${i.title}`).join('\n') || "Unknown" },
                             { name: "Amount", value: "£0.00", inline: true }
@@ -49,14 +48,18 @@ export default async function handler(req, res) {
         return res.status(200).json({ bypassUrl: `${origin}/index.html?payment=dev_success` });
     }
 
-    // --- NORMAL STRIPE FLOW ---
+    // --- STRIPE FLOW ---
     const itemSummary = cart.map(i => `${i.qty}x ${i.title}`).join(', ');
 
     const line_items = cart.map(item => {
       let priceValue = parseFloat(item.price.replace('£', '').replace('+', ''));
       
-      if(discountCode === "XMAS") priceValue = priceValue * 0.8;
-      else if(discountCode === "195612") priceValue = 0.30;
+      if(discountCode === "XMAS") {
+          priceValue = priceValue * 0.8;
+      } 
+      else if (discountCode === "195612") {
+          priceValue = 0.30;
+      }
 
       return {
         price_data: {

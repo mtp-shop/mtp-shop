@@ -1,8 +1,9 @@
 import { buffer } from 'micro';
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-const axios = require('axios');
+import Stripe from 'stripe';
+import axios from 'axios';
 
-// Tell Vercel not to touch the raw body (needed for Stripe security)
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
 export const config = {
   api: {
     bodyParser: false,
@@ -29,14 +30,12 @@ export default async function handler(req, res) {
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object;
     
-    // 1. Extract Details
     const amount = (session.amount_total / 100).toFixed(2);
     const currency = session.currency.toUpperCase();
     const email = session.customer_details?.email || "No email";
     const name = session.customer_details?.name || "Guest";
     const itemsBought = session.metadata?.items || "Items not listed";
 
-    // 2. Send to Discord
     try {
       await axios.post(process.env.DISCORD_WEBHOOK_URL, {
         embeds: [{

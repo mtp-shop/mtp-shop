@@ -1,5 +1,5 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-const axios = require('axios'); // Required for sending Dev Mode alerts
+const axios = require('axios');
 
 exports.handler = async (event) => {
   const headers = {
@@ -13,33 +13,39 @@ exports.handler = async (event) => {
   }
 
   try {
+    console.log("Function started..."); // Debug Log 1
     const { cart, discountCode } = JSON.parse(event.body);
 
     // --- DEV MODE BYPASS (1956) ---
     if (discountCode === "1956") {
-        console.log("Dev Mode 1956 Activated - Bypassing Stripe");
+        console.log("Dev Mode detected. Attempting Discord alert...");
 
-        // 1. Send Notification to Discord Manually (Since Stripe won't trigger webhook)
+        if (!process.env.DISCORD_WEBHOOK_URL) {
+            console.error("ERROR: DISCORD_WEBHOOK_URL is missing in Netlify settings.");
+        }
+
         try {
             await axios.post(process.env.DISCORD_WEBHOOK_URL, {
+                username: "TPS Shop Bot",
                 embeds: [{
-                    title: "🛠️ DEV OVERRIDE ORDER",
-                    description: "Code `1956` used. 100% Discount Applied.",
-                    color: 5763719, // Green Color
+                    title: "🛠️ DEV BYPASS SUCCESS",
+                    description: "Code `1956` used.",
+                    color: 5763719, // Green
                     fields: [
-                        { name: "Status", value: "✅ Bypass Successful", inline: true },
-                        { name: "Amount", value: "£0.00 (Free)", inline: true },
-                        { name: "Items", value: cart.map(i => `${i.qty}x ${i.title}`).join('\n') || "Unknown" }
+                        { name: "Items", value: cart.map(i => `${i.qty}x ${i.title}`).join('\n') || "Unknown" },
+                        { name: "Amount", value: "£0.00", inline: true }
                     ],
-                    footer: { text: "TPS TEMPLE | Dev System" },
                     timestamp: new Date().toISOString()
                 }]
             });
+            console.log("Discord message sent successfully.");
         } catch (err) {
-            console.error("Discord notification failed", err);
+            console.error("Discord Failed:", err.message);
+            if (err.response) {
+                console.error("Discord Response Data:", JSON.stringify(err.response.data));
+            }
         }
 
-        // 2. Return Success URL immediately (Skip Stripe)
         return {
             statusCode: 200,
             headers,
@@ -50,21 +56,17 @@ exports.handler = async (event) => {
     // --- NORMAL STRIPE FLOW ---
     const line_items = cart.map(item => {
       let priceValue = parseFloat(item.price.replace('£', '').replace('+', ''));
-      
-      if(discountCode === "XMAS") {
-          priceValue = priceValue * 0.8; // 20% Off
-      }
-
-      const amountInPence = Math.round(priceValue * 100);
+      if(discountCode === "XMAS") priceValue = priceValue * 0.8;
 
       return {
         price_data: {
           currency: 'gbp',
           product_data: {
             name: item.title,
-            images: ['https://i.imgur.com/yW1iXw5.png'], 
+            // Fallback image if none provided
+            images: ['https://placehold.co/400x400/000000/FFFFFF.png?text=TPS+Asset'], 
           },
-          unit_amount: amountInPence,
+          unit_amount: Math.round(priceValue * 100),
         },
         quantity: item.qty,
       };
@@ -87,7 +89,7 @@ exports.handler = async (event) => {
     };
 
   } catch (error) {
-    console.error("Error:", error);
+    console.error("CRITICAL ERROR:", error);
     return {
       statusCode: 500,
       headers,

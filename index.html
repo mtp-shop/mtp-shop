@@ -319,11 +319,12 @@
 
         .copyright { text-align: center; color: #444; margin-top: 20px; font-size: 0.8rem; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px; }
         
+        /* --- MOBILE FIXES --- */
         @media (max-width: 768px) { 
             .footer-content { flex-direction: column; text-align: center; align-items: center; } 
             .footer-col { text-align: center; } 
             
-            /* --- FIXED: HIDE CLOCK ON MOBILE TO PREVENT OVERLAP --- */
+            /* HIDE CLOCK ON MOBILE TO PREVENT OVERLAP */
             .ip-clock-container { display: none; }
         }
 
@@ -895,37 +896,63 @@
             });
         });
 
-        /* --- REAL RECENT SALES POPUP --- */
+        /* --- REAL RECENT SALES POPUP (UPDATED) --- */
+        let lastShownIndex = -1; // Track last shown to reduce repetition
+
         async function fetchRecentSales() {
             try {
                 const res = await fetch('/api/recent-sales');
                 const data = await res.json();
                 
                 if(data.sales && data.sales.length > 0) {
-                    const sale = data.sales[Math.floor(Math.random() * data.sales.length)];
-                    showSalesToast(sale.items, sale.location);
+                    // Logic to pick a random sale, trying not to repeat the immediate last one
+                    let randomIndex = Math.floor(Math.random() * data.sales.length);
+                    
+                    if (data.sales.length > 1 && randomIndex === lastShownIndex) {
+                        randomIndex = (randomIndex + 1) % data.sales.length;
+                    }
+                    
+                    lastShownIndex = randomIndex;
+                    const sale = data.sales[randomIndex];
+                    
+                    showSalesToast(sale.item, sale.name, sale.country);
                 }
             } catch (e) { console.error("Sales fetch error", e); }
         }
 
-        function showSalesToast(item, location) {
+        function showSalesToast(item, name, countryCode) {
+            let countryName = countryCode;
+            try {
+                const regionNames = new Intl.DisplayNames(['en'], {type: 'region'});
+                countryName = regionNames.of(countryCode);
+            } catch(e) { /* Fallback */ }
+
+            const locationText = `${name} from ${countryName}`;
+
             const toast = document.createElement('div');
             toast.style.cssText = `
                 position: fixed; bottom: 20px; left: 20px;
-                background: rgba(5, 5, 5, 0.9); border: 1px solid #333;
+                background: rgba(5, 5, 5, 0.95); border: 1px solid #333;
                 border-left: 3px solid #00ff88; padding: 15px 20px;
                 border-radius: 8px; z-index: 9999; backdrop-filter: blur(10px);
                 box-shadow: 0 10px 30px rgba(0,0,0,0.5);
                 font-family: var(--font-tech); font-size: 0.8rem;
                 transform: translateY(100px); transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-                display: flex; gap: 15px; align-items: center;
+                display: flex; gap: 15px; align-items: center; min-width: 250px;
             `;
             
             toast.innerHTML = `
-                <i class="fas fa-shopping-bag" style="color: #00ff88; font-size: 1.2rem;"></i>
+                <div style="background:rgba(0,255,136,0.1); padding:8px; border-radius:50%;">
+                    <i class="fas fa-shopping-bag" style="color: #00ff88; font-size: 1.2rem;"></i>
+                </div>
                 <div>
-                    <div style="color: #888; font-size: 0.7rem; text-transform: uppercase;">Recent Purchase • ${location}</div>
-                    <div style="color: white; font-weight: 700; margin-top: 2px;">${item}</div>
+                    <div style="color: #888; font-size: 0.7rem; text-transform: uppercase; letter-spacing:1px; margin-bottom:2px;">
+                        RECENT PURCHASE
+                    </div>
+                    <div style="color: white; font-weight: 700; font-size: 0.95rem;">${item}</div>
+                    <div style="color: #aaa; font-size: 0.75rem; margin-top: 2px;">
+                        <i class="fas fa-globe-americas" style="font-size:0.7rem; margin-right:4px;"></i> ${locationText}
+                    </div>
                 </div>
             `;
 
@@ -936,11 +963,11 @@
             setTimeout(() => {
                 toast.style.transform = 'translateY(100px)';
                 setTimeout(() => toast.remove(), 500);
-            }, 5000);
+            }, 6000);
         }
 
-        setTimeout(fetchRecentSales, 5000);
-        setInterval(fetchRecentSales, 60000);
+        setTimeout(fetchRecentSales, 4000);
+        setInterval(fetchRecentSales, 45000);
     </script>
 </body>
 </html>

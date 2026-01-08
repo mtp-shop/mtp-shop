@@ -127,6 +127,8 @@
             flex: 1; background: transparent; 
             border: 1px solid #444; padding: 10px; color: white; 
             border-radius: 4px; font-family: var(--font-body); 
+            /* FIX FOR IPHONE ZOOMING: 16px is the minimum to prevent auto-zoom */
+            font-size: 16px; 
         }
         .discount-btn { background: #333; color: white; border: 1px solid #444; padding: 10px 20px; cursor: pointer; border-radius: 4px; font-weight: bold; transition: 0.2s; }
         .discount-btn:hover { background: #555; }
@@ -456,7 +458,6 @@
             }
         }
 
-        // --- UPDATED CHECKOUT LOGIC (Saves Order for Success Page) ---
         // REPLACE WITH YOUR REAL PUBLIC KEY
         const stripe = Stripe('pk_live_51LDw4PLHs0w9JjR8nBwavRWVfCsKh1Tz7YJfkjwjNN9edtqvpnVZ8axuOTVQfUAquAgdksq9jBHX8VKXll5Ft6ss008lzh2Gq3'); 
 
@@ -470,7 +471,7 @@
             btn.style.opacity = "0.8";
             btn.style.pointerEvents = "none";
 
-            // 1. Save Pending Order So Success Page Can Read It
+            // SAVE PENDING ORDER BEFORE STRIPE REDIRECT (Fixes Missing Items on Return)
             localStorage.setItem('mtpPendingOrder', JSON.stringify(cart));
 
             try {

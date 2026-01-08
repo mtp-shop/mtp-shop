@@ -129,7 +129,6 @@
         .cart-link:hover { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 25px var(--accent-glow); }
 
         /* CART ANIMATIONS */
-        /* Initial Shake (Fast) */
         @keyframes shake-hard {
             0% { transform: translate(1px, 1px) rotate(0deg); }
             20% { transform: translate(-3px, 0px) rotate(1deg); }
@@ -139,20 +138,19 @@
             100% { transform: translate(1px, -2px) rotate(-1deg); }
         }
         
-        /* Persistent Slow Interval Shake */
         @keyframes shake-interval {
             0% { transform: rotate(0deg); }
             2% { transform: rotate(5deg); }
             4% { transform: rotate(-5deg); }
             6% { transform: rotate(5deg); }
             8% { transform: rotate(0deg); }
-            100% { transform: rotate(0deg); } /* Waits here for the rest of the duration */
+            100% { transform: rotate(0deg); } 
         }
 
         .cart-shaking { animation: shake-hard 0.5s; background: var(--accent) !important; color: white !important; border-color: #fff !important; }
         
         .cart-persistent { 
-            animation: shake-interval 5s infinite ease-in-out; /* Shakes every 5 seconds */
+            animation: shake-interval 5s infinite ease-in-out; 
             background: var(--accent) !important; 
             color: white !important; 
             font-weight: 900 !important;
@@ -314,10 +312,13 @@
 
         .copyright { text-align: center; color: #444; margin-top: 20px; font-size: 0.8rem; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px; }
         
+        /* --- MOBILE FIXES --- */
         @media (max-width: 768px) { 
             .footer-content { flex-direction: column; text-align: center; align-items: center; } 
             .footer-col { text-align: center; } 
-            .ip-clock-container { left: 10px; }
+            
+            /* HIDE CLOCK ON MOBILE TO PREVENT OVERLAP */
+            .ip-clock-container { display: none; }
         }
 
         /* --- MODAL --- */
@@ -412,7 +413,6 @@
             <a href="#chains">CHAINS</a>
             <a href="#gfx">GFX</a>
             <a href="#clothing">CLOTHING</a>
-            <!-- NEW SECTION LINK -->
             <a href="#tutorials">TUTORIALS</a>
             <a href="https://discord.gg/Vc7fjmbXAe" target="_blank" style="color:var(--accent);">DISCORD</a>
             <a onclick="goToCart(event)" class="cart-link" id="cartNavBtn">CART <i class="fas fa-shopping-cart"></i></a>
@@ -782,7 +782,7 @@
         });
         document.querySelectorAll('.hidden').forEach((el) => observer.observe(el));
 
-        /* MODAL LOGIC - STATIC TEXT VERSION */
+        /* MODAL LOGIC */
         const modal = document.getElementById('productModal');
         const modalImg = document.getElementById('modalImg');
         const modalTitle = document.getElementById('modalTitle');
@@ -825,7 +825,7 @@
             
             const note = document.getElementById('cart-notification'); note.classList.add('active'); setTimeout(() => { note.classList.remove('active'); }, 3000);
             
-            // SHAKE ANIMATION (Initial Fast Shake)
+            // SHAKE ANIMATION
             const btn = document.getElementById('cartNavBtn'); 
             btn.classList.add('cart-shaking'); 
             setTimeout(() => { btn.classList.remove('cart-shaking'); }, 500);
@@ -856,10 +856,8 @@
             
             document.getElementById("scroll-progress").style.width = scrolled + "%";
             
-            // Update dots
             updateDots(scrolled);
 
-            // Toggle Back to Top
             const btn = document.querySelector('.back-to-top');
             if(winScroll > 500) btn.classList.add('visible');
             else btn.classList.remove('visible');

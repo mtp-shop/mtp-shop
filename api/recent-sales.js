@@ -8,27 +8,35 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'GET');
 
   try {
-    // List the last 3 successful checkout sessions
+    // 1. Fetch last 10 orders to prevent repetition
     const sessions = await stripe.checkout.sessions.list({
-      limit: 3,
-      status: 'complete', // Only paid orders
+      limit: 10,
+      status: 'complete',
     });
 
-    // Format the data for the frontend
     const sales = sessions.data.map(session => {
-        // Get the item names from the metadata we saved in create-checkout.js
         const items = session.metadata.items || "Premium Assets";
         
-        // Get location (City or Country)
-        let location = "Unknown";
-        if (session.customer_details && session.customer_details.address) {
-            location = session.customer_details.address.city || session.customer_details.address.country || "Global";
+        // 2. PRIVACY LOGIC: Get First Name & Country Code only
+        let name = "Customer";
+        let country = "Global";
+
+        if (session.customer_details) {
+            // Get First Name (Split by space and take the first part)
+            if (session.customer_details.name) {
+                name = session.customer_details.name.split(' ')[0]; 
+            }
+            
+            // Get Country Code (e.g., 'GB', 'US') - No City!
+            if (session.customer_details.address && session.customer_details.address.country) {
+                country = session.customer_details.address.country;
+            }
         }
 
         return {
-            items: items.split(',')[0], // Just show the first item to keep it short
-            location: location,
-            time: session.created // Timestamp
+            item: items.split(',')[0], // Item Name
+            name: name,                // First Name (e.g. "Marley")
+            country: country           // Country Code (e.g. "GB")
         };
     });
 

@@ -23,6 +23,7 @@ export default async function handler(req, res) {
 
   try {
     const { cart, discountCode } = req.body;
+    // We default to your live site, but check headers just in case
     const origin = req.headers.origin || 'https://tpstemple.vercel.app';
 
     // --- DEV MODE BYPASS (1956) ---
@@ -45,7 +46,8 @@ export default async function handler(req, res) {
             }
         } catch (err) { console.error("Discord Error:", err.message); }
 
-        return res.status(200).json({ bypassUrl: `${origin}/index.html?payment=dev_success` });
+        // Send Dev Bypass to success page too (optional, but cleaner)
+        return res.status(200).json({ bypassUrl: `https://tpstemple.vercel.app/success.html` });
     }
 
     // --- STRIPE FLOW ---
@@ -80,7 +82,11 @@ export default async function handler(req, res) {
       mode: 'payment',
       invoice_creation: { enabled: true },
       metadata: { items: itemSummary },
-      success_url: `${origin}/index.html?payment=success`,
+      
+      // *** UPDATED LINE BELOW ***
+      success_url: `https://tpstemple.vercel.app/success.html`,
+      // *************************
+      
       cancel_url: `${origin}/cart.html?payment=cancelled`,
     });
 

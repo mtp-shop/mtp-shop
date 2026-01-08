@@ -236,7 +236,10 @@
         }
         .review-card:hover { transform: translateY(-5px); border-color: rgba(255,255,255,0.2); }
         .review-header { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; transform: translateZ(20px); }
-        .discord-pfp { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--accent); }
+        
+        /* UPDATED: Discord PFP handles styling for local images */
+        .discord-pfp { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--accent); object-fit: cover; }
+        
         .reviewer-name { font-size: 0.9rem; font-weight: 700; color: white; font-family: var(--font-head); }
         .stars { color: var(--accent); font-size: 0.8rem; letter-spacing: 2px; }
         .review-text { font-size: 0.85rem; color: #bbb; line-height: 1.6; font-style: italic; transform: translateZ(20px); }
@@ -364,9 +367,6 @@
         }
         .ctx-item:hover { background: rgba(255,255,255,0.05); color: var(--accent); border-left-color: var(--accent); }
         .ctx-line { height: 1px; background: #333; margin: 5px 0; }
-        
-        .hidden { opacity: 0; transform: translateY(30px); filter: blur(10px); transition: all 1s cubic-bezier(0.165, 0.84, 0.44, 1); }
-        .show { opacity: 1; transform: translateY(0); filter: blur(0); }
     </style>
 </head>
 <body>
@@ -428,29 +428,57 @@
         <a href="#intros" class="hero-btn hidden blur-load">SHOP NOW</a>
 
         <div class="reviews-container hidden">
+            <!-- REVIEW 1: Mathias (DOG) -->
             <div class="review-card" data-tilt data-tilt-glare data-tilt-max-glare="0.1">
-                <div class="review-header"><img src="https://media.discordapp.net/attachments/1351615087953055764/1453671599164100648/799cd799f17f9a28c14ad8110e68df1c.png?ex=694f9e2d&is=694e4cad&hm=6f92da561f481177c15ade75e1db4809daedcb05565d3eead76ac933af567d22&=&format=webp&quality=lossless&width=713&height=856" class="discord-pfp"><div class="reviewer-info"><span class="reviewer-name">@Mathias</span><div class="stars">★★★★★</div></div></div>
+                <div class="review-header">
+                    <img src="pfp1.jpg" class="discord-pfp">
+                    <div class="reviewer-info"><span class="reviewer-name">@Mathias</span><div class="stars">★★★★★</div></div>
+                </div>
                 <p class="review-text">"10/10 fast support and nice stuff you get, Buy from this man you will never regret it."</p>
             </div>
+
+            <!-- REVIEW 2: Cshadydjango (WHITE BEANIE) -->
             <div class="review-card" data-tilt data-tilt-glare data-tilt-max-glare="0.1">
-                <div class="review-header"><img src="https://cdn.discordapp.com/avatars/812503046374293525/768ae47a6dbc5022e077e899cb0597b4.webp?size=1024" class="discord-pfp"><div class="reviewer-info"><span class="reviewer-name">@Cshadydjango</span><div class="stars">★★★★★</div></div></div>
+                <div class="review-header">
+                    <img src="pfp2.jpg" class="discord-pfp">
+                    <div class="reviewer-info"><span class="reviewer-name">@Cshadydjango</span><div class="stars">★★★★★</div></div>
+                </div>
                 <p class="review-text">"10/10 fast and easy. Definitely will be returning for more."</p>
             </div>
+
+            <!-- REVIEW 3: Ryze (STAR SHIRT) -->
             <div class="review-card" data-tilt data-tilt-glare data-tilt-max-glare="0.1">
-                <div class="review-header"><img src="https://media.discordapp.net/attachments/1351615087953055764/1453672344106045483/SpotifyPFP.png?ex=694f9ede&is=694e4d5e&hm=1901880ef61938a93f1cab464fb61139759677c93dc13e927ccce03e7cc69710&=&format=webp&quality=lossless" class="discord-pfp"><div class="reviewer-info"><span class="reviewer-name">@Ryze</span><div class="stars">★★★★★</div></div></div>
+                <div class="review-header">
+                    <img src="pfp3.jpg" class="discord-pfp">
+                    <div class="reviewer-info"><span class="reviewer-name">@Ryze</span><div class="stars">★★★★★</div></div>
+                </div>
                 <p class="review-text">"GOATED 10/10 got me right and shi is tuffff."</p>
             </div>
+
+            <!-- REVIEW 4: Trez (CURLY HAIR) -->
             <div class="review-card" data-tilt data-tilt-glare data-tilt-max-glare="0.1">
-                <div class="review-header"><img src="https://cdn.discordapp.com/attachments/1351615087953055764/1453671599491252274/GirlPFP.png?ex=694f9e2d&is=694e4cad&hm=2604e885712d88a15c5c7ecaf0478915e35979f1d970cd0a4c7ff73ea0b3ac6e&" class="discord-pfp" style="background:#111;"><div class="reviewer-info"><span class="reviewer-name">@Trez
-</span><div class="stars">★★★★★</div></div></div>
+                <div class="review-header">
+                    <img src="pfp4.jpg" class="discord-pfp">
+                    <div class="reviewer-info"><span class="reviewer-name">@Trez</span><div class="stars">★★★★★</div></div>
+                </div>
                 <p class="review-text">"100/10 Going To Bro Everytime !!!"</p>
             </div>
+
+            <!-- REVIEW 5: Nicole (MIRROR SELFIE) -->
             <div class="review-card" data-tilt data-tilt-glare data-tilt-max-glare="0.1">
-                <div class="review-header"><img src="https://media.discordapp.net/attachments/1351615087953055764/1453672566010019851/4b5ade6a-9542-4280-855b-24cd1f192d03.png?ex=694f9f13&is=694e4d93&hm=01210e68933f90e0872eabedda8e349acccaa4c2018dddc1d06c6051f851d715&=&format=webp&quality=lossless" class="discord-pfp" style="background:#111;"><div class="reviewer-info"><span class="reviewer-name">@Nicole</span><div class="stars">★★★★★</div></div></div>
+                <div class="review-header">
+                    <img src="pfp5.jpg" class="discord-pfp">
+                    <div class="reviewer-info"><span class="reviewer-name">@Nicole</span><div class="stars">★★★★★</div></div>
+                </div>
                 <p class="review-text">"10/10 quick service, +rep for great costumer service."</p>
             </div>
+
+            <!-- REVIEW 6: X5 (GIRL ON BED) -->
             <div class="review-card" data-tilt data-tilt-glare data-tilt-max-glare="0.1">
-                <div class="review-header"><img src="https://cdn.discordapp.com/avatars/1187426141863157851/fdb2d7d2c0dd4e8c46b0019e5d84db3a.webp?size=1024" class="discord-pfp" style="background:#111;"><div class="reviewer-info"><span class="reviewer-name">@X5</span><div class="stars">★★★★★</div></div></div>
+                <div class="review-header">
+                    <img src="pfp6.png" class="discord-pfp">
+                    <div class="reviewer-info"><span class="reviewer-name">@X5</span><div class="stars">★★★★★</div></div>
+                </div>
                 <p class="review-text">" dude is just t and delivers when he says he his fire."</p>
             </div>
         </div>
@@ -886,7 +914,7 @@
             });
         });
 
-        /* --- REAL RECENT SALES POPUP (UPDATED: NO LOCATION, 13s TIMER) --- */
+        /* --- REAL RECENT SALES POPUP (UPDATED: NO LOCATION, 20s TIMER) --- */
         let lastShownIndex = -1; 
 
         async function fetchRecentSales() {
@@ -948,9 +976,9 @@
             }, 6000);
         }
 
-        // Run every 13 seconds
+        // Run every 20 seconds
         setTimeout(fetchRecentSales, 4000);
-        setInterval(fetchRecentSales, 13000);
+        setInterval(fetchRecentSales, 20000);
     </script>
 </body>
 </html>

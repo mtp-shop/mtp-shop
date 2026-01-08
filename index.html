@@ -351,11 +351,6 @@
             .cart-link { margin-left: auto; } 
         }
         
-        /* NIGHT VISION */
-        .nv-active { filter: sepia(1) hue-rotate(90deg) contrast(1.5) brightness(0.8) grayscale(0.2); }
-        .nv-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: repeating-linear-gradient(0deg, rgba(0,0,0,0.15), rgba(0,0,0,0.15) 1px, transparent 1px, transparent 2px); pointer-events: none; z-index: 999999; display:none; mix-blend-mode: overlay; opacity: 0.7; }
-        .nv-grain { position: fixed; top:0; left:0; width:100%; height:100%; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.15'/%3E%3C/svg%3E"); pointer-events: none; z-index: 999998; display:none; opacity: 0.4; }
-        
         #custom-context-menu {
             position: absolute; z-index: 99999; width: 200px;
             background: rgba(10, 10, 10, 0.95); backdrop-filter: blur(10px);
@@ -375,8 +370,6 @@
     </style>
 </head>
 <body>
-    <div class="nv-overlay" id="nvScan"></div>
-    <div class="nv-grain" id="nvGrain"></div>
 
     <!-- FEATURE: SCROLL DOTS -->
     <div class="scroll-dots">
@@ -881,9 +874,6 @@
             document.getElementById('bg-layer').style.transform = `translate(${x}px, ${y}px) scale(1.1)`;
         });
 
-        document.addEventListener('keydown', (e) => { if(e.code === 'Space') { document.body.classList.add('nv-active'); document.getElementById('nvScan').style.display = 'block'; document.getElementById('nvGrain').style.display = 'block'; } });
-        document.addEventListener('keyup', (e) => { if(e.code === 'Space') { document.body.classList.remove('nv-active'); document.getElementById('nvScan').style.display = 'none'; document.getElementById('nvGrain').style.display = 'none'; } });
-
         const ctxMenu = document.getElementById('custom-context-menu');
         document.addEventListener('contextmenu', (e) => { e.preventDefault(); ctxMenu.style.display = 'block'; ctxMenu.style.left = `${e.pageX}px`; ctxMenu.style.top = `${e.pageY}px`; });
         document.addEventListener('click', () => { ctxMenu.style.display = 'none'; });
@@ -896,8 +886,8 @@
             });
         });
 
-        /* --- REAL RECENT SALES POPUP (UPDATED) --- */
-        let lastShownIndex = -1; // Track last shown to reduce repetition
+        /* --- REAL RECENT SALES POPUP (UPDATED: NO LOCATION, 13s TIMER) --- */
+        let lastShownIndex = -1; 
 
         async function fetchRecentSales() {
             try {
@@ -905,7 +895,6 @@
                 const data = await res.json();
                 
                 if(data.sales && data.sales.length > 0) {
-                    // Logic to pick a random sale, trying not to repeat the immediate last one
                     let randomIndex = Math.floor(Math.random() * data.sales.length);
                     
                     if (data.sales.length > 1 && randomIndex === lastShownIndex) {
@@ -915,20 +904,13 @@
                     lastShownIndex = randomIndex;
                     const sale = data.sales[randomIndex];
                     
-                    showSalesToast(sale.item, sale.name, sale.country);
+                    // Passing item and name only (ignoring location)
+                    showSalesToast(sale.item, sale.name);
                 }
             } catch (e) { console.error("Sales fetch error", e); }
         }
 
-        function showSalesToast(item, name, countryCode) {
-            let countryName = countryCode;
-            try {
-                const regionNames = new Intl.DisplayNames(['en'], {type: 'region'});
-                countryName = regionNames.of(countryCode);
-            } catch(e) { /* Fallback */ }
-
-            const locationText = `${name} from ${countryName}`;
-
+        function showSalesToast(item, name) {
             const toast = document.createElement('div');
             toast.style.cssText = `
                 position: fixed; bottom: 20px; left: 20px;
@@ -951,7 +933,7 @@
                     </div>
                     <div style="color: white; font-weight: 700; font-size: 0.95rem;">${item}</div>
                     <div style="color: #aaa; font-size: 0.75rem; margin-top: 2px;">
-                        <i class="fas fa-globe-americas" style="font-size:0.7rem; margin-right:4px;"></i> ${locationText}
+                        Purchased by ${name}
                     </div>
                 </div>
             `;
@@ -966,8 +948,9 @@
             }, 6000);
         }
 
+        // Run every 13 seconds
         setTimeout(fetchRecentSales, 4000);
-        setInterval(fetchRecentSales, 45000);
+        setInterval(fetchRecentSales, 13000);
     </script>
 </body>
 </html>

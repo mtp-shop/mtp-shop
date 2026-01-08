@@ -7,6 +7,13 @@
     
     <link rel="icon" type="image/png" href="logo.png">
 
+    <!-- PWA / MOBILE APP FEEL -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#050505">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="logo.png">
+
     <!-- FONTS -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -312,12 +319,11 @@
 
         .copyright { text-align: center; color: #444; margin-top: 20px; font-size: 0.8rem; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px; }
         
-        /* --- MOBILE FIXES --- */
         @media (max-width: 768px) { 
             .footer-content { flex-direction: column; text-align: center; align-items: center; } 
             .footer-col { text-align: center; } 
             
-            /* HIDE CLOCK ON MOBILE TO PREVENT OVERLAP */
+            /* --- FIXED: HIDE CLOCK ON MOBILE TO PREVENT OVERLAP --- */
             .ip-clock-container { display: none; }
         }
 
@@ -888,6 +894,53 @@
                 item.classList.toggle('active');
             });
         });
+
+        /* --- REAL RECENT SALES POPUP --- */
+        async function fetchRecentSales() {
+            try {
+                const res = await fetch('/api/recent-sales');
+                const data = await res.json();
+                
+                if(data.sales && data.sales.length > 0) {
+                    const sale = data.sales[Math.floor(Math.random() * data.sales.length)];
+                    showSalesToast(sale.items, sale.location);
+                }
+            } catch (e) { console.error("Sales fetch error", e); }
+        }
+
+        function showSalesToast(item, location) {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed; bottom: 20px; left: 20px;
+                background: rgba(5, 5, 5, 0.9); border: 1px solid #333;
+                border-left: 3px solid #00ff88; padding: 15px 20px;
+                border-radius: 8px; z-index: 9999; backdrop-filter: blur(10px);
+                box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+                font-family: var(--font-tech); font-size: 0.8rem;
+                transform: translateY(100px); transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                display: flex; gap: 15px; align-items: center;
+            `;
+            
+            toast.innerHTML = `
+                <i class="fas fa-shopping-bag" style="color: #00ff88; font-size: 1.2rem;"></i>
+                <div>
+                    <div style="color: #888; font-size: 0.7rem; text-transform: uppercase;">Recent Purchase • ${location}</div>
+                    <div style="color: white; font-weight: 700; margin-top: 2px;">${item}</div>
+                </div>
+            `;
+
+            document.body.appendChild(toast);
+
+            setTimeout(() => { toast.style.transform = 'translateY(0)'; }, 100);
+
+            setTimeout(() => {
+                toast.style.transform = 'translateY(100px)';
+                setTimeout(() => toast.remove(), 500);
+            }, 5000);
+        }
+
+        setTimeout(fetchRecentSales, 5000);
+        setInterval(fetchRecentSales, 60000);
     </script>
 </body>
 </html>

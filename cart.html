@@ -6,6 +6,13 @@
     <title>Your Cart | TPS TEMPLE</title>
     
     <link rel="icon" type="image/png" href="logo.png">
+
+    <!-- PWA / MOBILE APP FEEL -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#050505">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="logo.png">
     
     <!-- FONTS -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -127,7 +134,7 @@
             flex: 1; background: transparent; 
             border: 1px solid #444; padding: 10px; color: white; 
             border-radius: 4px; font-family: var(--font-body); 
-            /* FIX FOR IPHONE ZOOMING: 16px is the minimum to prevent auto-zoom */
+            /* FIX FOR IPHONE ZOOMING */
             font-size: 16px; 
         }
         .discount-btn { background: #333; color: white; border: 1px solid #444; padding: 10px 20px; cursor: pointer; border-radius: 4px; font-weight: bold; transition: 0.2s; }
@@ -317,6 +324,7 @@
         function renderCart() {
             cartContainer.innerHTML = '';
             let total = 0;
+            let subtotal = 0; // Raw total before bundles
 
             let validItems = [];
             if (cart && cart.length > 0) {
@@ -333,13 +341,24 @@
                 cartSummary.style.display = 'flex';
             }
 
+            // 1. Check for Bundle Requirements
+            let hasIntro = false;
+            let hasChain = false;
+            let hasGFX = false;
+
             validItems.forEach((item, index) => {
                 let priceString = item.price.toString().replace('£', '').replace('+', '').trim();
                 let priceNum = parseFloat(priceString);
                 
                 if(!isNaN(priceNum)) {
-                     total += priceNum * item.qty;
+                     subtotal += priceNum * item.qty;
                 }
+
+                // Bundle Check
+                let t = item.title.toLowerCase();
+                if(t.includes('intro')) hasIntro = true;
+                if(t.includes('chain')) hasChain = true;
+                if(t.includes('gfx') || t.includes('banner')) hasGFX = true;
 
                 let html = `
                 <div class="cart-item">
@@ -362,55 +381,66 @@
                 cartContainer.innerHTML += html;
             });
 
-            // --- VISUAL LOGIC ---
+            // 2. Apply Bundle Logic (15% off)
+            let bundleActive = false;
+            if(hasIntro && hasChain && hasGFX) {
+                bundleActive = true;
+                total = subtotal * 0.85; 
+            } else {
+                total = subtotal;
+            }
+
+            // 3. Apply Promo Codes
             if(activeCode === "1956") {
-                // FREE BYPASS
-                oldPriceEl.innerText = '£' + total.toFixed(2);
-                oldPriceEl.style.display = 'inline';
-                totalEl.innerText = '£0.00';
-                totalEl.style.color = '#00ff88';
-                
-                checkoutBtn.innerHTML = '<i class="fas fa-lock-open"></i> DEV BYPASS';
-                checkoutBtn.style.background = "#00ff88";
-                checkoutBtn.style.color = "#000";
-                checkoutBtn.style.boxShadow = "0 0 20px rgba(0,255,136,0.4)";
+                total = 0;
+                discountMsg.innerText = "DEV MODE: 100% OFF";
+                discountMsg.style.display = "block";
+                discountMsg.style.color = "#00ff88";
             } 
             else if (activeCode === "195612") {
-                // STRIPE TEST (30p)
-                oldPriceEl.innerText = '£' + total.toFixed(2);
-                oldPriceEl.style.display = 'inline';
-                // Calculate 30p per item
-                let testTotal = validItems.reduce((acc, item) => acc + (0.30 * item.qty), 0);
-                totalEl.innerText = '£' + testTotal.toFixed(2);
-                totalEl.style.color = '#ffa500';
-                
-                checkoutBtn.innerHTML = '<i class="fas fa-vial"></i> PAY TEST (30p)';
-                checkoutBtn.style.background = "#ffa500";
-                checkoutBtn.style.color = "#000";
-                checkoutBtn.style.boxShadow = "0 0 20px rgba(255, 165, 0, 0.4)";
+                total = validItems.reduce((acc, item) => acc + (0.30 * item.qty), 0);
+                discountMsg.innerText = "STRIPE TEST (30p)";
+                discountMsg.style.display = "block";
+                discountMsg.style.color = "#ffa500";
             }
             else if(activeCode === "XMAS") {
-                // 20% OFF
-                oldPriceEl.innerText = '£' + total.toFixed(2);
+                total = total * 0.80; // 20% off (stacks with bundle)
+                discountMsg.innerText = "XMAS CODE: 20% OFF";
+                discountMsg.style.display = "block";
+                discountMsg.style.color = "#00ff88";
+            }
+            else if(bundleActive) {
+                discountMsg.innerText = "🔥 BUNDLE: 15% OFF APPLIED";
+                discountMsg.style.display = "block";
+                discountMsg.style.color = "#ff1f1f";
+            } 
+            else {
+                discountMsg.style.display = "none";
+            }
+
+            // Visual Updates
+            if(subtotal !== total) {
+                oldPriceEl.innerText = '£' + subtotal.toFixed(2);
                 oldPriceEl.style.display = 'inline';
-                let newTotal = total * 0.80; 
-                totalEl.innerText = '£' + newTotal.toFixed(2);
-                totalEl.style.color = '#00ff88';
-                
-                checkoutBtn.innerHTML = '<i class="fas fa-credit-card"></i> PAY WITH STRIPE';
-                checkoutBtn.style.background = "#635bff";
-                checkoutBtn.style.color = "#fff";
-                checkoutBtn.style.boxShadow = "0 5px 20px rgba(99, 91, 255, 0.3)";
             } else {
-                // NORMAL
-                totalEl.innerText = '£' + total.toFixed(2);
                 oldPriceEl.style.display = 'none';
-                totalEl.style.color = '#ff1f1f'; 
-                
+            }
+            
+            totalEl.innerText = '£' + total.toFixed(2);
+
+            // Update Button Color
+            if(activeCode === "1956") {
+                totalEl.style.color = '#00ff88';
+                checkoutBtn.innerHTML = '<i class="fas fa-lock-open"></i> DEV BYPASS';
+                checkoutBtn.style.background = "#00ff88"; checkoutBtn.style.color = "#000";
+            } else if (activeCode === "195612") {
+                totalEl.style.color = '#ffa500';
+                checkoutBtn.innerHTML = '<i class="fas fa-vial"></i> PAY TEST (30p)';
+                checkoutBtn.style.background = "#ffa500"; checkoutBtn.style.color = "#000";
+            } else {
+                totalEl.style.color = '#ff1f1f';
                 checkoutBtn.innerHTML = '<i class="fas fa-credit-card"></i> PAY WITH STRIPE';
-                checkoutBtn.style.background = "#635bff";
-                checkoutBtn.style.color = "#fff";
-                checkoutBtn.style.boxShadow = "0 5px 20px rgba(99, 91, 255, 0.3)";
+                checkoutBtn.style.background = "#635bff"; checkoutBtn.style.color = "#fff";
             }
         }
 
@@ -429,36 +459,16 @@
         function applyDiscount() {
             const input = document.getElementById('promoInput').value.trim().toUpperCase();
             
-            if(input === "1956") {
-                activeCode = "1956";
-                discountMsg.innerText = "DEV MODE: 100% OFF ACTIVATED";
-                discountMsg.style.display = "block";
-                discountMsg.style.color = "#00ff88";
+            if(input === "1956" || input === "195612" || input === "XMAS") {
+                activeCode = input;
                 renderCart();
-            } 
-            else if (input === "195612") {
-                activeCode = "195612";
-                discountMsg.innerText = "STRIPE TEST MODE: PRICE SET TO 30p";
-                discountMsg.style.display = "block";
-                discountMsg.style.color = "#ffa500";
-                renderCart();
-            }
-            else if(input === "XMAS") {
-                activeCode = "XMAS";
-                discountMsg.innerText = "CODE APPLIED: 20% OFF";
-                discountMsg.style.display = "block";
-                discountMsg.style.color = "#00ff88";
-                renderCart();
-            } 
-            else {
+            } else {
                 alert("Invalid Code");
                 activeCode = "";
-                discountMsg.style.display = "none";
                 renderCart();
             }
         }
 
-        // REPLACE WITH YOUR REAL PUBLIC KEY
         const stripe = Stripe('pk_live_51LDw4PLHs0w9JjR8nBwavRWVfCsKh1Tz7YJfkjwjNN9edtqvpnVZ8axuOTVQfUAquAgdksq9jBHX8VKXll5Ft6ss008lzh2Gq3'); 
 
         checkoutBtn.addEventListener('click', async function() {
@@ -471,7 +481,7 @@
             btn.style.opacity = "0.8";
             btn.style.pointerEvents = "none";
 
-            // SAVE PENDING ORDER BEFORE STRIPE REDIRECT (Fixes Missing Items on Return)
+            // SAVE PENDING ORDER
             localStorage.setItem('mtpPendingOrder', JSON.stringify(cart));
 
             try {

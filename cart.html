@@ -20,10 +20,9 @@
         /* --- VARIABLES --- */
         :root {
             --bg-dark: #050505;
-            --glass-border: rgba(255, 255, 255, 0.15); /* Brighter border since bg is transparent */
+            --glass-border: rgba(255, 255, 255, 0.15);
             --accent: #ff1f1f;
             --accent-glow: rgba(255, 31, 31, 0.4);
-            --accent-hover: #b30000;
             --text-main: #ffffff;
             --font-head: 'Montserrat', sans-serif;
             --font-body: 'Poppins', sans-serif;
@@ -39,7 +38,7 @@
             display: flex; flex-direction: column;
         }
 
-        /* --- RED SCROLLBAR --- */
+        /* --- SCROLLBAR --- */
         ::-webkit-scrollbar { width: 10px; }
         ::-webkit-scrollbar-track { background: #0a0a0a; }
         ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 5px; }
@@ -83,7 +82,7 @@
         /* CART ITEMS */
         .cart-item {
             display: flex; align-items: center; justify-content: space-between;
-            background: transparent; /* Transparent to match style */
+            background: transparent;
             border: 1px solid var(--glass-border);
             padding: 20px; margin-bottom: 15px; 
             border-radius: 12px; transition: 0.3s;
@@ -105,9 +104,9 @@
         .remove-btn { background: none; border: none; color: #555; cursor: pointer; font-size: 1.1rem; transition: 0.2s; padding: 10px; }
         .remove-btn:hover { color: var(--accent); transform: scale(1.1); }
 
-        /* --- FULLY TRANSPARENT SUMMARY BOX --- */
+        /* --- CART SUMMARY --- */
         .cart-summary {
-            background: transparent; /* NO BACKGROUND COLOR */
+            background: transparent;
             padding: 40px; 
             border: 1px solid var(--glass-border); 
             margin-top: 40px; border-radius: 12px;
@@ -122,7 +121,7 @@
         .total-price { font-size: 2.5rem; font-weight: 900; color: var(--accent); margin: 0 0 10px 0; font-family: var(--font-head); font-style: italic; }
         .old-price { text-decoration: line-through; color: #666; font-size: 1.2rem; margin-right: 10px; display: none; }
 
-        /* DISCOUNT INPUT - Also Transparent */
+        /* DISCOUNT INPUT */
         .discount-box { display: flex; gap: 10px; width: 100%; margin-bottom: 5px; }
         .discount-input { 
             flex: 1; background: transparent; 
@@ -311,15 +310,12 @@
         const discountMsg = document.getElementById('discountMsg');
         const checkoutBtn = document.getElementById('checkout-button');
         
-        let discountApplied = false;
-        let devMode = false;
-        let activeCode = ""; // Global variable
+        let activeCode = ""; 
 
         function renderCart() {
             cartContainer.innerHTML = '';
             let total = 0;
 
-            // FIX: Check for empty cart correctly
             let validItems = [];
             if (cart && cart.length > 0) {
                 validItems = cart.filter(item => item.price && item.title);
@@ -460,6 +456,7 @@
             }
         }
 
+        // --- UPDATED CHECKOUT LOGIC (Saves Order for Success Page) ---
         // REPLACE WITH YOUR REAL PUBLIC KEY
         const stripe = Stripe('pk_live_51LDw4PLHs0w9JjR8nBwavRWVfCsKh1Tz7YJfkjwjNN9edtqvpnVZ8axuOTVQfUAquAgdksq9jBHX8VKXll5Ft6ss008lzh2Gq3'); 
 
@@ -473,13 +470,16 @@
             btn.style.opacity = "0.8";
             btn.style.pointerEvents = "none";
 
+            // 1. Save Pending Order So Success Page Can Read It
+            localStorage.setItem('mtpPendingOrder', JSON.stringify(cart));
+
             try {
                 const response = await fetch('/api/create-checkout', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
                         cart: cart,
-                        discountCode: activeCode // Sends the current code (1956, 195612, or XMAS)
+                        discountCode: activeCode 
                     }),
                 });
 
@@ -509,7 +509,6 @@
             }
         });
         
-        // Run on load
         renderCart();
     </script>
 </body>

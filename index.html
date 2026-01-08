@@ -17,7 +17,7 @@
     <!-- FONTS -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,700;1,900&family=Poppins:wght@300;400;600&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Libre+Barcode+128&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,700;1,900&family=Poppins:wght@300;400;600&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syncopate:wght@400;700&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
@@ -36,33 +36,31 @@
             --text-main: #eeeeee;
             --text-dim: #9ca3af;
             --font-head: 'Montserrat', sans-serif; 
+            --font-wide: 'Syncopate', sans-serif;
             --font-body: 'Poppins', sans-serif;
             --font-tech: 'Space Mono', monospace; 
         }
 
         * { box-sizing: border-box; }
         
-        /* Fallback color for HTML, but BODY must be transparent */
         html { background-color: var(--bg-dark); }
 
         body {
             margin: 0; font-family: var(--font-body); color: var(--text-main);
             overflow-x: hidden; 
-            background-color: transparent; /* <--- CRITICAL FIX: Allows background image to show */
+            background-color: transparent; /* TRANSPARENT allows bg image to show */
             min-height: 100vh;
         }
 
-        /* --- BACKGROUND LAYER --- */
+        /* --- BACKGROUND LAYERS --- */
         #bg-layer {
             position: fixed; top: -5%; left: -5%; width: 110%; height: 110%;
-            /* Adjusted gradient opacity (0.85) so image is visible but text remains readable */
             background-image: linear-gradient(to bottom, rgba(5,5,5,0.85), rgba(5,5,5,0.98)), url('background.png'); 
             background-size: cover; background-position: center;
             z-index: -10; pointer-events: none;
             transition: transform 0.1s ease-out;
         }
 
-        /* --- PARTICLE CANVAS --- */
         #particle-canvas {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             z-index: -1; pointer-events: none;
@@ -185,7 +183,7 @@
         .blur-load { filter: blur(15px); opacity: 0; transform: translateY(20px); transition: 1.5s cubic-bezier(0.19, 1, 0.22, 1); }
         .blur-active { filter: blur(0); opacity: 1; transform: translateY(0); }
 
-        /* --- ORIGINAL HERO TEXT STYLES --- */
+        /* --- HERO TEXT (Restored Italic Style) --- */
         h1 { 
             font-size: 4.5rem; margin: 0; letter-spacing: -2px; line-height: 0.9; font-family: var(--font-head); font-weight: 900; font-style: italic; text-transform: uppercase;
             background: linear-gradient(to right, #b0b0b0 0%, #ffffff 20%, #4a4a4a 40%, #ffffff 60%, #b0b0b0 80%, #4a4a4a 100%);
@@ -199,9 +197,50 @@
         .cursor { display: inline-block; width: 2px; height: 1em; background-color: var(--text-dim); animation: blink 1s infinite; vertical-align: text-bottom; margin-left: 2px;}
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
-        /* --- ORIGINAL BUTTON STYLE --- */
-        .hero-btn { margin-top: 50px; padding: 18px 50px; background: var(--accent-gradient); color: white; font-weight: 900; text-decoration: none; border-radius: 50px; font-family: var(--font-head); font-style: italic; box-shadow: 0 10px 40px var(--accent-glow); transition: 0.3s; display: inline-block; }
-        .hero-btn:hover { transform: translateY(-5px) scale(1.05); box-shadow: 0 20px 60px var(--accent-glow); }
+        /* --- RESTORED: SQUARE CYBER BUTTON --- */
+        .hero-btn { 
+            margin-top: 50px; 
+            padding: 18px 50px; 
+            background: transparent;
+            color: var(--accent);
+            font-weight: 900; 
+            text-decoration: none; 
+            font-family: var(--font-head); /* Matches the Title */
+            font-style: italic; /* Matches the Title */
+            letter-spacing: 1px; 
+            font-size: 1rem;
+            position: relative;
+            display: inline-block;
+            overflow: hidden;
+            /* Angled Corners */
+            clip-path: polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%);
+            border: 1px solid var(--accent);
+            transition: all 0.3s ease;
+            z-index: 1;
+            box-shadow: 0 0 20px rgba(255, 31, 31, 0.2);
+        }
+
+        /* Slide Animation */
+        .hero-btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: var(--accent);
+            transition: 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+            z-index: -1;
+        }
+
+        .hero-btn:hover { 
+            color: white; /* Turns white on hover */
+            box-shadow: 0 0 40px var(--accent-glow);
+            transform: translateY(-5px) scale(1.05);
+        }
+        
+        .hero-btn:hover::before {
+            left: 0; /* Slide in */
+        }
+        
         .see-more-btn { margin-top: 40px; font-size: 0.9rem; color: var(--accent); text-decoration: none; text-transform: uppercase; letter-spacing: 2px; transition: 0.3s; font-weight: 700; }
         .see-more-btn:hover { color: white; text-shadow: 0 0 10px var(--accent); transform: scale(1.05); }
 
@@ -269,6 +308,7 @@
         footer { 
             background: rgba(5, 5, 5, 0.6); backdrop-filter: blur(20px);
             border-top: 1px solid rgba(255,255,255,0.1); padding: 80px 20px 40px; margin-top: 100px; 
+            transform: translate3d(0,0,0); /* Fix for flicker */
         }
         .footer-content { max-width: 1000px; margin: 0 auto; display: flex; justify-content: space-evenly; flex-wrap: wrap; gap: 40px; text-align: left; }
         .footer-col { min-width: 200px; }

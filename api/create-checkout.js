@@ -1,93 +1,103 @@
-import Stripe from 'stripe';
-import axios from 'axios';
+checkoutBtn.addEventListener('click', async function() {
+            const btn = this;
+            const originalText = btn.innerHTML;
+            
+            if(cart.length === 0) { alert("Cart is empty."); return; }
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> PROCESSING...';
+            btn.style.opacity = "0.8";
+            btn.style.pointerEvents = "none";
 
-export default async function handler(req, res) {
-  // 1. Handle CORS
-  res.setHeader('Access-Control-Allow-Credentials', true);
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-  res.setHeader(
-    'Access-Control-Allow-Headers',
-    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
-  );
+            // SAVE PENDING ORDER
+            localStorage.setItem('mtpPendingOrder', JSON.stringify(cart));
 
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
+            // --- CALCULATE DISCOUNT CODE TO SEND ---
+            let codeToSend = activeCode; // Default to manual code
 
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method Not Allowed' });
-  }
-
-  try {
-    const { cart, discountCode } = req.body;
-    const origin = req.headers.origin || 'https://tpstemple.vercel.app';
-
-    // --- DEV MODE BYPASS (1956) ---
-    if (discountCode === "1956") {
-        try {
-            if (process.env.DISCORD_WEBHOOK_URL) {
-                await axios.post(process.env.DISCORD_WEBHOOK_URL, {
-                    username: "TPS Shop Bot",
-                    embeds: [{
-                        title: "🛠️ DEV BYPASS SUCCESS",
-                        description: "Code `1956` used.",
-                        color: 5763719,
-                        fields: [
-                            { name: "Items", value: cart.map(i => `${i.qty}x ${i.title}`).join('\n') || "Unknown" },
-                            { name: "Amount", value: "£0.00", inline: true }
-                        ],
-                        timestamp: new Date().toISOString()
-                    }]
+            // If no manual code, check for bundle conditions
+            if (!codeToSend) {
+                // 1. Calculate Subtotal
+                let subtotal = 0;
+                cart.forEach(item => {
+                    let p = parseFloat(item.price.replace('£', '').replace('+', ''));
+                    if(!isNaN(p)) subtotal += p * item.qty;
                 });
+
+                // 2. Check Categories
+                let hasIntro = cart.some(i => i.title.toLowerCase().includes('intro'));
+                let hasChain = cart.some(i => i.title.toLowerCase().includes('chain'));
+                let hasGFX = cart.some(i => i.title.toLowerCase().includes('gfx') || i.title.toLowerCase().includes('banner'));
+                let hasCloth = cart.some(i => i.title.toLowerCase().includes('cloth') || i.title.toLowerCase().includes('pack'));
+
+                let categoryCount = 0;
+                if(hasIntro) categoryCount++;
+                if(hasChain) categoryCount++;
+                if(hasGFX) categoryCount++;
+                if(hasCloth) categoryCount++;
+
+                // 3. Set code if conditions met
+                if (categoryCount >= 3 || subtotal > 35) {
+                    codeToSend = "BUNDLE25";
+                }
             }
-        } catch (err) { console.error("Discord Error:", err.message); }
+            // ----------------------------------------
 
-        return res.status(200).json({ bypassUrl: `https://tpstemple.vercel.app/success.html` });
-    }
+            try {
+                // SIMULATE SAVING ORDER TO USER ACCOUNT (MOCK DB)
+                const currentUser = JSON.parse(localStorage.getItem('tps_current_user'));
+                if(currentUser) {
+                    const usersDB = JSON.parse(localStorage.getItem('tps_users_db')) || [];
+                    const userIndex = usersDB.findIndex(u => u.email === currentUser.email);
+                    
+                    if(userIndex > -1) {
+                        const newOrder = {
+                            id: Math.floor(Math.random() * 90000) + 10000,
+                            date: new Date().toLocaleDateString(),
+                            count: cart.length,
+                            total: totalEl.innerText,
+                            items: cart 
+                        };
+                        
+                        // Save to DB and Current User Session
+                        usersDB[userIndex].orders.unshift(newOrder);
+                        currentUser.orders.unshift(newOrder);
+                        
+                        localStorage.setItem('tps_users_db', JSON.stringify(usersDB));
+                        localStorage.setItem('tps_current_user', JSON.stringify(currentUser));
+                    }
+                }
 
-    // --- STRIPE FLOW ---
-    const itemSummary = cart.map(i => `${i.qty}x ${i.title}`).join(', ');
+                const response = await fetch('/api/create-checkout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        cart: cart,
+                        discountCode: codeToSend // SEND THE CALCULATED CODE
+                    }),
+                });
 
-    const line_items = cart.map(item => {
-      let priceValue = parseFloat(item.price.replace('£', '').replace('+', ''));
-      
-      if(discountCode === "XMAS") {
-          priceValue = priceValue * 0.8;
-      } 
-      else if (discountCode === "195612") {
-          priceValue = 0.30;
-      }
+                const data = await response.json();
 
-      return {
-        price_data: {
-          currency: 'gbp',
-          product_data: {
-            name: item.title,
-            images: [item.img], 
-          },
-          unit_amount: Math.round(priceValue * 100),
-        },
-        quantity: item.qty,
-      };
-    });
+                if (data.error) { throw new Error(data.error); }
 
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card', 'paypal'], 
-      line_items: line_items,
-      mode: 'payment',
-      invoice_creation: { enabled: true },
-      metadata: { items: itemSummary }, // Saves items for Recent Sales API
-      success_url: `https://tpstemple.vercel.app/success.html`,
-      cancel_url: `${origin}/cart.html?payment=cancelled`,
-    });
+                if (data.bypassUrl) {
+                    localStorage.removeItem('mtpCart');
+                    window.location.href = data.bypassUrl;
+                } 
+                else if (data.id) {
+                    const result = await stripe.redirectToCheckout({ sessionId: data.id });
+                    if (result.error) { alert(result.error.message); resetBtn(); }
+                }
 
-    return res.status(200).json({ id: session.id });
+            } catch (error) {
+                console.error('Error:', error);
+                alert("Checkout Error: " + error.message);
+                resetBtn();
+            }
 
-  } catch (error) {
-    console.error("Error:", error);
-    return res.status(500).json({ error: error.message });
-  }
-}
+            function resetBtn() {
+                btn.innerHTML = originalText;
+                btn.style.opacity = "1";
+                btn.style.pointerEvents = "all";
+            }
+        });

@@ -20,7 +20,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,700;1,900&family=Poppins:wght@300;400;600&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
-    <!-- STRIPE JS -->
+    <!-- STRIPE -->
     <script src="https://js.stripe.com/v3/"></script>
 
     <style>
@@ -631,7 +631,12 @@
             btn.style.opacity = "0.8";
             btn.style.pointerEvents = "none";
 
-            localStorage.setItem('mtpPendingOrder', JSON.stringify(cart));
+            // SAVE PENDING ORDER TO LOCAL STORAGE (SUCCESS PAGE WILL PICK THIS UP)
+            localStorage.setItem('mtpPendingOrder', JSON.stringify({
+                items: cart,
+                total: totalEl.innerText,
+                date: new Date().toLocaleDateString()
+            }));
 
             // --- CALCULATE DISCOUNT CODE ---
             let codeToSend = activeCode; // Start with manual code
@@ -661,36 +666,13 @@
             }
 
             try {
-                // SIMULATE SAVING ORDER (Mock DB)
-                const currentUser = JSON.parse(localStorage.getItem('tps_current_user'));
-                if(currentUser) {
-                    const usersDB = JSON.parse(localStorage.getItem('tps_users_db')) || [];
-                    const userIndex = usersDB.findIndex(u => u.email === currentUser.email);
-                    
-                    if(userIndex > -1) {
-                        const newOrder = {
-                            id: Math.floor(Math.random() * 90000) + 10000,
-                            date: new Date().toLocaleDateString(),
-                            count: cart.length,
-                            total: totalEl.innerText,
-                            items: cart // Store exact items
-                        };
-                        
-                        usersDB[userIndex].orders.unshift(newOrder);
-                        currentUser.orders.unshift(newOrder);
-                        
-                        localStorage.setItem('tps_users_db', JSON.stringify(usersDB));
-                        localStorage.setItem('tps_current_user', JSON.stringify(currentUser));
-                    }
-                }
-
                 // FETCH API
                 const response = await fetch('/api/create-checkout', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
                         cart: cart,
-                        discountCode: codeToSend // Send BUNDLE25 if applicable
+                        discountCode: codeToSend 
                     }),
                 });
 

@@ -304,7 +304,7 @@
         }
         .faq-item.active .faq-answer { max-height: 100px; padding-bottom: 20px; }
 
-        /* --- FOOTER & SCRATCH CARD --- */
+        /* --- FOOTER --- */
         footer { 
             background: rgba(5, 5, 5, 0.6); backdrop-filter: blur(20px);
             border-top: 1px solid rgba(255,255,255,0.1); padding: 80px 20px 40px; margin-top: 100px; 
@@ -325,14 +325,6 @@
             transition: 0.3s;
         }
         .qr-img:hover { transform: scale(1.05); box-shadow: 0 0 20px var(--accent-glow); border-color: var(--accent); }
-
-        /* HIDDEN SCRATCH CARD */
-        .hidden-scratch-area { margin-top: 40px; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0.4; transition: 0.3s; }
-        .hidden-scratch-area:hover { opacity: 1; }
-        .scratch-container { position: relative; width: 160px; height: 50px; margin-top: 5px; border: 1px solid #333; overflow: hidden; border-radius: 4px; cursor: crosshair; }
-        .scratch-code { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #111; display: flex; justify-content: center; align-items: center; font-family: var(--font-tech); color: #00ff88; font-weight: bold; font-size: 1rem; z-index: 1; }
-        .scratch-canvas { position: absolute; top: 0; left: 0; z-index: 2; }
-        .scratch-label { font-size: 0.6rem; color: #555; letter-spacing: 2px; font-family: var(--font-tech); }
 
         .copyright { text-align: center; color: #444; margin-top: 20px; font-size: 0.8rem; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px; }
         
@@ -637,14 +629,6 @@
                 <a href="https://youtube.com/@tps_temple" target="_blank" class="social-btn"><i class="fab fa-youtube"></i> YouTube</a>
             </div>
         </div>
-
-        <div class="hidden-scratch-area">
-            <div class="scratch-label">SECRET TICKET</div>
-            <div class="scratch-container" id="scratchCard">
-                <div class="scratch-code">XMAS</div>
-                <canvas id="scratchCanvas" width="160" height="50" class="scratch-canvas"></canvas>
-            </div>
-        </div>
         
         <div class="copyright">
             &copy; 2025 TPS TEMPLE. All rights reserved.
@@ -741,37 +725,6 @@
             requestAnimationFrame(animateParticles);
         }
         initParticles(); animateParticles();
-
-        /* SCRATCH CARD LOGIC */
-        const scratchCanvas = document.getElementById('scratchCanvas');
-        const scCtx = scratchCanvas.getContext('2d');
-        scCtx.fillStyle = '#222';
-        scCtx.fillRect(0, 0, 160, 50);
-        scCtx.fillStyle = '#555';
-        scCtx.font = "12px monospace";
-        scCtx.fillText("SCRATCH ME", 45, 30);
-        
-        let isDrawing = false;
-        function getPos(e) {
-            const rect = scratchCanvas.getBoundingClientRect();
-            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-            return { x: clientX - rect.left, y: clientY - rect.top };
-        }
-        function scratch(e) {
-            if (!isDrawing) return;
-            const pos = getPos(e);
-            scCtx.globalCompositeOperation = 'destination-out';
-            scCtx.beginPath();
-            scCtx.arc(pos.x, pos.y, 10, 0, 2 * Math.PI);
-            scCtx.fill();
-        }
-        scratchCanvas.addEventListener('mousedown', () => isDrawing = true);
-        scratchCanvas.addEventListener('touchstart', () => isDrawing = true);
-        window.addEventListener('mouseup', () => isDrawing = false);
-        window.addEventListener('touchend', () => isDrawing = false);
-        scratchCanvas.addEventListener('mousemove', scratch);
-        scratchCanvas.addEventListener('touchmove', scratch);
 
         /* 3D LOGO GENERATOR */
         const logoWrapper = document.getElementById('logo3D');

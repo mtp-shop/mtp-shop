@@ -403,12 +403,6 @@
                 discountMsg.style.display = "block";
                 discountMsg.style.color = "#ffa500";
             }
-            else if(activeCode === "XMAS") {
-                total = total * 0.80; // 20% off (stacks with bundle)
-                discountMsg.innerText = "XMAS CODE: 20% OFF";
-                discountMsg.style.display = "block";
-                discountMsg.style.color = "#00ff88";
-            }
             else if(bundleActive) {
                 discountMsg.innerText = "🔥 BUNDLE: 15% OFF APPLIED";
                 discountMsg.style.display = "block";
@@ -459,7 +453,7 @@
         function applyDiscount() {
             const input = document.getElementById('promoInput').value.trim().toUpperCase();
             
-            if(input === "1956" || input === "195612" || input === "XMAS") {
+            if(input === "1956" || input === "195612") {
                 activeCode = input;
                 renderCart();
             } else {

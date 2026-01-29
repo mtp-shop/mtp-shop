@@ -275,7 +275,7 @@
                 <!-- LOGIN REMINDER -->
                 <div class="login-reminder" id="loginReminder">
                     <strong>Not Signed In?</strong>
-                    <a href="#" onclick="openAuthModal(); return false;">Create Account</a> to view previous orders<br>
+                    <a href="#" onclick="openAuthModal(); return false;">Create Account</a> to track order<br>
                     or continue as Guest.
                 </div>
 
@@ -455,7 +455,7 @@
                 cartContainer.innerHTML += html;
             });
 
-            // 2. CHECK BUNDLE PROGRESS (Dynamic 25% Logic)
+            // 2. CHECK BUNDLE PROGRESS (Dynamic 15% Logic)
             let hasIntro = cart.some(i => i.title.toLowerCase().includes('intro'));
             let hasChain = cart.some(i => i.title.toLowerCase().includes('chain'));
             let hasGFX = cart.some(i => i.title.toLowerCase().includes('gfx') || i.title.toLowerCase().includes('banner'));
@@ -471,7 +471,7 @@
             let bundleActive = (categoryCount >= 3 || isOver35);
 
             if(bundleActive) {
-                total = subtotal * 0.75; // 25% OFF
+                total = subtotal * 0.85; // 15% OFF
             } else {
                 total = subtotal;
             }
@@ -490,12 +490,12 @@
                 discountMsg.style.color = "#ffa500";
             }
             else if(bundleActive) {
-                discountMsg.innerText = "🔥 BUNDLE UNLOCKED: 25% OFF APPLIED";
+                discountMsg.innerText = "🔥 BUNDLE UNLOCKED: 15% OFF APPLIED";
                 discountMsg.style.display = "block";
                 discountMsg.style.color = "#00ff88"; 
             } 
             else {
-                discountMsg.innerText = `Spend £${(35 - subtotal).toFixed(2)} more for 25% OFF`;
+                discountMsg.innerText = `Spend £${(35 - subtotal).toFixed(2)} more for 15% OFF`;
                 discountMsg.style.display = "block";
                 discountMsg.style.color = "#aaa";
             }
@@ -661,7 +661,7 @@
                 if(hasCloth) categoryCount++;
 
                 if (categoryCount >= 3 || subtotal > 35) {
-                    codeToSend = "BUNDLE25";
+                    codeToSend = "BUNDLE15";
                 }
             }
 
@@ -713,5 +713,4 @@
         renderCart();
     </script>
 </body>
-
 </html>

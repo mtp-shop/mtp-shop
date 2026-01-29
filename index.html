@@ -743,7 +743,7 @@
         </div>
         <div class="progress-track"><div class="progress-fill" id="bundleProgress"></div></div>
         <div class="bundle-status">
-            <span id="bundleText">Add items to unlock 25% OFF</span>
+            <span id="bundleText">Add items to unlock 15% OFF</span>
             <span id="bundlePct">0%</span>
         </div>
     </div>
@@ -971,7 +971,7 @@
             closeModal();
         }
 
-        /* --- BUNDLE LOGIC (UPDATED: 25% OFF) --- */
+        /* --- BUNDLE LOGIC (UPDATED: 15% OFF) --- */
         function updateBundleProgress() {
             const cart = JSON.parse(localStorage.getItem('mtpCart')) || [];
             const widget = document.getElementById('bundleWidget');
@@ -1020,7 +1020,7 @@
             } else {
                 bar.style.background = "linear-gradient(90deg, var(--accent), #ff8888)";
                 bar.style.boxShadow = "0 0 15px var(--accent)";
-                text.innerText = "Spend over £35 OR add 3 categories for 25% OFF";
+                text.innerText = "Spend over £35 OR add 3 categories for 15% OFF";
                 text.className = "";
             }
         }

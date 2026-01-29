@@ -61,8 +61,9 @@ export default async function handler(req, res) {
       else if (discountCode === "195612") {
           priceValue = 0.30;
       }
-      else if (discountCode === "BUNDLE25") {
-          priceValue = priceValue * 0.75; // 25% OFF
+      // --- FIXED: CHANGED FROM BUNDLE25 TO BUNDLE15 ---
+      else if (discountCode === "BUNDLE15") {
+          priceValue = priceValue * 0.85; // 15% OFF
       }
 
       return {

@@ -23,7 +23,7 @@ export default async function handler(req, res) {
 
   try {
     const { cart, discountCode } = req.body;
-    const origin = req.headers.origin || 'https://tpstemple.vercel.app';
+    const origin = req.headers.origin || 'https://tpstemple.shop';
 
     // --- DEV MODE BYPASS (1956) ---
     if (discountCode === "1956") {
@@ -45,7 +45,7 @@ export default async function handler(req, res) {
             }
         } catch (err) { console.error("Discord Error:", err.message); }
 
-        return res.status(200).json({ bypassUrl: `https://tpstemple.vercel.app/success.html` });
+        return res.status(200).json({ bypassUrl: `https://tpstemple.shop/success.html` });
     }
 
     // --- STRIPE FLOW ---
@@ -85,7 +85,7 @@ export default async function handler(req, res) {
       mode: 'payment',
       invoice_creation: { enabled: true },
       metadata: { items: itemSummary }, 
-      success_url: `https://tpstemple.vercel.app/success.html`,
+      success_url: `https://tpstemple.shop/success.html`,
       cancel_url: `${origin}/cart.html?payment=cancelled`,
     });
 

@@ -55,10 +55,11 @@ export default async function handler(req, res) {
             };
         });
 
-        // --- CREATE SESSION (CLEAN VERSION) ---
+        // --- CREATE SESSION WITH AUTOMATIC PAYMENT METHODS ---
         const session = await stripe.checkout.sessions.create({
             ui_mode: 'embedded',
-            payment_method_types: ['card', 'paypal'], 
+            // ENABLE AUTOMATIC METHODS (Enables Apple Pay, Google Pay, etc.)
+            automatic_payment_methods: { enabled: true }, 
             line_items: line_items,
             mode: 'payment',
             invoice_creation: { enabled: true },

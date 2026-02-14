@@ -539,9 +539,13 @@
             document.getElementById('checkout-container').style.display = 'none';
             document.getElementById('cartItems').style.display = 'block';
             document.getElementById('cartSummary').style.display = 'flex';
+            
+            // --- FIX FOR FROZEN BUTTON ---
+            checkoutBtn.innerHTML = '<i class="fas fa-credit-card"></i> PAY WITH STRIPE';
+            checkoutBtn.style.pointerEvents = "all";
+            checkoutBtn.style.opacity = "1";
         }
 
-        // --- CHECKOUT LOGIC WITH ERROR HANDLING ---
         checkoutBtn.addEventListener('click', async function() {
             const btn = this;
             if(cart.length === 0) return;
@@ -578,7 +582,6 @@
                     document.getElementById('cartSummary').style.display = 'none';
                     document.getElementById('checkout-container').style.display = 'block';
 
-                    // INITIALIZE WITHOUT illegal appearance parameter
                     embeddedCheckout = await stripe.initEmbeddedCheckout({ 
                         clientSecret: data.clientSecret
                     });

@@ -273,16 +273,16 @@
     <div class="container">
         <h1>Shopping Cart</h1>
         
-        <!-- Cart Items List -->
+        <!-- Cart Items -->
         <div id="cartItems"></div>
 
-        <!-- Embedded Stripe Area -->
+        <!-- Embedded Stripe Checkout -->
         <div id="checkout-container">
             <div id="checkout"></div>
             <a onclick="cancelCheckout()" class="cancel-checkout-link">← Cancel and Edit Cart</a>
         </div>
 
-        <!-- Summary (Checkout Options) -->
+        <!-- Summary (Checkout) -->
         <div class="cart-summary" id="cartSummary" style="display:none;">
             <div class="summary-left">
                 <h3><i class="fas fa-shield-alt"></i> SECURE CHECKOUT</h3>
@@ -319,7 +319,7 @@
             </div>
         </div>
         
-        <!-- Empty Cart UI -->
+        <!-- Empty Cart Message -->
         <div id="emptyCart" class="empty-container">
             <div class="empty-icon"><i class="fas fa-shopping-basket"></i></div>
             <div class="empty-title">YOUR CART IS EMPTY</div>
@@ -328,7 +328,6 @@
         </div>
     </div>
 
-    <!-- FOOTER -->
     <footer>
         <div class="footer-content">
             <div class="footer-col">
@@ -387,7 +386,6 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT LOGIC -->
     <script>
         const stripe = Stripe('pk_live_51LDw4PLHs0w9JjR8nBwavRWVfCsKh1Tz7YJfkjwjNN9edtqvpnVZ8axuOTVQfUAquAgdksq9jBHX8VKXll5Ft6ss008lzh2Gq3');
         let embeddedCheckout = null;
@@ -421,10 +419,7 @@
             let total = 0;
             let subtotal = 0; 
 
-            let validItems = [];
-            if (cart && cart.length > 0) {
-                validItems = cart.filter(item => item.price && item.title);
-            }
+            let validItems = (cart && cart.length > 0) ? cart.filter(item => item.price && item.title) : [];
 
             if (validItems.length === 0) {
                 cartSummary.style.display = 'none';
@@ -444,18 +439,14 @@
             }
 
             validItems.forEach((item, index) => {
-                let priceString = item.price.toString().replace('£', '').replace('+', '').trim();
-                let priceNum = parseFloat(priceString);
+                let priceNum = parseFloat(item.price.toString().replace('£', '').replace('+', '').trim());
                 if(!isNaN(priceNum)) subtotal += priceNum * item.qty;
 
                 cartContainer.innerHTML += `
                 <div class="cart-item">
                     <div class="item-left">
                         <img src="${item.img}" class="item-img">
-                        <div class="item-info">
-                            <h3>${item.title}</h3>
-                            <p>${item.price}</p>
-                        </div>
+                        <div class="item-info"><h3>${item.title}</h3><p>${item.price}</p></div>
                     </div>
                     <div class="item-right">
                         <div class="qty-controls">
@@ -468,53 +459,19 @@
                 </div>`;
             });
 
-            // BUNDLE LOGIC
-            let hasIntro = cart.some(i => i.title.toLowerCase().includes('intro'));
-            let hasChain = cart.some(i => i.title.toLowerCase().includes('chain'));
-            let hasGFX = cart.some(i => i.title.toLowerCase().includes('gfx') || i.title.toLowerCase().includes('banner'));
-            let hasCloth = cart.some(i => i.title.toLowerCase().includes('cloth') || i.title.toLowerCase().includes('pack'));
-
-            let categoryCount = (hasIntro?1:0) + (hasChain?1:0) + (hasGFX?1:0) + (hasCloth?1:0);
-            let bundleActive = (categoryCount >= 3 || subtotal > 35);
+            let bundleActive = (new Set(cart.map(i => i.title.split(' ')[1])).size >= 3 || subtotal > 35);
             total = bundleActive ? subtotal * 0.85 : subtotal;
 
-            if(activeCode === "1956") {
-                total = 0;
-                discountMsg.innerText = "DEV MODE: 100% OFF";
-                discountMsg.style.display = "block";
-                discountMsg.style.color = "#00ff88";
-            } else if (activeCode === "195612") {
-                total = validItems.reduce((acc, item) => acc + (0.30 * item.qty), 0);
-                discountMsg.innerText = "STRIPE TEST (30p)";
-                discountMsg.style.display = "block";
-                discountMsg.style.color = "#ffa500";
-            } else if(bundleActive) {
-                discountMsg.innerText = "🔥 BUNDLE UNLOCKED: 15% OFF APPLIED";
-                discountMsg.style.display = "block";
-                discountMsg.style.color = "#00ff88"; 
-            } else {
-                discountMsg.innerText = `Spend £${(35 - subtotal).toFixed(2)} more for 15% OFF`;
-                discountMsg.style.display = "block";
-                discountMsg.style.color = "#aaa";
-            }
+            if(activeCode === "1956") total = 0;
+            else if (activeCode === "195612") total = validItems.reduce((acc, item) => acc + (0.30 * item.qty), 0);
 
-            if(subtotal !== total) {
-                oldPriceEl.innerText = '£' + subtotal.toFixed(2);
-                oldPriceEl.style.display = 'inline';
-            } else oldPriceEl.style.display = 'none';
+            if(total < subtotal) { oldPriceEl.innerText = '£' + subtotal.toFixed(2); oldPriceEl.style.display = 'inline'; } 
+            else oldPriceEl.style.display = 'none';
             
             totalEl.innerText = '£' + total.toFixed(2);
-
-            if(activeCode === "1956") {
-                checkoutBtn.innerHTML = '<i class="fas fa-lock-open"></i> DEV BYPASS';
-                checkoutBtn.style.background = "#00ff88"; checkoutBtn.style.color = "#000";
-            } else if (activeCode === "195612") {
-                checkoutBtn.innerHTML = '<i class="fas fa-vial"></i> PAY TEST (30p)';
-                checkoutBtn.style.background = "#ffa500"; checkoutBtn.style.color = "#000";
-            } else {
-                checkoutBtn.innerHTML = '<i class="fas fa-credit-card"></i> PAY WITH STRIPE';
-                checkoutBtn.style.background = "#635bff"; checkoutBtn.style.color = "#fff";
-            }
+            discountMsg.innerText = bundleActive ? "🔥 BUNDLE UNLOCKED: 15% OFF APPLIED" : `Spend £${(35 - subtotal).toFixed(2)} more for 15% OFF`;
+            discountMsg.style.display = "block";
+            discountMsg.style.color = bundleActive ? "#00ff88" : "#aaa";
         }
 
         function changeQty(index, amount) {
@@ -542,7 +499,7 @@
             document.getElementById('cartItems').style.display = 'block';
             document.getElementById('cartSummary').style.display = 'flex';
             
-            // --- FIX FOR FROZEN BUTTON ---
+            // --- BUTTON RESET FIX ---
             checkoutBtn.innerHTML = '<i class="fas fa-credit-card"></i> PAY WITH STRIPE';
             checkoutBtn.style.pointerEvents = "all";
             checkoutBtn.style.opacity = "1";
@@ -584,10 +541,7 @@
                     document.getElementById('cartSummary').style.display = 'none';
                     document.getElementById('checkout-container').style.display = 'block';
 
-                    embeddedCheckout = await stripe.initEmbeddedCheckout({ 
-                        clientSecret: data.clientSecret
-                    });
-                    
+                    embeddedCheckout = await stripe.initEmbeddedCheckout({ clientSecret: data.clientSecret });
                     embeddedCheckout.mount('#checkout');
                 } else {
                     throw new Error("No client secret received from server.");

@@ -28,8 +28,8 @@
         /* --- VARIABLES --- */
         :root {
             --bg-dark: #050505;
-            --glass-bg: rgba(255, 255, 255, 0.02);
-            --glass-border: rgba(255, 255, 255, 0.05);
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
             --accent: #ff1f1f;       
             --accent-glow: rgba(255, 31, 31, 0.6);
             --accent-gradient: linear-gradient(135deg, #ff1f1f 0%, #b30000 100%);
@@ -48,7 +48,7 @@
         body {
             margin: 0; font-family: var(--font-body); color: var(--text-main);
             overflow-x: hidden; 
-            background-color: transparent; 
+            background-color: transparent; /* TRANSPARENT allows bg image to show */
             min-height: 100vh;
         }
 
@@ -74,7 +74,7 @@
         ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 5px; }
         ::-webkit-scrollbar-thumb:hover { background: #ff4444; }
 
-        /* --- SCROLL DOTS --- */
+        /* --- SCROLL DOTS (RESTORED) --- */
         .scroll-dots {
             position: fixed; top: 50%; right: 20px; transform: translateY(-50%);
             display: flex; flex-direction: column; gap: 15px; z-index: 1001;
@@ -86,7 +86,7 @@
         .dot:hover { background: var(--accent); }
         .dot.active { background: var(--accent); box-shadow: 0 0 10px var(--accent); transform: scale(1.2); }
 
-        /* --- BACK TO TOP --- */
+        /* --- BACK TO TOP (RESTORED) --- */
         .back-to-top {
             position: fixed; 
             bottom: 30px; 
@@ -137,11 +137,12 @@
         nav a { color: var(--text-dim); text-decoration: none; font-size: 0.9rem; font-weight: 700; transition: 0.3s; font-family: var(--font-head); text-transform: uppercase; letter-spacing: 0.5px; }
         nav a:hover { color: white; text-shadow: 0 0 15px rgba(255,255,255,0.3); }
         
+        /* USER ICON STYLE - SMALLER & 10s LOOP */
         .user-btn { 
             cursor: pointer; color: var(--text-dim); transition: 0.3s; font-size: 1.1rem; 
             position: relative; 
-            width: 35px; height: 35px;
-            display: flex; align-items: center; justify-content: center;
+            width: 35px; height: 35px; /* Enforce Square */
+            display: flex; align-items: center; justify-content: center; /* Perfect Centering */
             border-radius: 50%;
         }
         .user-btn:hover { color: var(--accent); text-shadow: 0 0 10px var(--accent); }
@@ -157,6 +158,7 @@
             z-index: -1;
         }
 
+        /* 10 Second Loop: 1.5s animation, 8.5s silence */
         .user-attention::before {
             width: 100%; height: 100%;
             animation: ripple-10s 10s infinite ease-out;
@@ -164,13 +166,13 @@
         
         .user-attention::after {
             width: 100%; height: 100%;
-            animation: ripple-10s 10s infinite ease-out 0.4s;
+            animation: ripple-10s 10s infinite ease-out 0.4s; /* Slight delay for double ring effect */
         }
 
         @keyframes ripple-10s {
             0% { width: 100%; height: 100%; opacity: 0.8; border-width: 2px; }
-            15% { width: 160%; height: 160%; opacity: 0; border-width: 0px; }
-            100% { width: 160%; height: 160%; opacity: 0; border-width: 0px; }
+            15% { width: 160%; height: 160%; opacity: 0; border-width: 0px; } /* Reduced size from 250% to 160% */
+            100% { width: 160%; height: 160%; opacity: 0; border-width: 0px; } /* Stay hidden for rest of time */
         }
 
         .cart-link { 
@@ -180,6 +182,7 @@
         }
         .cart-link:hover { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 25px var(--accent-glow); }
 
+        /* CART ANIMATIONS */
         @keyframes shake-hard {
             0% { transform: translate(1px, 1px) rotate(0deg); }
             20% { transform: translate(-3px, 0px) rotate(1deg); }
@@ -272,108 +275,21 @@
         .hero-btn:hover { color: white; box-shadow: 0 0 40px var(--accent-glow); transform: translateY(-5px) scale(1.05); }
         .hero-btn:hover::before { left: 0; }
         
-        /* --- IMPROVED COMPACT VOUCH UI --- */
-        .vouch-section {
-            width: 100%;
-            max-width: 1200px;
-            margin: 80px auto 0;
-            padding: 0 20px;
-            position: relative;
+        .see-more-btn { margin-top: 40px; font-size: 0.9rem; color: var(--accent); text-decoration: none; text-transform: uppercase; letter-spacing: 2px; transition: 0.3s; font-weight: 700; }
+        .see-more-btn:hover { color: white; text-shadow: 0 0 10px var(--accent); transform: scale(1.05); }
+
+        /* --- REVIEWS --- */
+        .reviews-container { margin-top: 100px; display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; max-width: 1200px; min-height: 200px; }
+        .review-card {
+            background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
+            border: 1px solid var(--glass-border); padding: 25px; border-radius: 16px; backdrop-filter: blur(10px); width: 300px; text-align: left; transition: 0.3s; transform-style: preserve-3d; transform: perspective(1000px);
         }
-        .vouch-wall-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 15px;
-            transition: all 0.5s ease;
-            overflow: hidden;
-        }
-        .compact-vouch {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            padding: 20px;
-            backdrop-filter: blur(10px);
-            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            text-align: left;
-            position: relative;
-            transform-style: preserve-3d;
-            transform: perspective(1000px);
-        }
-        .compact-vouch:hover {
-            background: rgba(255, 255, 255, 0.04);
-            border-color: var(--accent);
-            transform: translateY(-5px) scale(1.02);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-        .vouch-user-row {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 12px;
-        }
-        .vouch-pfp {
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            border: 1.5px solid var(--accent);
-            object-fit: cover;
-            box-shadow: 0 0 10px rgba(255, 31, 31, 0.2);
-        }
-        .vouch-meta {
-            display: flex;
-            flex-direction: column;
-        }
-        .vouch-username {
-            font-size: 0.9rem;
-            font-weight: 700;
-            color: white;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        .vouch-verified {
-            color: #00ff88;
-            font-size: 0.75rem;
-            filter: drop-shadow(0 0 5px rgba(0, 255, 136, 0.3));
-        }
-        .vouch-rating {
-            color: #f1c40f;
-            font-size: 0.7rem;
-            letter-spacing: 2px;
-        }
-        .vouch-body {
-            font-size: 0.85rem;
-            color: #ccc;
-            line-height: 1.6;
-            font-style: italic;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-        .view-all-vouches-btn {
-            margin-top: 30px;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--glass-border);
-            color: var(--text-dim);
-            padding: 12px 30px;
-            border-radius: 50px;
-            font-family: var(--font-head);
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            font-size: 0.8rem;
-            cursor: pointer;
-            transition: 0.3s;
-            display: inline-block;
-        }
-        .view-all-vouches-btn:hover {
-            background: var(--accent);
-            color: white;
-            border-color: var(--accent);
-            box-shadow: 0 0 20px var(--accent-glow);
-            transform: scale(1.05);
-        }
+        .review-card:hover { transform: translateY(-5px); border-color: rgba(255,255,255,0.2); }
+        .review-header { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; transform: translateZ(20px); }
+        .discord-pfp { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--accent); object-fit: cover; }
+        .reviewer-name { font-size: 0.9rem; font-weight: 700; color: white; font-family: var(--font-head); }
+        .stars { color: var(--accent); font-size: 0.8rem; letter-spacing: 2px; }
+        .review-text { font-size: 0.85rem; color: #bbb; line-height: 1.6; font-style: italic; transform: translateZ(20px); }
 
         /* --- PRODUCTS --- */
         .container { max-width: 1300px; margin: 0 auto; padding: 50px 30px; }
@@ -435,7 +351,6 @@
             .footer-content { flex-direction: column; text-align: center; align-items: center; } 
             .footer-col { text-align: center; } 
             .ip-clock-container { display: none; }
-            h1 { font-size: 3rem; }
         }
 
         /* --- MODAL --- */
@@ -456,6 +371,7 @@
         @media (max-width: 900px) { 
             .modal-content { grid-template-columns: 1fr; height: 90vh; overflow-y: scroll; padding: 20px; } 
             .modal-img-wrapper { height: 300px; } 
+            h1 { font-size: 3.5rem; } 
             nav a:not(.cart-link):not(.user-btn) { display: none; } 
             .cart-link { margin-left: auto; } 
         }
@@ -481,11 +397,13 @@
         .auth-submit { background: var(--accent); color: white; border: none; padding: 15px; border-radius: 8px; font-weight: 900; font-family: var(--font-head); cursor: pointer; transition: 0.3s; }
         .auth-submit:hover { background: white; color: black; }
 
+        /* PROFILE VIEW (UPDATED FOR EXPANDABLE ROWS) */
         .profile-view { display: none; }
         .profile-view.active { display: block; }
         .profile-header { display: flex; align-items: center; gap: 20px; margin-bottom: 30px; }
         .profile-avatar { width: 60px; height: 60px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 900; color: white; }
         .order-history { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        
         .order-history th { text-align: left; padding: 10px; color: #888; font-size: 0.8rem; border-bottom: 1px solid #333; }
         .order-history td { padding: 15px 10px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.9rem; }
         .status-pill { padding: 5px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; background: rgba(0,255,136,0.1); color: #00ff88; border: 1px solid #00ff88; }
@@ -501,7 +419,7 @@
         /* --- BUNDLE BUILDER WIDGET --- */
         .bundle-widget {
             position: fixed; 
-            bottom: 90px; 
+            bottom: 90px; /* Increased from 30px to sit above the arrow */
             right: 30px; 
             width: 320px;
             background: rgba(10, 10, 10, 0.95); 
@@ -528,12 +446,14 @@
 </head>
 <body>
 
+    <!-- FEATURE: SCROLL DOTS -->
     <div class="scroll-dots">
         <div class="dot active" onclick="scrollToPos(0)"></div>
         <div class="dot" onclick="scrollToPos(0.5)"></div>
         <div class="dot" onclick="scrollToPos(1)"></div>
     </div>
 
+    <!-- FEATURE: BACK TO TOP -->
     <div class="back-to-top" onclick="window.scrollTo(0,0)"><i class="fas fa-arrow-up"></i></div>
 
     <div id="custom-context-menu">
@@ -550,7 +470,7 @@
 
     <div id="loader"><div class="loader-content"><img src="logo.png" class="loader-logo"><div class="loading-bar"><div class="loading-progress"></div></div></div></div>
     
-    <div id="scroll-progress" style="position:fixed; top:0; left:0; height:3px; background:var(--accent); z-index:1001; transition:0.1s;"></div>
+    <div id="scroll-progress"></div>
 
     <div id="bg-layer"></div>
     <canvas id="particle-canvas"></canvas>
@@ -570,7 +490,10 @@
             <a href="#clothing">CLOTHING</a>
             <a href="#tutorials">TUTORIALS</a>
             <a href="https://discord.gg/Vc7fjmbXAe" target="_blank" style="color:var(--accent);">DISCORD</a>
+            
+            <!-- NEW USER ICON -->
             <a onclick="openAuthModal()" class="user-btn"><i class="fas fa-user"></i></a>
+
             <a onclick="goToCart(event)" class="cart-link" id="cartNavBtn">CART <i class="fas fa-shopping-cart"></i></a>
         </div>
     </nav>
@@ -583,23 +506,19 @@
         <p class="subtitle hidden blur-load"><span id="typewriter"></span><span class="cursor">|</span></p>
         <a href="#intros" class="hero-btn hidden blur-load">SHOP NOW</a>
 
-        <!-- IMPROVED COMPACT VOUCH SECTION -->
-        <div class="vouch-section hidden">
-            <div class="section-header" style="justify-content:center; border:none; margin-top:60px; margin-bottom: 40px;">
-                <div class="clock-dot"></div>
-                <!-- CHANGED TO CLIENT REVIEWS -->
-                <h2 class="section-title" style="font-size: 1.6rem;">CLIENT <span>REVIEWS</span></h2>
-            </div>
-            
-            <div id="vouch-wall" class="vouch-wall-grid">
-                <p id="vouch-loading" style="grid-column: 1/-1; color:var(--text-dim); font-family:var(--font-tech); font-size:0.8rem; letter-spacing:2px; text-align:center;">CONNECTING TO TEMPLE FEED...</p>
-            </div>
-            
-            <!-- CHANGED TO SEE MORE (NO NUMBERS) -->
-            <button id="view-all-vouches" class="view-all-vouches-btn" onclick="toggleVouches()">
-                SEE MORE
-            </button>
+        <!-- FEATURE: LIVE VOUCH WALL -->
+        <div class="section-header hidden" style="margin-top:100px;">
+            <h2 class="section-title">LIVE <span>VOUCHES</span></h2>
+            <div class="clock-dot" style="margin-left:10px;"></div>
         </div>
+        
+        <div id="vouch-wall" class="reviews-container hidden">
+            <p id="vouch-loading" style="color:var(--text-dim); font-family:var(--font-tech); font-size:0.8rem; letter-spacing:2px;">CONNECTING TO TEMPLE FEED...</p>
+        </div>
+        
+        <a href="https://discord.com/channels/1316535768717463644/1316537153500745809" target="_blank" class="see-more-btn hidden">
+            View All Vouches on Discord <i class="fas fa-external-link-alt"></i>
+        </a>
     </header>
 
     <div class="container">
@@ -736,6 +655,7 @@
                 <a href="https://discord.gg/Vc7fjmbXAe" target="_blank" class="social-btn"><i class="fab fa-discord"></i> Discord</a>
                 <a href="https://youtube.com/@tps_temple" target="_blank" class="social-btn"><i class="fab fa-youtube"></i> YouTube</a>
 				<a href="https://tpstools.vercel.app" target="_blank" class="social-btn"><i class="fas fa-tools"></i> TPS Tools</a>
+
             </div>
         </div>
         
@@ -767,7 +687,7 @@
         </div>
     </div>
 
-    <!-- BUNDLE WIDGET -->
+    <!-- BUNDLE WIDGET (UPDATED: NO ICONS) -->
     <div class="bundle-widget" id="bundleWidget">
         <div class="bundle-header">
             <div class="bundle-title">BUILD A BUNDLE</div>
@@ -785,6 +705,7 @@
         <div class="modal-content" style="max-width: 500px; display: block; min-height: auto;">
             <span class="close-btn" onclick="document.getElementById('authModal').classList.remove('active'); setTimeout(()=>document.getElementById('authModal').style.display='none',300)">&times;</span>
             
+            <!-- Login/Register View -->
             <div id="authForms">
                 <h2 class="modal-title" style="font-size: 2rem; margin-bottom: 20px;">TPS ACCOUNT</h2>
                 <div class="auth-tabs">
@@ -792,12 +713,14 @@
                     <div class="auth-tab" onclick="switchTab('register')">REGISTER</div>
                 </div>
 
+                <!-- Login Form -->
                 <div class="auth-form active" id="loginForm">
                     <input type="email" id="loginEmail" class="auth-input" placeholder="Email Address">
                     <input type="password" id="loginPass" class="auth-input" placeholder="Password">
                     <button class="auth-submit" onclick="handleLogin()">ENTER TEMPLE</button>
                 </div>
 
+                <!-- Register Form -->
                 <div class="auth-form" id="registerForm">
                     <input type="text" id="regName" class="auth-input" placeholder="Username">
                     <input type="email" id="regEmail" class="auth-input" placeholder="Email Address">
@@ -806,6 +729,7 @@
                 </div>
             </div>
 
+            <!-- Logged In Profile View -->
             <div class="profile-view" id="profileView">
                 <div class="profile-header">
                     <div class="profile-avatar" id="userAvatar">U</div>
@@ -817,16 +741,15 @@
                 <h4 style="color:var(--accent); font-family:var(--font-tech);">ORDER HISTORY</h4>
                 <table class="order-history">
                     <thead><tr><th>ORDER ID</th><th>PRODUCTS</th><th>TOTAL</th><th>STATUS</th></tr></thead>
-                    <tbody id="orderTableBody"></tbody>
+                    <tbody id="orderTableBody">
+                        <!-- Populated by JS -->
+                    </tbody>
                 </table>
             </div>
         </div>
     </div>
 
     <script>
-        let allVouches = [];
-        let vouchesExpanded = false;
-
         window.addEventListener('load', () => {
             setTimeout(() => {
                 document.getElementById('loader').style.opacity = '0';
@@ -838,7 +761,7 @@
             updateCartButton();
             updateBundleProgress();
             checkLoginState();
-            loadLiveVouches(); 
+            loadLiveVouches(); // Load Discord Vouches
         });
 
         /* --- FEATURE: BROWSER TAB TICKER --- */
@@ -848,18 +771,39 @@
             document.title = docTitle;
         }, 200);
 
-        /* --- UPDATED VOUCH LOGIC (NEWEST FIRST) --- */
+        /* --- FEATURE: LIVE VOUCH WALL FETCH --- */
         async function loadLiveVouches() {
             const wall = document.getElementById('vouch-wall');
             try {
                 const res = await fetch('/api/get-vouches');
-                let data = await res.json();
-                
-                // SHOW NEWEST FIRST BY REVERSING ARRAY
-                allVouches = data.reverse();
+                const data = await res.json();
 
-                if(allVouches && allVouches.length > 0) {
-                    renderVouches();
+                if(data && data.length > 0) {
+                    wall.innerHTML = ''; // Clear loading text
+                    data.forEach(vouch => {
+                        const card = document.createElement('div');
+                        card.className = 'review-card';
+                        card.setAttribute('data-tilt', '');
+                        card.setAttribute('data-tilt-glare', 'true');
+                        card.setAttribute('data-tilt-max-glare', '0.1');
+                        
+                        card.innerHTML = `
+                            <div class="review-header">
+                                <img src="${vouch.avatar}" class="discord-pfp">
+                                <div class="reviewer-info">
+                                    <span class="reviewer-name">@${vouch.username}</span>
+                                    <div class="stars">★★★★★</div>
+                                </div>
+                            </div>
+                            <p class="review-text">"${vouch.content}"</p>
+                        `;
+                        wall.appendChild(card);
+                    });
+                    
+                    // Re-init Tilt for dynamic cards
+                    VanillaTilt.init(document.querySelectorAll(".review-card"), {
+                        max: 10, speed: 400, glare: true, "max-glare": 0.1
+                    });
                 }
             } catch (e) {
                 console.error("Vouch error", e);
@@ -867,55 +811,14 @@
             }
         }
 
-        function renderVouches() {
-            const wall = document.getElementById('vouch-wall');
-            wall.innerHTML = '';
-            
-            const countToRender = vouchesExpanded ? allVouches.length : 6;
-            const items = allVouches.slice(0, countToRender);
-
-            items.forEach(vouch => {
-                const card = document.createElement('div');
-                card.className = 'compact-vouch';
-                card.setAttribute('data-tilt', '');
-                card.setAttribute('data-tilt-glare', 'true');
-                card.setAttribute('data-tilt-max-glare', '0.05');
-                
-                card.innerHTML = `
-                    <div class="vouch-user-row">
-                        <img src="${vouch.avatar || 'logo.png'}" class="vouch-pfp">
-                        <div class="vouch-meta">
-                            <span class="vouch-username">@${vouch.username} <i class="fas fa-check-circle vouch-verified"></i></span>
-                            <div class="vouch-rating">★★★★★</div>
-                        </div>
-                    </div>
-                    <p class="vouch-body">"${vouch.content}"</p>
-                `;
-                wall.appendChild(card);
-            });
-            
-            VanillaTilt.init(document.querySelectorAll(".compact-vouch"), {
-                max: 8, speed: 400, glare: true, "max-glare": 0.05
-            });
-        }
-
-        function toggleVouches() {
-            vouchesExpanded = !vouchesExpanded;
-            const btn = document.getElementById('view-all-vouches');
-            // UPDATED BUTTON TEXT (NO NUMBERS)
-            btn.innerText = vouchesExpanded ? "SEE LESS" : "SEE MORE";
-            renderVouches();
-            
-            if(!vouchesExpanded) {
-                document.querySelector('.vouch-section').scrollIntoView({ behavior: 'smooth' });
-            }
-        }
-
-        /* --- CORE PAGE LOGIC --- */
+        /* --- FEATURE: CART PAGE TRANSITION FIX --- */
         function goToCart(e) {
             e.preventDefault();
             const loader = document.getElementById('loader');
+            const bar = loader.querySelector('.loading-bar');
+            if(bar) bar.style.display = 'none';
             loader.style.display = 'flex';
+            void loader.offsetWidth; 
             loader.style.pointerEvents = 'all';
             loader.style.opacity = '1';
             setTimeout(() => { window.location.href = 'cart.html'; }, 400);
@@ -958,12 +861,12 @@
         }
         initParticles(); animateParticles();
 
-        /* 3D LOGO */
+        /* 3D LOGO GENERATOR */
         const logoWrapper = document.getElementById('logo3D');
-        const layersCount = 20; 
-        for(let i = 0; i < layersCount; i++) {
+        const layers = 20; 
+        for(let i = 0; i < layers; i++) {
             let img = document.createElement('img'); img.src = 'logo.png'; img.className = 'logo-layer';
-            let z = i - (layersCount / 2); img.style.transform = `translateZ(${z}px)`; logoWrapper.appendChild(img);
+            let z = i - (layers / 2); img.style.transform = `translateZ(${z}px)`; logoWrapper.appendChild(img);
         }
 
         VanillaTilt.init(document.querySelectorAll(".card"), { max: 15, speed: 400, glare: true, "max-glare": 0.1 });
@@ -974,8 +877,9 @@
         function typeWriter() {
             const currentText = textToType.substring(0, typeIndex);
             typeElement.innerHTML = currentText;
-            if (!isDeleting && typeIndex < textToType.length) { typeIndex++; setTimeout(typeWriter, 50); }
-            else if (isDeleting && typeIndex > 0) { typeIndex--; setTimeout(typeWriter, 30); }
+            let typeSpeed = 50;
+            if (!isDeleting && typeIndex < textToType.length) { typeIndex++; setTimeout(typeWriter, typeSpeed); }
+            else if (isDeleting && typeIndex > 0) { typeIndex--; typeSpeed = 30; setTimeout(typeWriter, typeSpeed); }
             else if (!isDeleting && typeIndex === textToType.length) { isDeleting = true; setTimeout(typeWriter, 5000); }
             else if (isDeleting && typeIndex === 0) { isDeleting = false; setTimeout(typeWriter, 500); }
         }
@@ -1007,7 +911,7 @@
         });
         document.querySelectorAll('.hidden').forEach((el) => observer.observe(el));
 
-        /* MODAL */
+        /* MODAL LOGIC */
         const modal = document.getElementById('productModal');
         const modalImg = document.getElementById('modalImg');
         const modalTitle = document.getElementById('modalTitle');
@@ -1031,10 +935,13 @@
             const cart = JSON.parse(localStorage.getItem('mtpCart')) || [];
             const btn = document.getElementById('cartNavBtn');
             if (cart.length > 0) { 
-                btn.classList.add('cart-persistent');
+                btn.classList.add('cart-active'); 
+                btn.classList.add('cart-persistent'); // Add persistent shake
                 btn.innerHTML = `CART (${cart.length}) <i class="fas fa-shopping-cart"></i>`; 
-            } else { 
-                btn.classList.remove('cart-persistent');
+            } 
+            else { 
+                btn.classList.remove('cart-active'); 
+                btn.classList.remove('cart-persistent'); // Remove persistent shake
                 btn.innerHTML = `CART <i class="fas fa-shopping-cart"></i>`; 
             }
         }
@@ -1047,6 +954,7 @@
             
             const note = document.getElementById('cart-notification'); note.classList.add('active'); setTimeout(() => { note.classList.remove('active'); }, 3000);
             
+            // SHAKE ANIMATION
             const btn = document.getElementById('cartNavBtn'); 
             btn.classList.add('cart-shaking'); 
             setTimeout(() => { btn.classList.remove('cart-shaking'); }, 500);
@@ -1056,17 +964,22 @@
             closeModal();
         }
 
+        /* --- BUNDLE LOGIC (UPDATED: 15% OFF) --- */
         function updateBundleProgress() {
             const cart = JSON.parse(localStorage.getItem('mtpCart')) || [];
             const widget = document.getElementById('bundleWidget');
+            
+            // Check categories present
             let hasIntro = cart.some(i => i.title.toLowerCase().includes('intro'));
             let hasChain = cart.some(i => i.title.toLowerCase().includes('chain'));
             let hasGFX = cart.some(i => i.title.toLowerCase().includes('gfx') || i.title.toLowerCase().includes('banner'));
             let hasCloth = cart.some(i => i.title.toLowerCase().includes('cloth') || i.title.toLowerCase().includes('pack'));
 
+            // Calculate Score based on category
             let score = 0;
             if(hasIntro) score++; if(hasChain) score++; if(hasGFX) score++; if(hasCloth) score++;
             
+            // Also check TOTAL VALUE > 35
             let totalValue = 0;
             cart.forEach(item => {
                  let priceVal = parseFloat(item.price.replace('£', '').replace('+', ''));
@@ -1074,9 +987,14 @@
             });
 
             let pct = 0;
-            if (score >= 3 || totalValue > 35) { pct = 100; } 
-            else if (score === 2) { pct = 66; } 
-            else if (score === 1) { pct = 33; }
+            // Logic: 3 categories OR total > 35 gives 100%
+            if (score >= 3 || totalValue > 35) {
+                pct = 100;
+            } else if (score === 2) {
+                pct = 66;
+            } else if (score === 1) {
+                pct = 33;
+            }
 
             const bar = document.getElementById('bundleProgress');
             const text = document.getElementById('bundleText');
@@ -1089,26 +1007,29 @@
 
             if(pct === 100) {
                 bar.style.background = "#00ff88";
+                bar.style.boxShadow = "0 0 20px #00ff88";
                 text.innerHTML = "BUNDLE UNLOCKED <i class='fas fa-check'></i>";
                 text.className = "bundle-unlocked";
             } else {
                 bar.style.background = "linear-gradient(90deg, var(--accent), #ff8888)";
+                bar.style.boxShadow = "0 0 15px var(--accent)";
                 text.innerText = "Spend over £35 OR add 3 categories for 15% OFF";
                 text.className = "";
             }
         }
 
-        /* --- AUTH --- */
+        /* --- AUTH SYSTEM (MOCK) --- */
         function openAuthModal() {
-            const m = document.getElementById('authModal');
-            m.style.display = 'flex';
-            setTimeout(() => m.classList.add('active'), 10);
+            const modal = document.getElementById('authModal');
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('active'), 10);
             checkLoginState();
         }
 
         function switchTab(tab) {
             document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+            
             if(tab === 'login') {
                 document.querySelectorAll('.auth-tab')[0].classList.add('active');
                 document.getElementById('loginForm').classList.add('active');
@@ -1118,6 +1039,7 @@
             }
         }
 
+        // MOCK DATABASE
         function getDB() { return JSON.parse(localStorage.getItem('tps_users_db')) || []; }
         function saveDB(db) { localStorage.setItem('tps_users_db', JSON.stringify(db)); }
 
@@ -1125,12 +1047,24 @@
             const name = document.getElementById('regName').value;
             const email = document.getElementById('regEmail').value;
             const pass = document.getElementById('regPass').value;
+            
             if(!name || !email || !pass) { alert("Please fill all fields"); return; }
+
+            // Email Validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                alert("Please enter a valid email address");
+                return;
+            }
+            
             let db = getDB();
             if(db.find(u => u.email === email)) { alert("Email already registered"); return; }
+            
             const newUser = { name, email, pass, orders: [] };
             db.push(newUser);
             saveDB(db);
+            
+            // Auto Login
             localStorage.setItem('tps_current_user', JSON.stringify(newUser));
             checkLoginState();
         }
@@ -1138,41 +1072,122 @@
         function handleLogin() {
             const email = document.getElementById('loginEmail').value;
             const pass = document.getElementById('loginPass').value;
+            
             let db = getDB();
             const user = db.find(u => u.email === email && u.pass === pass);
-            if(user) { localStorage.setItem('tps_current_user', JSON.stringify(user)); checkLoginState(); } 
-            else { alert("Invalid Credentials"); }
+            
+            if(user) {
+                localStorage.setItem('tps_current_user', JSON.stringify(user));
+                checkLoginState();
+            } else {
+                alert("Invalid Credentials");
+            }
         }
 
-        function handleLogout() { localStorage.removeItem('tps_current_user'); checkLoginState(); }
+        function handleLogout() {
+            localStorage.removeItem('tps_current_user');
+            checkLoginState();
+        }
+
+        function toggleOrder(row) {
+            const detailsRow = row.nextElementSibling;
+            if(detailsRow && detailsRow.classList.contains('order-details-row')) {
+                row.classList.toggle('expanded');
+                if(detailsRow.style.display === 'none') {
+                    detailsRow.style.display = 'table-row';
+                } else {
+                    detailsRow.style.display = 'none';
+                }
+            }
+        }
 
         function checkLoginState() {
             const user = JSON.parse(localStorage.getItem('tps_current_user'));
             const forms = document.getElementById('authForms');
             const profile = document.getElementById('profileView');
             const userBtn = document.querySelector('.user-btn');
+            
             if(user) {
                 forms.style.display = 'none';
                 profile.classList.add('active');
                 document.getElementById('userNameDisplay').innerText = user.name.toUpperCase();
                 document.getElementById('userAvatar').innerText = user.name.charAt(0).toUpperCase();
-                userBtn.classList.remove('user-attention');
+                userBtn.classList.remove('user-attention'); // Remove animation
+                
+                // Render Orders
+                const tbody = document.getElementById('orderTableBody');
+                tbody.innerHTML = '';
+                if(user.orders.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#444;">No orders found.</td></tr>';
+                } else {
+                    user.orders.forEach(order => {
+                        let totalString = order.total || "-"; 
+                        let itemsHtml = '';
+                        
+                        // Build list of items
+                        if(order.items && Array.isArray(order.items)) {
+                            order.items.forEach(item => {
+                                itemsHtml += `<li><span>${item.title} (x${item.qty})</span> <span>${item.price}</span></li>`;
+                            });
+                        } else {
+                            itemsHtml = `<li>${order.count} Items</li>`;
+                        }
+
+                        tbody.innerHTML += `
+                            <tr class="order-row" onclick="toggleOrder(this)">
+                                <td>
+                                    <span style="font-family:var(--font-tech); font-weight:bold;">#${order.id}</span>
+                                    <i class="fas fa-chevron-down order-chevron" style="font-size:0.7rem; margin-left:5px;"></i><br>
+                                    <span style="font-size:0.7rem; color:#666;">${order.date}</span>
+                                </td>
+                                <td>${totalString}</td>
+                                <td><span class="status-pill">COMPLETED</span></td>
+                            </tr>
+                            <tr class="order-details-row" style="display:none;">
+                                <td colspan="3">
+                                    <ul class="order-items-list">
+                                        ${itemsHtml}
+                                    </ul>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                }
             } else {
                 forms.style.display = 'block';
                 profile.classList.remove('active');
-                userBtn.classList.add('user-attention');
+                userBtn.classList.add('user-attention'); // Add animation
             }
         }
 
-        function scrollToPos(pct) { window.scrollTo({ top: document.body.scrollHeight * pct, behavior: 'smooth' }); }
+        /* SCROLL DOTS & ARROW LOGIC */
+        function scrollToPos(pct) {
+            window.scrollTo({
+                top: document.body.scrollHeight * pct,
+                behavior: 'smooth'
+            });
+        }
+
+        function updateDots(scrolledPct) {
+            const dots = document.querySelectorAll('.dot');
+            dots.forEach(d => d.classList.remove('active'));
+            if(scrolledPct < 33) dots[0].classList.add('active');
+            else if(scrolledPct < 66) dots[1].classList.add('active');
+            else dots[2].classList.add('active');
+        }
 
         window.onscroll = function() {
             let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
             let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
             let scrolled = (winScroll / height) * 100;
+            
             document.getElementById("scroll-progress").style.width = scrolled + "%";
+            
+            updateDots(scrolled);
+
             const btn = document.querySelector('.back-to-top');
-            if(winScroll > 500) btn.classList.add('visible'); else btn.classList.remove('visible');
+            if(winScroll > 500) btn.classList.add('visible');
+            else btn.classList.remove('visible');
         };
 
         document.addEventListener('mousemove', (e) => {
@@ -1190,33 +1205,79 @@
         document.addEventListener('contextmenu', (e) => { e.preventDefault(); ctxMenu.style.display = 'block'; ctxMenu.style.left = `${e.pageX}px`; ctxMenu.style.top = `${e.pageY}px`; });
         document.addEventListener('click', () => { ctxMenu.style.display = 'none'; });
 
+        // FAQ TOGGLE
         document.querySelectorAll('.faq-question').forEach(q => {
-            q.addEventListener('click', () => q.parentElement.classList.toggle('active'));
+            q.addEventListener('click', () => {
+                const item = q.parentElement;
+                item.classList.toggle('active');
+            });
         });
 
-        /* SALES TOAST */
+        /* --- REAL RECENT SALES POPUP (UPDATED: NO LOCATION, 20s TIMER) --- */
+        let lastShownIndex = -1; 
+
+        async function fetchRecentSales() {
+            try {
+                const res = await fetch('/api/recent-sales');
+                const data = await res.json();
+                
+                if(data.sales && data.sales.length > 0) {
+                    let randomIndex = Math.floor(Math.random() * data.sales.length);
+                    
+                    if (data.sales.length > 1 && randomIndex === lastShownIndex) {
+                        randomIndex = (randomIndex + 1) % data.sales.length;
+                    }
+                    
+                    lastShownIndex = randomIndex;
+                    const sale = data.sales[randomIndex];
+                    
+                    // Passing item and name only (ignoring location)
+                    showSalesToast(sale.item, sale.name);
+                }
+            } catch (e) { console.error("Sales fetch error", e); }
+        }
+
         function showSalesToast(item, name) {
             const toast = document.createElement('div');
             toast.style.cssText = `
-                position: fixed; bottom: 20px; left: 20px; background: rgba(5, 5, 5, 0.95); border: 1px solid #333;
-                border-left: 3px solid #00ff88; padding: 15px 20px; border-radius: 8px; z-index: 9999; backdrop-filter: blur(10px);
-                font-family: var(--font-tech); font-size: 0.8rem; transform: translateY(100px); transition: 0.5s; display: flex; gap: 15px; align-items: center; min-width: 250px;
+                position: fixed; bottom: 20px; left: 20px;
+                background: rgba(5, 5, 5, 0.95); border: 1px solid #333;
+                border-left: 3px solid #00ff88; padding: 15px 20px;
+                border-radius: 8px; z-index: 9999; backdrop-filter: blur(10px);
+                box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+                font-family: var(--font-tech); font-size: 0.8rem;
+                transform: translateY(100px); transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                display: flex; gap: 15px; align-items: center; min-width: 250px;
             `;
-            toast.innerHTML = `<div style="background:rgba(0,255,136,0.1); padding:8px; border-radius:50%;"><i class="fas fa-shopping-bag" style="color:#00ff88;"></i></div>
-                <div><div style="color:#888; font-size:0.7rem;">RECENT PURCHASE</div><div style="color:white; font-weight:700;">${item}</div><div style="color:#aaa; font-size:0.75rem;">By ${name}</div></div>`;
+            
+            toast.innerHTML = `
+                <div style="background:rgba(0,255,136,0.1); padding:8px; border-radius:50%;">
+                    <i class="fas fa-shopping-bag" style="color: #00ff88; font-size: 1.2rem;"></i>
+                </div>
+                <div>
+                    <div style="color: #888; font-size: 0.7rem; text-transform: uppercase; letter-spacing:1px; margin-bottom:2px;">
+                        RECENT PURCHASE
+                    </div>
+                    <div style="color: white; font-weight: 700; font-size: 0.95rem;">${item}</div>
+                    <div style="color: #aaa; font-size: 0.75rem; margin-top: 2px;">
+                        Purchased by ${name}
+                    </div>
+                </div>
+            `;
+
             document.body.appendChild(toast);
+
             setTimeout(() => { toast.style.transform = 'translateY(0)'; }, 100);
-            setTimeout(() => { toast.style.transform = 'translateY(100px)'; setTimeout(() => toast.remove(), 500); }, 6000);
+
+            setTimeout(() => {
+                toast.style.transform = 'translateY(100px)';
+                setTimeout(() => toast.remove(), 500);
+            }, 6000);
         }
 
-        setInterval(() => {
-            fetch('/api/recent-sales').then(r => r.json()).then(data => {
-                if(data.sales) {
-                    const s = data.sales[Math.floor(Math.random()*data.sales.length)];
-                    showSalesToast(s.item, s.name);
-                }
-            }).catch(e => {});
-        }, 20000);
+        // Run every 20 seconds
+        setTimeout(fetchRecentSales, 4000);
+        setInterval(fetchRecentSales, 20000);
     </script>
 </body>
 </html>

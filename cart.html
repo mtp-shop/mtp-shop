@@ -152,6 +152,20 @@
         }
         .stripe-btn:hover { background: #7a73ff; box-shadow: 0 5px 30px rgba(99, 91, 255, 0.5); transform: translateY(-2px); }
         
+        /* NEW: EMBEDDED CHECKOUT CONTAINER */
+        #checkout-container { 
+            display: none; 
+            margin-top: 40px; 
+            background: #fff; /* Stripe recommends white or high contrast for the iframe */
+            padding: 20px; 
+            border-radius: 16px; 
+            min-height: 500px;
+        }
+        .cancel-checkout-link {
+            display: block; text-align: center; margin-top: 20px; color: #666; font-size: 0.9rem; text-decoration: none; cursor: pointer; font-family: var(--font-head); font-weight: 700;
+        }
+        .cancel-checkout-link:hover { color: var(--accent); }
+
         /* LOGIN REMINDER */
         .login-reminder {
             background: rgba(255,255,255,0.05);
@@ -163,7 +177,7 @@
             text-align: center;
             font-size: 0.8rem;
             color: #aaa;
-            display: none; /* Hidden by default */
+            display: none; 
         }
         .login-reminder strong { color: white; display:block; margin-bottom:5px; }
         .login-reminder a { color: var(--accent); text-decoration: none; font-weight: bold; cursor: pointer; }
@@ -220,11 +234,11 @@
         .qr-img:hover { transform: scale(1.05); box-shadow: 0 0 20px var(--accent-glow); border-color: var(--accent); }
 
         .copyright { 
-            text-align: center; color: #444; margin-top: 60px; pt-top: 20px; 
+            text-align: center; color: #444; margin-top: 60px; 
             border-top: 1px solid #111; font-size: 0.8rem; padding-top: 20px; 
         }
 
-        /* --- AUTH MODAL (ADDED TO CART PAGE) --- */
+        /* --- AUTH MODAL --- */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); backdrop-filter: blur(20px); z-index: 9999; display: none; justify-content: center; align-items: center; padding: 20px; opacity: 0; transition: opacity 0.3s ease; }
         .modal-overlay.active { opacity: 1; }
         .modal-content { background: #080808; width: 100%; max-width: 500px; padding: 40px; border-radius: 20px; border: 1px solid #222; position: relative; box-shadow: 0 0 100px rgba(0,0,0,1); transform: translateY(50px); transition: 0.4s ease; }
@@ -261,6 +275,12 @@
         <!-- Cart Items -->
         <div id="cartItems"></div>
 
+        <!-- NEW: Embedded Stripe Area -->
+        <div id="checkout-container">
+            <div id="checkout"></div>
+            <a onclick="cancelCheckout()" class="cancel-checkout-link">← Cancel and Edit Cart</a>
+        </div>
+
         <!-- Summary (Checkout) -->
         <div class="cart-summary" id="cartSummary" style="display:none;">
             <div class="summary-left">
@@ -292,7 +312,6 @@
                     <span class="total-price" id="totalPrice">£0.00</span>
                 </div>
                 
-                <!-- STRIPE / DEV BUTTON -->
                 <button id="checkout-button" class="stripe-btn">
                     <i class="fas fa-credit-card"></i> PAY WITH STRIPE
                 </button>
@@ -338,12 +357,11 @@
         </div>
     </footer>
 
-    <!-- AUTH MODAL (FOR LOGIN REMINDER) -->
+    <!-- AUTH MODAL -->
     <div class="modal-overlay" id="authModal">
         <div class="modal-content">
             <span class="close-btn" onclick="document.getElementById('authModal').classList.remove('active'); setTimeout(()=>document.getElementById('authModal').style.display='none',300)">&times;</span>
             
-            <!-- Login/Register View -->
             <div id="authForms">
                 <h2 class="modal-title" style="font-size: 2rem; margin-bottom: 20px;">TPS ACCOUNT</h2>
                 <div class="auth-tabs">
@@ -351,14 +369,12 @@
                     <div class="auth-tab" onclick="switchTab('register')">REGISTER</div>
                 </div>
 
-                <!-- Login Form -->
                 <div class="auth-form active" id="loginForm">
                     <input type="email" id="loginEmail" class="auth-input" placeholder="Email Address">
                     <input type="password" id="loginPass" class="auth-input" placeholder="Password">
                     <button class="auth-submit" onclick="handleLogin()">ENTER TEMPLE</button>
                 </div>
 
-                <!-- Register Form -->
                 <div class="auth-form" id="registerForm">
                     <input type="text" id="regName" class="auth-input" placeholder="Username">
                     <input type="email" id="regEmail" class="auth-input" placeholder="Email Address">
@@ -370,13 +386,15 @@
     </div>
 
     <script>
+        const stripe = Stripe('pk_live_51LDw4PLHs0w9JjR8nBwavRWVfCsKh1Tz7YJfkjwjNN9edtqvpnVZ8axuOTVQfUAquAgdksq9jBHX8VKXll5Ft6ss008lzh2Gq3');
+        let embeddedCheckout = null;
+
         window.addEventListener('load', () => {
             setTimeout(() => {
                 document.getElementById('loader').style.opacity = '0';
                 setTimeout(() => { document.getElementById('loader').style.display = 'none'; }, 500);
             }, 1000); 
             
-            // Check login on load
             const currentUser = JSON.parse(localStorage.getItem('tps_current_user'));
             if (!currentUser) {
                 const reminder = document.getElementById('loginReminder');
@@ -398,7 +416,7 @@
         function renderCart() {
             cartContainer.innerHTML = '';
             let total = 0;
-            let subtotal = 0; // Raw total before bundles
+            let subtotal = 0; 
 
             let validItems = [];
             if (cart && cart.length > 0) {
@@ -415,26 +433,19 @@
                 cartSummary.style.display = 'flex';
             }
 
-            // CHECK LOGIN FOR REMINDER
             const currentUser = JSON.parse(localStorage.getItem('tps_current_user'));
             const reminder = document.getElementById('loginReminder');
             if (reminder) {
-                if (!currentUser) {
-                    reminder.style.display = 'block';
-                } else {
-                    reminder.style.display = 'none';
-                }
+                if (!currentUser) reminder.style.display = 'block';
+                else reminder.style.display = 'none';
             }
 
             validItems.forEach((item, index) => {
                 let priceString = item.price.toString().replace('£', '').replace('+', '').trim();
                 let priceNum = parseFloat(priceString);
-                
-                if(!isNaN(priceNum)) {
-                     subtotal += priceNum * item.qty;
-                }
+                if(!isNaN(priceNum)) subtotal += priceNum * item.qty;
 
-                let html = `
+                cartContainer.innerHTML += `
                 <div class="cart-item">
                     <div class="item-left">
                         <img src="${item.img}" class="item-img">
@@ -452,75 +463,53 @@
                         <button class="remove-btn" onclick="removeItem(${index})"><i class="fas fa-trash"></i></button>
                     </div>
                 </div>`;
-                cartContainer.innerHTML += html;
             });
 
-            // 2. CHECK BUNDLE PROGRESS (Dynamic 15% Logic)
+            // BUNDLE LOGIC
             let hasIntro = cart.some(i => i.title.toLowerCase().includes('intro'));
             let hasChain = cart.some(i => i.title.toLowerCase().includes('chain'));
             let hasGFX = cart.some(i => i.title.toLowerCase().includes('gfx') || i.title.toLowerCase().includes('banner'));
             let hasCloth = cart.some(i => i.title.toLowerCase().includes('cloth') || i.title.toLowerCase().includes('pack'));
 
-            let categoryCount = 0;
-            if(hasIntro) categoryCount++;
-            if(hasChain) categoryCount++;
-            if(hasGFX) categoryCount++;
-            if(hasCloth) categoryCount++;
+            let categoryCount = (hasIntro?1:0) + (hasChain?1:0) + (hasGFX?1:0) + (hasCloth?1:0);
+            let bundleActive = (categoryCount >= 3 || subtotal > 35);
+            total = bundleActive ? subtotal * 0.85 : subtotal;
 
-            let isOver35 = subtotal > 35;
-            let bundleActive = (categoryCount >= 3 || isOver35);
-
-            if(bundleActive) {
-                total = subtotal * 0.85; // 15% OFF
-            } else {
-                total = subtotal;
-            }
-
-            // 3. Apply Promo Codes
             if(activeCode === "1956") {
                 total = 0;
                 discountMsg.innerText = "DEV MODE: 100% OFF";
                 discountMsg.style.display = "block";
                 discountMsg.style.color = "#00ff88";
-            } 
-            else if (activeCode === "195612") {
+            } else if (activeCode === "195612") {
                 total = validItems.reduce((acc, item) => acc + (0.30 * item.qty), 0);
                 discountMsg.innerText = "STRIPE TEST (30p)";
                 discountMsg.style.display = "block";
                 discountMsg.style.color = "#ffa500";
-            }
-            else if(bundleActive) {
+            } else if(bundleActive) {
                 discountMsg.innerText = "🔥 BUNDLE UNLOCKED: 15% OFF APPLIED";
                 discountMsg.style.display = "block";
                 discountMsg.style.color = "#00ff88"; 
-            } 
-            else {
+            } else {
                 discountMsg.innerText = `Spend £${(35 - subtotal).toFixed(2)} more for 15% OFF`;
                 discountMsg.style.display = "block";
                 discountMsg.style.color = "#aaa";
             }
 
-            // Visual Updates
             if(subtotal !== total) {
                 oldPriceEl.innerText = '£' + subtotal.toFixed(2);
                 oldPriceEl.style.display = 'inline';
-            } else {
-                oldPriceEl.style.display = 'none';
-            }
+            } else oldPriceEl.style.display = 'none';
             
             totalEl.innerText = '£' + total.toFixed(2);
 
-            // Update Button Color
+            // Button Styles
             if(activeCode === "1956") {
-                totalEl.style.color = '#00ff88';
                 checkoutBtn.innerHTML = '<i class="fas fa-lock-open"></i> DEV BYPASS';
                 checkoutBtn.style.background = "#00ff88"; checkoutBtn.style.color = "#000";
             } else if (activeCode === "195612") {
-                totalEl.style.color = '#ffa500';
                 checkoutBtn.innerHTML = '<i class="fas fa-vial"></i> PAY TEST (30p)';
                 checkoutBtn.style.background = "#ffa500"; checkoutBtn.style.color = "#000";
             } else {
-                totalEl.style.color = '#ff1f1f';
                 checkoutBtn.innerHTML = '<i class="fas fa-credit-card"></i> PAY WITH STRIPE';
                 checkoutBtn.style.background = "#635bff"; checkoutBtn.style.color = "#fff";
             }
@@ -528,7 +517,7 @@
 
         function changeQty(index, amount) {
             cart[index].qty += amount;
-            if (cart[index].qty <= 0) { removeItem(index); } 
+            if (cart[index].qty <= 0) removeItem(index);
             else { localStorage.setItem('mtpCart', JSON.stringify(cart)); renderCart(); }
         }
 
@@ -540,28 +529,75 @@
 
         function applyDiscount() {
             const input = document.getElementById('promoInput').value.trim().toUpperCase();
-            
-            if(input === "1956" || input === "195612") {
-                activeCode = input;
-                renderCart();
-            } else {
-                alert("Invalid Code");
-                activeCode = "";
-                renderCart();
-            }
+            if(input === "1956" || input === "195612") activeCode = input;
+            else { alert("Invalid Code"); activeCode = ""; }
+            renderCart();
         }
 
-        /* --- AUTH SYSTEM LOGIC --- */
+        async function cancelCheckout() {
+            if (embeddedCheckout) await embeddedCheckout.destroy();
+            document.getElementById('checkout-container').style.display = 'none';
+            document.getElementById('cartItems').style.display = 'block';
+            document.getElementById('cartSummary').style.display = 'flex';
+        }
+
+        checkoutBtn.addEventListener('click', async function() {
+            const btn = this;
+            if(cart.length === 0) return;
+
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> LOADING...';
+            btn.style.pointerEvents = "none";
+
+            localStorage.setItem('mtpPendingOrder', JSON.stringify({
+                items: cart, total: totalEl.innerText, date: new Date().toLocaleDateString()
+            }));
+
+            // Calc bundle logic again for API
+            let subtotal = cart.reduce((acc, i) => acc + (parseFloat(i.price.replace('£',''))*i.qty), 0);
+            let hasIntro = cart.some(i => i.title.toLowerCase().includes('intro'));
+            let hasChain = cart.some(i => i.title.toLowerCase().includes('chain'));
+            let hasGFX = cart.some(i => i.title.toLowerCase().includes('gfx'));
+            let hasCloth = cart.some(i => i.title.toLowerCase().includes('cloth'));
+            let codeToSend = activeCode;
+            if (!codeToSend && ((hasIntro?1:0)+(hasChain?1:0)+(hasGFX?1:0)+(hasCloth?1:0) >= 3 || subtotal > 35)) {
+                codeToSend = "BUNDLE15";
+            }
+
+            try {
+                const response = await fetch('/api/create-checkout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ cart: cart, discountCode: codeToSend }),
+                });
+
+                const data = await response.json();
+                if (data.bypassUrl) { localStorage.removeItem('mtpCart'); window.location.href = data.bypassUrl; return; }
+
+                if (data.clientSecret) {
+                    document.getElementById('cartItems').style.display = 'none';
+                    document.getElementById('cartSummary').style.display = 'none';
+                    document.getElementById('checkout-container').style.display = 'block';
+
+                    embeddedCheckout = await stripe.initEmbeddedCheckout({ clientSecret: data.clientSecret });
+                    embeddedCheckout.mount('#checkout');
+                }
+
+            } catch (error) {
+                alert("Error starting checkout. Please try again.");
+                btn.innerHTML = '<i class="fas fa-credit-card"></i> PAY WITH STRIPE';
+                btn.style.pointerEvents = "all";
+            }
+        });
+
+        /* --- AUTH SYSTEM --- */
         function openAuthModal() {
             const modal = document.getElementById('authModal');
             modal.style.display = 'flex';
             setTimeout(() => modal.classList.add('active'), 10);
         }
-
         function switchTab(tab) {
             document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
-            
             if(tab === 'login') {
                 document.querySelectorAll('.auth-tab')[0].classList.add('active');
                 document.getElementById('loginForm').classList.add('active');
@@ -570,146 +606,25 @@
                 document.getElementById('registerForm').classList.add('active');
             }
         }
-
         function getDB() { return JSON.parse(localStorage.getItem('tps_users_db')) || []; }
         function saveDB(db) { localStorage.setItem('tps_users_db', JSON.stringify(db)); }
-
         function handleRegister() {
-            const name = document.getElementById('regName').value;
-            const email = document.getElementById('regEmail').value;
-            const pass = document.getElementById('regPass').value;
-            
-            if(!name || !email || !pass) { alert("Please fill all fields"); return; }
-
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) {
-                alert("Please enter a valid email address");
-                return;
-            }
-            
+            const name = document.getElementById('regName').value, email = document.getElementById('regEmail').value, pass = document.getElementById('regPass').value;
+            if(!name || !email || !pass) return alert("Fill all fields");
             let db = getDB();
-            if(db.find(u => u.email === email)) { alert("Email already registered"); return; }
-            
+            if(db.find(u => u.email === email)) return alert("Already registered");
             const newUser = { name, email, pass, orders: [] };
-            db.push(newUser);
-            saveDB(db);
-            
-            localStorage.setItem('tps_current_user', JSON.stringify(newUser));
-            // Close modal & Refresh cart to hide reminder
-            document.getElementById('authModal').classList.remove('active');
-            setTimeout(() => document.getElementById('authModal').style.display = 'none', 300);
-            renderCart();
+            db.push(newUser); saveDB(db); localStorage.setItem('tps_current_user', JSON.stringify(newUser));
+            location.reload();
         }
-
         function handleLogin() {
-            const email = document.getElementById('loginEmail').value;
-            const pass = document.getElementById('loginPass').value;
-            
+            const email = document.getElementById('loginEmail').value, pass = document.getElementById('loginPass').value;
             let db = getDB();
             const user = db.find(u => u.email === email && u.pass === pass);
-            
-            if(user) {
-                localStorage.setItem('tps_current_user', JSON.stringify(user));
-                // Close modal & Refresh cart to hide reminder
-                document.getElementById('authModal').classList.remove('active');
-                setTimeout(() => document.getElementById('authModal').style.display = 'none', 300);
-                renderCart();
-            } else {
-                alert("Invalid Credentials");
-            }
+            if(user) { localStorage.setItem('tps_current_user', JSON.stringify(user)); location.reload(); }
+            else alert("Invalid Credentials");
         }
 
-        const stripe = Stripe('pk_live_51LDw4PLHs0w9JjR8nBwavRWVfCsKh1Tz7YJfkjwjNN9edtqvpnVZ8axuOTVQfUAquAgdksq9jBHX8VKXll5Ft6ss008lzh2Gq3'); 
-
-        checkoutBtn.addEventListener('click', async function() {
-            const btn = this;
-            const originalText = btn.innerHTML;
-            
-            if(cart.length === 0) { alert("Cart is empty."); return; }
-
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> PROCESSING...';
-            btn.style.opacity = "0.8";
-            btn.style.pointerEvents = "none";
-
-            // SAVE PENDING ORDER TO LOCAL STORAGE (SUCCESS PAGE WILL PICK THIS UP)
-            localStorage.setItem('mtpPendingOrder', JSON.stringify({
-                items: cart,
-                total: totalEl.innerText,
-                date: new Date().toLocaleDateString()
-            }));
-
-            // --- CALCULATE DISCOUNT CODE ---
-            let codeToSend = activeCode; // Start with manual code
-            
-            // Only apply bundle logic if no manual code is set OR if we want bundle to override
-            if (!codeToSend) {
-                let subtotal = 0;
-                cart.forEach(item => {
-                    let p = parseFloat(item.price.replace('£', '').replace('+', ''));
-                    if(!isNaN(p)) subtotal += p * item.qty;
-                });
-
-                let hasIntro = cart.some(i => i.title.toLowerCase().includes('intro'));
-                let hasChain = cart.some(i => i.title.toLowerCase().includes('chain'));
-                let hasGFX = cart.some(i => i.title.toLowerCase().includes('gfx') || i.title.toLowerCase().includes('banner'));
-                let hasCloth = cart.some(i => i.title.toLowerCase().includes('cloth') || i.title.toLowerCase().includes('pack'));
-
-                let categoryCount = 0;
-                if(hasIntro) categoryCount++;
-                if(hasChain) categoryCount++;
-                if(hasGFX) categoryCount++;
-                if(hasCloth) categoryCount++;
-
-                if (categoryCount >= 3 || subtotal > 35) {
-                    codeToSend = "BUNDLE15";
-                }
-            }
-
-            try {
-                // FETCH API
-                const response = await fetch('/api/create-checkout', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        cart: cart,
-                        discountCode: codeToSend 
-                    }),
-                });
-
-                // ROBUST ERROR HANDLING
-                const contentType = response.headers.get("content-type");
-                let data;
-                if (contentType && contentType.indexOf("application/json") !== -1) {
-                    data = await response.json();
-                } else {
-                    const text = await response.text();
-                    throw new Error("Server Error: " + text);
-                }
-
-                if (data.error) { throw new Error(data.error); }
-
-                if (data.bypassUrl) {
-                    localStorage.removeItem('mtpCart');
-                    window.location.href = data.bypassUrl;
-                } 
-                else if (data.id) {
-                    const result = await stripe.redirectToCheckout({ sessionId: data.id });
-                    if (result.error) { alert(result.error.message); resetBtn(); }
-                }
-
-            } catch (error) {
-                console.error('Error:', error);
-                alert(error.message);
-                resetBtn();
-            }
-
-            function resetBtn() {
-                btn.innerHTML = originalText;
-                btn.style.opacity = "1";
-                btn.style.pointerEvents = "all";
-            }
-        });
-        
         renderCart();
     </script>
 </body>

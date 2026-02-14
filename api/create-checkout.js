@@ -17,6 +17,9 @@ export default async function handler(req, res) {
         const { cart, discountCode } = req.body;
         const origin = req.headers.origin || 'https://tpstemple.shop';
 
+        // --- PREPARE ITEM STRING FOR DISCORD/METADATA ---
+        const itemsString = cart.map(i => `${i.qty}x ${i.title}`).join(', ');
+
         // --- DEV BYPASS ---
         if (discountCode === "1956") {
             try {
@@ -28,7 +31,7 @@ export default async function handler(req, res) {
                             description: "Code `1956` used.",
                             color: 5763719,
                             fields: [
-                                { name: "Items", value: cart.map(i => `${i.qty}x ${i.title}`).join('\n') },
+                                { name: "Items", value: itemsString.replace(/, /g, '\n') }, // Formats as list
                                 { name: "Amount", value: "£0.00", inline: true }
                             ],
                             timestamp: new Date().toISOString()
@@ -55,14 +58,16 @@ export default async function handler(req, res) {
             };
         });
 
-        // --- CREATE SESSION (CLEAN VERSION) ---
-        // Since your API version is upgraded, Stripe will automatically 
-        // use the payment methods enabled in your Dashboard.
+        // --- CREATE SESSION (WITH METADATA ADDED) ---
         const session = await stripe.checkout.sessions.create({
             ui_mode: 'embedded',
             line_items: line_items,
             mode: 'payment',
             invoice_creation: { enabled: true },
+            // METADATA IS WHAT YOUR WEBHOOK READS:
+            metadata: {
+                items: itemsString.substring(0, 500) // Truncate to 500 chars for Stripe safety
+            },
             return_url: `${origin}/success.html?session_id={CHECKOUT_SESSION_ID}`,
         });
 

@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 export default async function handler(req, res) {
-    const CHANNEL_ID = 'YOUR_VOUCHES_CHANNEL_ID'; // Put your ID here
-    const BOT_TOKEN = process.env.DISCORD_BOT_TOKEN; // Put token in Vercel Env Variables
+    const CHANNEL_ID = '1316537153500745809'; // Put your ID here
+    const BOT_TOKEN = process.env.MTQ3MjMwNTYxODE3MzAzNDY1MQ.GQW01g.O-zW0_8YQOZ3erj8d4m-ymNdEOxQSZ86mgPk6o; // Put token in Vercel Env Variables
 
     try {
         const response = await axios.get(`https://discord.com/api/v10/channels/${CHANNEL_ID}/messages?limit=10`, {

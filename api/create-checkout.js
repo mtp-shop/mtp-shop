@@ -4,7 +4,7 @@ import axios from 'axios';
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export default async function handler(req, res) {
-    // 1. CORS Headers
+    // 1. Handle CORS
     res.setHeader('Access-Control-Allow-Credentials', true);
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
@@ -39,7 +39,6 @@ export default async function handler(req, res) {
             return res.status(200).json({ bypassUrl: `${origin}/success.html` });
         }
 
-        // --- PREPARE ITEMS ---
         const line_items = cart.map(item => {
             let priceValue = parseFloat(item.price.replace('£', '').replace('+', ''));
             if(discountCode === "XMAS") priceValue *= 0.8;
@@ -56,7 +55,7 @@ export default async function handler(req, res) {
             };
         });
 
-        // --- CREATE SESSION WITH THEME ---
+        // --- CREATE SESSION (CLEAN VERSION) ---
         const session = await stripe.checkout.sessions.create({
             ui_mode: 'embedded',
             payment_method_types: ['card', 'paypal'], 
@@ -64,25 +63,12 @@ export default async function handler(req, res) {
             mode: 'payment',
             invoice_creation: { enabled: true },
             return_url: `${origin}/success.html?session_id={CHECKOUT_SESSION_ID}`,
-            // Appearance is now supported thanks to your API upgrade
-            appearance: {
-                theme: 'night',
-                variables: {
-                    colorPrimary: '#ff1f1f',
-                    colorBackground: '#050505',
-                    colorText: '#ffffff',
-                    colorDanger: '#df1b41',
-                    fontFamily: 'Ideal Sans, system-ui, sans-serif',
-                    spacingUnit: '4px',
-                    borderRadius: '8px',
-                },
-            },
         });
 
         return res.status(200).json({ clientSecret: session.client_secret });
 
     } catch (error) {
-        console.error("Stripe Error:", error.message);
+        console.error("Stripe Session Error:", error.message);
         return res.status(500).json({ error: error.message });
     }
 }

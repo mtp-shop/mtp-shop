@@ -156,10 +156,11 @@
         #checkout-container { 
             display: none; 
             margin-top: 40px; 
-            background: #fff; /* Stripe recommends white or high contrast for the iframe */
+            background: #fff; 
             padding: 20px; 
             border-radius: 16px; 
             min-height: 500px;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
         }
         .cancel-checkout-link {
             display: block; text-align: center; margin-top: 20px; color: #666; font-size: 0.9rem; text-decoration: none; cursor: pointer; font-family: var(--font-head); font-weight: 700;
@@ -260,6 +261,7 @@
 </head>
 <body>
 
+    <!-- LOADER SYSTEM -->
     <div id="loader">
         <div class="loader-content">
             <img src="logo.png" class="loader-logo">
@@ -267,21 +269,23 @@
         </div>
     </div>
 
+    <!-- NAVIGATION -->
     <nav><a href="index.html">← Back to Shop</a></nav>
 
+    <!-- MAIN CONTAINER -->
     <div class="container">
         <h1>Shopping Cart</h1>
         
-        <!-- Cart Items -->
+        <!-- Cart Items List -->
         <div id="cartItems"></div>
 
-        <!-- NEW: Embedded Stripe Area -->
+        <!-- NEW: Embedded Checkout Window -->
         <div id="checkout-container">
             <div id="checkout"></div>
             <a onclick="cancelCheckout()" class="cancel-checkout-link">← Cancel and Edit Cart</a>
         </div>
 
-        <!-- Summary (Checkout) -->
+        <!-- Summary (Checkout Options) -->
         <div class="cart-summary" id="cartSummary" style="display:none;">
             <div class="summary-left">
                 <h3><i class="fas fa-shield-alt"></i> SECURE CHECKOUT</h3>
@@ -312,13 +316,14 @@
                     <span class="total-price" id="totalPrice">£0.00</span>
                 </div>
                 
+                <!-- CHECKOUT BUTTON -->
                 <button id="checkout-button" class="stripe-btn">
                     <i class="fas fa-credit-card"></i> PAY WITH STRIPE
                 </button>
             </div>
         </div>
         
-        <!-- Empty Cart Message -->
+        <!-- Empty Cart UI -->
         <div id="emptyCart" class="empty-container">
             <div class="empty-icon"><i class="fas fa-shopping-basket"></i></div>
             <div class="empty-title">YOUR CART IS EMPTY</div>
@@ -327,6 +332,7 @@
         </div>
     </div>
 
+    <!-- FOOTER SYSTEM -->
     <footer>
         <div class="footer-content">
             <div class="footer-col">
@@ -357,7 +363,7 @@
         </div>
     </footer>
 
-    <!-- AUTH MODAL -->
+    <!-- AUTHENTICATION MODAL -->
     <div class="modal-overlay" id="authModal">
         <div class="modal-content">
             <span class="close-btn" onclick="document.getElementById('authModal').classList.remove('active'); setTimeout(()=>document.getElementById('authModal').style.display='none',300)">&times;</span>
@@ -385,6 +391,7 @@
         </div>
     </div>
 
+    <!-- JAVASCRIPT LOGIC -->
     <script>
         const stripe = Stripe('pk_live_51LDw4PLHs0w9JjR8nBwavRWVfCsKh1Tz7YJfkjwjNN9edtqvpnVZ8axuOTVQfUAquAgdksq9jBHX8VKXll5Ft6ss008lzh2Gq3');
         let embeddedCheckout = null;
@@ -465,7 +472,7 @@
                 </div>`;
             });
 
-            // BUNDLE LOGIC
+            // BUNDLE CALCULATION
             let hasIntro = cart.some(i => i.title.toLowerCase().includes('intro'));
             let hasChain = cart.some(i => i.title.toLowerCase().includes('chain'));
             let hasGFX = cart.some(i => i.title.toLowerCase().includes('gfx') || i.title.toLowerCase().includes('banner'));
@@ -502,7 +509,6 @@
             
             totalEl.innerText = '£' + total.toFixed(2);
 
-            // Button Styles
             if(activeCode === "1956") {
                 checkoutBtn.innerHTML = '<i class="fas fa-lock-open"></i> DEV BYPASS';
                 checkoutBtn.style.background = "#00ff88"; checkoutBtn.style.color = "#000";
@@ -541,6 +547,7 @@
             document.getElementById('cartSummary').style.display = 'flex';
         }
 
+        // --- FIXED CHECKOUT WITH ERROR HANDLING ---
         checkoutBtn.addEventListener('click', async function() {
             const btn = this;
             if(cart.length === 0) return;
@@ -552,16 +559,9 @@
                 items: cart, total: totalEl.innerText, date: new Date().toLocaleDateString()
             }));
 
-            // Calc bundle logic again for API
             let subtotal = cart.reduce((acc, i) => acc + (parseFloat(i.price.replace('£',''))*i.qty), 0);
-            let hasIntro = cart.some(i => i.title.toLowerCase().includes('intro'));
-            let hasChain = cart.some(i => i.title.toLowerCase().includes('chain'));
-            let hasGFX = cart.some(i => i.title.toLowerCase().includes('gfx'));
-            let hasCloth = cart.some(i => i.title.toLowerCase().includes('cloth'));
             let codeToSend = activeCode;
-            if (!codeToSend && ((hasIntro?1:0)+(hasChain?1:0)+(hasGFX?1:0)+(hasCloth?1:0) >= 3 || subtotal > 35)) {
-                codeToSend = "BUNDLE15";
-            }
+            if (!codeToSend && subtotal > 35) codeToSend = "BUNDLE15";
 
             try {
                 const response = await fetch('/api/create-checkout', {
@@ -571,25 +571,37 @@
                 });
 
                 const data = await response.json();
-                if (data.bypassUrl) { localStorage.removeItem('mtpCart'); window.location.href = data.bypassUrl; return; }
+
+                // If the API sends an error field, throw it to the catch block
+                if (data.error) throw new Error(data.error);
+
+                if (data.bypassUrl) {
+                    localStorage.removeItem('mtpCart');
+                    window.location.href = data.bypassUrl;
+                    return;
+                }
 
                 if (data.clientSecret) {
+                    // Hide UI and show Stripe Embed
                     document.getElementById('cartItems').style.display = 'none';
                     document.getElementById('cartSummary').style.display = 'none';
                     document.getElementById('checkout-container').style.display = 'block';
 
                     embeddedCheckout = await stripe.initEmbeddedCheckout({ clientSecret: data.clientSecret });
                     embeddedCheckout.mount('#checkout');
+                } else {
+                    throw new Error("No client secret received from server.");
                 }
 
             } catch (error) {
-                alert("Error starting checkout. Please try again.");
+                console.error("Checkout Fail:", error);
+                alert("Checkout Error: " + error.message);
                 btn.innerHTML = '<i class="fas fa-credit-card"></i> PAY WITH STRIPE';
                 btn.style.pointerEvents = "all";
             }
         });
 
-        /* --- AUTH SYSTEM --- */
+        /* --- AUTHENTICATION HELPERS --- */
         function openAuthModal() {
             const modal = document.getElementById('authModal');
             modal.style.display = 'flex';

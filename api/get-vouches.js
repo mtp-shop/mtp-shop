@@ -10,7 +10,7 @@ export default async function handler(req, res) {
     }
 
     try {
-        const response = await axios.get(`https://discord.com/api/v10/channels/${CHANNEL_ID}/messages?limit=100`, {
+        const response = await axios.get(`https://discord.com/api/v10/channels/${CHANNEL_ID}/messages?limit=10`, {
             headers: {
                 Authorization: `Bot ${BOT_TOKEN}`
             }

@@ -4,25 +4,20 @@ import axios from 'axios';
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export default async function handler(req, res) {
-    // 1. Handle CORS
+    // 1. CORS Headers
     res.setHeader('Access-Control-Allow-Credentials', true);
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
     res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
 
-    if (req.method === 'OPTIONS') {
-        return res.status(200).end();
-    }
-
-    if (req.method !== 'POST') {
-        return res.status(405).json({ error: 'Method Not Allowed' });
-    }
+    if (req.method === 'OPTIONS') return res.status(200).end();
+    if (req.method !== 'POST') return res.status(405).json({ error: 'Method Not Allowed' });
 
     try {
         const { cart, discountCode } = req.body;
         const origin = req.headers.origin || 'https://tpstemple.shop';
 
-        // --- DEV BYPASS (Code: 1956) ---
+        // --- DEV BYPASS ---
         if (discountCode === "1956") {
             try {
                 if (process.env.DISCORD_WEBHOOK_URL) {
@@ -40,47 +35,54 @@ export default async function handler(req, res) {
                         }]
                     });
                 }
-            } catch (err) { console.error("Discord Webhook Error:", err.message); }
+            } catch (err) { console.error("Discord Error:", err.message); }
             return res.status(200).json({ bypassUrl: `${origin}/success.html` });
         }
 
-        // --- PREPARE LINE ITEMS ---
+        // --- PREPARE ITEMS ---
         const line_items = cart.map(item => {
             let priceValue = parseFloat(item.price.replace('£', '').replace('+', ''));
-            
-            // Apply Discounts
-            if (discountCode === "XMAS") priceValue *= 0.8;
+            if(discountCode === "XMAS") priceValue *= 0.8;
             else if (discountCode === "195612") priceValue = 0.30;
             else if (discountCode === "BUNDLE15") priceValue *= 0.85;
 
-            // THIS RETURN STATEMENT IS CRITICAL
             return {
                 price_data: {
                     currency: 'gbp',
-                    product_data: {
-                        name: item.title,
-                        images: [item.img],
-                    },
+                    product_data: { name: item.title, images: [item.img] },
                     unit_amount: Math.round(priceValue * 100),
                 },
                 quantity: item.qty,
             };
         });
 
-        // --- CREATE EMBEDDED SESSION ---
+        // --- CREATE SESSION WITH THEME ---
         const session = await stripe.checkout.sessions.create({
             ui_mode: 'embedded',
-            payment_method_types: ['card', 'paypal'],
+            payment_method_types: ['card', 'paypal'], 
             line_items: line_items,
             mode: 'payment',
             invoice_creation: { enabled: true },
             return_url: `${origin}/success.html?session_id={CHECKOUT_SESSION_ID}`,
+            // Appearance is now supported thanks to your API upgrade
+            appearance: {
+                theme: 'night',
+                variables: {
+                    colorPrimary: '#ff1f1f',
+                    colorBackground: '#050505',
+                    colorText: '#ffffff',
+                    colorDanger: '#df1b41',
+                    fontFamily: 'Ideal Sans, system-ui, sans-serif',
+                    spacingUnit: '4px',
+                    borderRadius: '8px',
+                },
+            },
         });
 
         return res.status(200).json({ clientSecret: session.client_secret });
 
     } catch (error) {
-        console.error("Stripe Session Error:", error);
+        console.error("Stripe Error:", error.message);
         return res.status(500).json({ error: error.message });
     }
 }

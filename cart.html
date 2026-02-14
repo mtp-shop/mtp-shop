@@ -152,7 +152,7 @@
         }
         .stripe-btn:hover { background: #7a73ff; box-shadow: 0 5px 30px rgba(99, 91, 255, 0.5); transform: translateY(-2px); }
         
-        /* CHECKOUT CONTAINER */
+        /* NEW: EMBEDDED CHECKOUT CONTAINER */
         #checkout-container { 
             display: none; 
             margin-top: 40px; 
@@ -276,7 +276,7 @@
         <!-- Cart Items -->
         <div id="cartItems"></div>
 
-        <!-- NEW: Embedded Stripe Area -->
+        <!-- Embedded Stripe Area -->
         <div id="checkout-container">
             <div id="checkout"></div>
             <a onclick="cancelCheckout()" class="cancel-checkout-link">← Cancel and Edit Cart</a>
@@ -541,7 +541,7 @@
             document.getElementById('cartSummary').style.display = 'flex';
         }
 
-        // --- CHECKOUT LOGIC (APPEARANCE REMOVED FROM CLIENT CALL) ---
+        // --- CHECKOUT LOGIC WITH ERROR HANDLING ---
         checkoutBtn.addEventListener('click', async function() {
             const btn = this;
             if(cart.length === 0) return;

@@ -278,18 +278,77 @@
         .see-more-btn { margin-top: 40px; font-size: 0.9rem; color: var(--accent); text-decoration: none; text-transform: uppercase; letter-spacing: 2px; transition: 0.3s; font-weight: 700; }
         .see-more-btn:hover { color: white; text-shadow: 0 0 10px var(--accent); transform: scale(1.05); }
 
-        /* --- REVIEWS --- */
-        .reviews-container { margin-top: 100px; display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; max-width: 1200px; min-height: 200px; }
-        .review-card {
-            background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
-            border: 1px solid var(--glass-border); padding: 25px; border-radius: 16px; backdrop-filter: blur(10px); width: 300px; text-align: left; transition: 0.3s; transform-style: preserve-3d; transform: perspective(1000px);
+        /* --- UPDATED COMPACT VOUCH UI --- */
+        .vouch-wall-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+            max-width: 1200px;
+            margin: 40px auto 0;
+            padding: 0 20px;
         }
-        .review-card:hover { transform: translateY(-5px); border-color: rgba(255,255,255,0.2); }
-        .review-header { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; transform: translateZ(20px); }
-        .discord-pfp { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--accent); object-fit: cover; }
-        .reviewer-name { font-size: 0.9rem; font-weight: 700; color: white; font-family: var(--font-head); }
-        .stars { color: var(--accent); font-size: 0.8rem; letter-spacing: 2px; }
-        .review-text { font-size: 0.85rem; color: #bbb; line-height: 1.6; font-style: italic; transform: translateZ(20px); }
+        .compact-vouch {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 16px;
+            backdrop-filter: blur(10px);
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+            transform-style: preserve-3d;
+            transform: perspective(1000px);
+        }
+        .compact-vouch:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--accent);
+            transform: translateY(-5px);
+        }
+        .vouch-user-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .vouch-pfp {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 1px solid var(--accent);
+            object-fit: cover;
+        }
+        .vouch-meta {
+            display: flex;
+            flex-direction: column;
+        }
+        .vouch-username {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .vouch-verified {
+            color: #00ff88;
+            font-size: 0.7rem;
+        }
+        .vouch-rating {
+            color: var(--accent);
+            font-size: 0.65rem;
+            letter-spacing: 1px;
+        }
+        .vouch-body {
+            font-size: 0.8rem;
+            color: #aaa;
+            line-height: 1.5;
+            font-style: italic;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
 
         /* --- PRODUCTS --- */
         .container { max-width: 1300px; margin: 0 auto; padding: 50px 30px; }
@@ -506,18 +565,19 @@
         <p class="subtitle hidden blur-load"><span id="typewriter"></span><span class="cursor">|</span></p>
         <a href="#intros" class="hero-btn hidden blur-load">SHOP NOW</a>
 
-        <!-- FEATURE: LIVE VOUCH WALL -->
-        <div class="section-header hidden" style="margin-top:100px;">
-            <h2 class="section-title">LIVE <span>VOUCHES</span></h2>
-            <div class="clock-dot" style="margin-left:10px;"></div>
+        <!-- UPDATED COMPACT VOUCH HEADER -->
+        <div class="section-header hidden" style="margin-top:100px; justify-content:center; border:none;">
+            <div class="clock-dot"></div>
+            <h2 class="section-title" style="font-size: 1.5rem;">LIVE <span>VOUCHES</span></h2>
         </div>
         
-        <div id="vouch-wall" class="reviews-container hidden">
-            <p id="vouch-loading" style="color:var(--text-dim); font-family:var(--font-tech); font-size:0.8rem; letter-spacing:2px;">CONNECTING TO TEMPLE FEED...</p>
+        <!-- COMPACT VOUCH WALL GRID -->
+        <div id="vouch-wall" class="vouch-wall-grid hidden">
+            <p id="vouch-loading" style="grid-column: 1/-1; color:var(--text-dim); font-family:var(--font-tech); font-size:0.8rem; letter-spacing:2px;">CONNECTING TO TEMPLE FEED...</p>
         </div>
         
         <a href="https://discord.com/channels/1316535768717463644/1316537153500745809" target="_blank" class="see-more-btn hidden">
-            View All Vouches on Discord <i class="fas fa-external-link-alt"></i>
+            All Vouches <i class="fas fa-external-link-alt"></i>
         </a>
     </header>
 
@@ -771,7 +831,7 @@
             document.title = docTitle;
         }, 200);
 
-        /* --- FEATURE: LIVE VOUCH WALL FETCH --- */
+        /* --- FEATURE: UPDATED COMPACT VOUCH FETCH --- */
         async function loadLiveVouches() {
             const wall = document.getElementById('vouch-wall');
             try {
@@ -782,27 +842,27 @@
                     wall.innerHTML = ''; // Clear loading text
                     data.forEach(vouch => {
                         const card = document.createElement('div');
-                        card.className = 'review-card';
+                        card.className = 'compact-vouch';
                         card.setAttribute('data-tilt', '');
                         card.setAttribute('data-tilt-glare', 'true');
-                        card.setAttribute('data-tilt-max-glare', '0.1');
+                        card.setAttribute('data-tilt-max-glare', '0.05');
                         
                         card.innerHTML = `
-                            <div class="review-header">
-                                <img src="${vouch.avatar}" class="discord-pfp">
-                                <div class="reviewer-info">
-                                    <span class="reviewer-name">@${vouch.username}</span>
-                                    <div class="stars">★★★★★</div>
+                            <div class="vouch-user-row">
+                                <img src="${vouch.avatar}" class="vouch-pfp">
+                                <div class="vouch-meta">
+                                    <span class="vouch-username">@${vouch.username} <i class="fas fa-check-circle vouch-verified"></i></span>
+                                    <div class="vouch-rating">★★★★★</div>
                                 </div>
                             </div>
-                            <p class="review-text">"${vouch.content}"</p>
+                            <p class="vouch-body">"${vouch.content}"</p>
                         `;
                         wall.appendChild(card);
                     });
                     
                     // Re-init Tilt for dynamic cards
-                    VanillaTilt.init(document.querySelectorAll(".review-card"), {
-                        max: 10, speed: 400, glare: true, "max-glare": 0.1
+                    VanillaTilt.init(document.querySelectorAll(".compact-vouch"), {
+                        max: 8, speed: 400, glare: true, "max-glare": 0.05
                     });
                 }
             } catch (e) {

@@ -276,7 +276,7 @@
         <!-- Cart Items -->
         <div id="cartItems"></div>
 
-        <!-- Embedded Stripe Area -->
+        <!-- NEW: Embedded Stripe Area -->
         <div id="checkout-container">
             <div id="checkout"></div>
             <a onclick="cancelCheckout()" class="cancel-checkout-link">← Cancel and Edit Cart</a>
@@ -541,7 +541,7 @@
             document.getElementById('cartSummary').style.display = 'flex';
         }
 
-        // --- CHECKOUT LOGIC WITH CORRECTED APPEARANCE PLACEMENT ---
+        // --- CHECKOUT LOGIC (APPEARANCE REMOVED FROM CLIENT CALL) ---
         checkoutBtn.addEventListener('click', async function() {
             const btn = this;
             if(cart.length === 0) return;
@@ -578,21 +578,9 @@
                     document.getElementById('cartSummary').style.display = 'none';
                     document.getElementById('checkout-container').style.display = 'block';
 
-                    // INITIALIZE WITH APPEARANCE (CLIENT SIDE)
+                    // INITIALIZE WITHOUT illegal appearance parameter
                     embeddedCheckout = await stripe.initEmbeddedCheckout({ 
-                        clientSecret: data.clientSecret,
-                        appearance: {
-                            theme: 'night',
-                            variables: {
-                                colorPrimary: '#ff1f1f',
-                                colorBackground: '#050505',
-                                colorText: '#ffffff',
-                                colorDanger: '#df1b41',
-                                fontFamily: 'Ideal Sans, system-ui, sans-serif',
-                                spacingUnit: '4px',
-                                borderRadius: '8px',
-                            },
-                        },
+                        clientSecret: data.clientSecret
                     });
                     
                     embeddedCheckout.mount('#checkout');

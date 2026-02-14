@@ -55,11 +55,11 @@ export default async function handler(req, res) {
             };
         });
 
-        // --- CREATE SESSION WITH AUTOMATIC PAYMENT METHODS ---
+        // --- CREATE SESSION (CLEAN VERSION) ---
+        // Since your API version is upgraded, Stripe will automatically 
+        // use the payment methods enabled in your Dashboard.
         const session = await stripe.checkout.sessions.create({
             ui_mode: 'embedded',
-            // ENABLE AUTOMATIC METHODS (Enables Apple Pay, Google Pay, etc.)
-            automatic_payment_methods: { enabled: true }, 
             line_items: line_items,
             mode: 'payment',
             invoice_creation: { enabled: true },

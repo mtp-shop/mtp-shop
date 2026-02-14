@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Your Cart | TPS TEMPLE</title>
     
     <link rel="icon" type="image/png" href="logo.png">
@@ -44,6 +44,7 @@
             background-image: linear-gradient(to bottom, rgba(0,0,0,0.8), rgba(0,0,0,0.95)), url('background.png'); 
             background-size: cover; background-attachment: fixed; min-height: 100vh;
             display: flex; flex-direction: column;
+            overflow-x: hidden;
         }
 
         /* --- SCROLLBAR --- */
@@ -119,8 +120,10 @@
             border: 1px solid var(--glass-border); 
             margin-top: 40px; border-radius: 12px;
             display: flex; justify-content: space-between; align-items: flex-start;
+            gap: 30px;
         }
 
+        .summary-left { flex: 1; }
         .summary-left h3 { margin: 0 0 15px 0; font-size: 1.4rem; color: white; font-family: var(--font-head); font-weight: 900; font-style: italic; }
         .summary-left p { margin: 8px 0; color: #aaa; font-size: 0.9rem; line-height: 1.5; }
 
@@ -152,7 +155,7 @@
         }
         .stripe-btn:hover { background: #7a73ff; box-shadow: 0 5px 30px rgba(99, 91, 255, 0.5); transform: translateY(-2px); }
         
-        /* NEW: EMBEDDED CHECKOUT CONTAINER */
+        /* CHECKOUT CONTAINER */
         #checkout-container { 
             display: none; 
             margin-top: 40px; 
@@ -256,6 +259,34 @@
         .auth-input:focus { border-color: var(--accent); }
         .auth-submit { background: var(--accent); color: white; border: none; padding: 15px; border-radius: 8px; font-weight: 900; font-family: var(--font-head); cursor: pointer; transition: 0.3s; }
         .auth-submit:hover { background: white; color: black; }
+
+        /* --- MOBILE RESPONSIVE FIXES --- */
+        @media (max-width: 768px) {
+            h1 { font-size: 2.2rem; margin-bottom: 20px; }
+            .container { margin-top: 80px; padding: 15px; }
+            
+            .cart-item { padding: 15px; flex-direction: column; align-items: flex-start; gap: 15px; }
+            .item-right { width: 100%; justify-content: space-between; }
+            .item-img { width: 70px; height: 70px; }
+            .item-info h3 { font-size: 1.1rem; }
+            
+            .cart-summary {
+                flex-direction: column;
+                padding: 30px 20px;
+                gap: 25px;
+            }
+            .summary-right {
+                width: 100%;
+                text-align: left;
+                align-items: flex-start;
+            }
+            .total-price { font-size: 2.3rem; }
+            .discount-box { width: 100%; }
+            .stripe-btn { font-size: 0.95rem; padding: 18px; }
+            
+            .footer-content { flex-direction: column; text-align: center; align-items: center; }
+            .footer-col { min-width: unset; text-align: center; }
+        }
         
     </style>
 </head>
@@ -276,7 +307,7 @@
         <!-- Cart Items -->
         <div id="cartItems"></div>
 
-        <!-- Embedded Stripe Checkout -->
+        <!-- Embedded Checkout -->
         <div id="checkout-container">
             <div id="checkout"></div>
             <a onclick="cancelCheckout()" class="cancel-checkout-link">← Cancel and Edit Cart</a>
@@ -439,14 +470,18 @@
             }
 
             validItems.forEach((item, index) => {
-                let priceNum = parseFloat(item.price.toString().replace('£', '').replace('+', '').trim());
+                let priceString = item.price.toString().replace('£', '').replace('+', '').trim();
+                let priceNum = parseFloat(priceString);
                 if(!isNaN(priceNum)) subtotal += priceNum * item.qty;
 
                 cartContainer.innerHTML += `
                 <div class="cart-item">
                     <div class="item-left">
                         <img src="${item.img}" class="item-img">
-                        <div class="item-info"><h3>${item.title}</h3><p>${item.price}</p></div>
+                        <div class="item-info">
+                            <h3>${item.title}</h3>
+                            <p>${item.price}</p>
+                        </div>
                     </div>
                     <div class="item-right">
                         <div class="qty-controls">
@@ -459,19 +494,53 @@
                 </div>`;
             });
 
-            let bundleActive = (new Set(cart.map(i => i.title.split(' ')[1])).size >= 3 || subtotal > 35);
+            // BUNDLE LOGIC
+            let hasIntro = cart.some(i => i.title.toLowerCase().includes('intro'));
+            let hasChain = cart.some(i => i.title.toLowerCase().includes('chain'));
+            let hasGFX = cart.some(i => i.title.toLowerCase().includes('gfx') || i.title.toLowerCase().includes('banner'));
+            let hasCloth = cart.some(i => i.title.toLowerCase().includes('cloth') || i.title.toLowerCase().includes('pack'));
+
+            let categoryCount = (hasIntro?1:0) + (hasChain?1:0) + (hasGFX?1:0) + (hasCloth?1:0);
+            let bundleActive = (categoryCount >= 3 || subtotal > 35);
             total = bundleActive ? subtotal * 0.85 : subtotal;
 
-            if(activeCode === "1956") total = 0;
-            else if (activeCode === "195612") total = validItems.reduce((acc, item) => acc + (0.30 * item.qty), 0);
+            if(activeCode === "1956") {
+                total = 0;
+                discountMsg.innerText = "DEV MODE: 100% OFF";
+                discountMsg.style.display = "block";
+                discountMsg.style.color = "#00ff88";
+            } else if (activeCode === "195612") {
+                total = validItems.reduce((acc, item) => acc + (0.30 * item.qty), 0);
+                discountMsg.innerText = "STRIPE TEST (30p)";
+                discountMsg.style.display = "block";
+                discountMsg.style.color = "#ffa500";
+            } else if(bundleActive) {
+                discountMsg.innerText = "🔥 BUNDLE UNLOCKED: 15% OFF APPLIED";
+                discountMsg.style.display = "block";
+                discountMsg.style.color = "#00ff88"; 
+            } else {
+                discountMsg.innerText = `Spend £${(35 - subtotal).toFixed(2)} more for 15% OFF`;
+                discountMsg.style.display = "block";
+                discountMsg.style.color = "#aaa";
+            }
 
-            if(total < subtotal) { oldPriceEl.innerText = '£' + subtotal.toFixed(2); oldPriceEl.style.display = 'inline'; } 
-            else oldPriceEl.style.display = 'none';
+            if(subtotal !== total) {
+                oldPriceEl.innerText = '£' + subtotal.toFixed(2);
+                oldPriceEl.style.display = 'inline';
+            } else oldPriceEl.style.display = 'none';
             
             totalEl.innerText = '£' + total.toFixed(2);
-            discountMsg.innerText = bundleActive ? "🔥 BUNDLE UNLOCKED: 15% OFF APPLIED" : `Spend £${(35 - subtotal).toFixed(2)} more for 15% OFF`;
-            discountMsg.style.display = "block";
-            discountMsg.style.color = bundleActive ? "#00ff88" : "#aaa";
+
+            if(activeCode === "1956") {
+                checkoutBtn.innerHTML = '<i class="fas fa-lock-open"></i> DEV BYPASS';
+                checkoutBtn.style.background = "#00ff88"; checkoutBtn.style.color = "#000";
+            } else if (activeCode === "195612") {
+                checkoutBtn.innerHTML = '<i class="fas fa-vial"></i> PAY TEST (30p)';
+                checkoutBtn.style.background = "#ffa500"; checkoutBtn.style.color = "#000";
+            } else {
+                checkoutBtn.innerHTML = '<i class="fas fa-credit-card"></i> PAY WITH STRIPE';
+                checkoutBtn.style.background = "#635bff"; checkoutBtn.style.color = "#fff";
+            }
         }
 
         function changeQty(index, amount) {
@@ -541,7 +610,10 @@
                     document.getElementById('cartSummary').style.display = 'none';
                     document.getElementById('checkout-container').style.display = 'block';
 
-                    embeddedCheckout = await stripe.initEmbeddedCheckout({ clientSecret: data.clientSecret });
+                    embeddedCheckout = await stripe.initEmbeddedCheckout({ 
+                        clientSecret: data.clientSecret
+                    });
+                    
                     embeddedCheckout.mount('#checkout');
                 } else {
                     throw new Error("No client secret received from server.");

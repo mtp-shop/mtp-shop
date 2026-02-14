@@ -587,15 +587,17 @@
         <div class="vouch-section hidden">
             <div class="section-header" style="justify-content:center; border:none; margin-top:60px; margin-bottom: 40px;">
                 <div class="clock-dot"></div>
-                <h2 class="section-title" style="font-size: 1.6rem;">TEMPLE <span>REVIEWS</span></h2>
+                <!-- CHANGED TO CLIENT REVIEWS -->
+                <h2 class="section-title" style="font-size: 1.6rem;">CLIENT <span>REVIEWS</span></h2>
             </div>
             
             <div id="vouch-wall" class="vouch-wall-grid">
                 <p id="vouch-loading" style="grid-column: 1/-1; color:var(--text-dim); font-family:var(--font-tech); font-size:0.8rem; letter-spacing:2px; text-align:center;">CONNECTING TO TEMPLE FEED...</p>
             </div>
             
+            <!-- CHANGED TO SEE MORE (NO NUMBERS) -->
             <button id="view-all-vouches" class="view-all-vouches-btn" onclick="toggleVouches()">
-                VIEW MORE (50+)
+                SEE MORE
             </button>
         </div>
     </header>
@@ -846,12 +848,15 @@
             document.title = docTitle;
         }, 200);
 
-        /* --- UPDATED VOUCH LOGIC --- */
+        /* --- UPDATED VOUCH LOGIC (NEWEST FIRST) --- */
         async function loadLiveVouches() {
             const wall = document.getElementById('vouch-wall');
             try {
                 const res = await fetch('/api/get-vouches');
-                allVouches = await res.json();
+                let data = await res.json();
+                
+                // SHOW NEWEST FIRST BY REVERSING ARRAY
+                allVouches = data.reverse();
 
                 if(allVouches && allVouches.length > 0) {
                     renderVouches();
@@ -897,7 +902,8 @@
         function toggleVouches() {
             vouchesExpanded = !vouchesExpanded;
             const btn = document.getElementById('view-all-vouches');
-            btn.innerText = vouchesExpanded ? "SHOW LESS" : `VIEW ALL (${allVouches.length})`;
+            // UPDATED BUTTON TEXT (NO NUMBERS)
+            btn.innerText = vouchesExpanded ? "SEE LESS" : "SEE MORE";
             renderVouches();
             
             if(!vouchesExpanded) {

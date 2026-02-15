@@ -47,6 +47,7 @@ export default async function handler(req, res) {
             if(discountCode === "XMAS") priceValue *= 0.8;
             else if (discountCode === "195612") priceValue = 0.30;
             else if (discountCode === "BUNDLE15") priceValue *= 0.85;
+            else if (discountCode === "VALENTINE") priceValue *= 0.50;
 
             return {
                 price_data: {

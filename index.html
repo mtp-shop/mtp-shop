@@ -74,7 +74,7 @@
         ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 5px; }
         ::-webkit-scrollbar-thumb:hover { background: #ff4444; }
 
-        /* --- SCROLL DOTS (RESTORED) --- */
+        /* --- SCROLL DOTS --- */
         .scroll-dots {
             position: fixed; top: 50%; right: 20px; transform: translateY(-50%);
             display: flex; flex-direction: column; gap: 15px; z-index: 1001;
@@ -86,7 +86,7 @@
         .dot:hover { background: var(--accent); }
         .dot.active { background: var(--accent); box-shadow: 0 0 10px var(--accent); transform: scale(1.2); }
 
-        /* --- BACK TO TOP (RESTORED) --- */
+        /* --- BACK TO TOP --- */
         .back-to-top {
             position: fixed; 
             bottom: 30px; 
@@ -137,42 +137,30 @@
         nav a { color: var(--text-dim); text-decoration: none; font-size: 0.9rem; font-weight: 700; transition: 0.3s; font-family: var(--font-head); text-transform: uppercase; letter-spacing: 0.5px; }
         nav a:hover { color: white; text-shadow: 0 0 15px rgba(255,255,255,0.3); }
         
-        /* USER ICON STYLE - SMALLER & 10s LOOP */
+        /* USER ICON STYLE */
         .user-btn { 
             cursor: pointer; color: var(--text-dim); transition: 0.3s; font-size: 1.1rem; 
             position: relative; 
-            width: 35px; height: 35px; /* Enforce Square */
-            display: flex; align-items: center; justify-content: center; /* Perfect Centering */
+            width: 35px; height: 35px; 
+            display: flex; align-items: center; justify-content: center; 
             border-radius: 50%;
         }
         .user-btn:hover { color: var(--accent); text-shadow: 0 0 10px var(--accent); }
+        .user-btn.admin-logged-in { color: #00ff88; text-shadow: 0 0 15px #00ff88; } /* ADMIN STYLE */
 
         .user-attention::before, .user-attention::after {
-            content: '';
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            border-radius: 50%;
-            border: 1px solid var(--accent);
-            opacity: 0;
-            z-index: -1;
+            content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            border-radius: 50%; border: 1px solid var(--accent); opacity: 0; z-index: -1;
         }
 
-        /* 10 Second Loop: 1.5s animation, 8.5s silence */
-        .user-attention::before {
-            width: 100%; height: 100%;
-            animation: ripple-10s 10s infinite ease-out;
-        }
-        
-        .user-attention::after {
-            width: 100%; height: 100%;
-            animation: ripple-10s 10s infinite ease-out 0.4s; /* Slight delay for double ring effect */
-        }
+        /* 10 Second Loop */
+        .user-attention::before { width: 100%; height: 100%; animation: ripple-10s 10s infinite ease-out; }
+        .user-attention::after { width: 100%; height: 100%; animation: ripple-10s 10s infinite ease-out 0.4s; }
 
         @keyframes ripple-10s {
             0% { width: 100%; height: 100%; opacity: 0.8; border-width: 2px; }
-            15% { width: 160%; height: 160%; opacity: 0; border-width: 0px; } /* Reduced size from 250% to 160% */
-            100% { width: 160%; height: 160%; opacity: 0; border-width: 0px; } /* Stay hidden for rest of time */
+            15% { width: 160%; height: 160%; opacity: 0; border-width: 0px; }
+            100% { width: 160%; height: 160%; opacity: 0; border-width: 0px; }
         }
 
         .cart-link { 
@@ -191,16 +179,9 @@
             80% { transform: translate(-1px, -1px) rotate(1deg); }
             100% { transform: translate(1px, -2px) rotate(-1deg); }
         }
-        
         @keyframes shake-interval {
-            0% { transform: rotate(0deg); }
-            2% { transform: rotate(5deg); }
-            4% { transform: rotate(-5deg); }
-            6% { transform: rotate(5deg); }
-            8% { transform: rotate(0deg); }
-            100% { transform: rotate(0deg); } 
+            0% { transform: rotate(0deg); } 2% { transform: rotate(5deg); } 4% { transform: rotate(-5deg); } 6% { transform: rotate(5deg); } 8% { transform: rotate(0deg); } 100% { transform: rotate(0deg); } 
         }
-
         .cart-shaking { animation: shake-hard 0.5s; background: var(--accent) !important; color: white !important; border-color: #fff !important; }
         .cart-persistent { animation: shake-interval 5s infinite ease-in-out; background: var(--accent) !important; color: white !important; font-weight: 900 !important; box-shadow: 0 0 15px rgba(255, 31, 31, 0.3); }
 
@@ -442,6 +423,77 @@
         .bundle-status { font-size: 0.8rem; color: #aaa; display: flex; justify-content: space-between; font-weight: 700; }
         .bundle-unlocked { color: #00ff88; text-shadow: 0 0 10px rgba(0,255,136,0.4); animation: pulseGreen 1s infinite; }
         @keyframes pulseGreen { 0% { opacity: 0.7; } 50% { opacity: 1; } 100% { opacity: 0.7; } }
+
+        /* 
+           ==========================================================================
+           ADMIN ADDITIONS
+           ========================================================================== 
+        */
+        .admin-edit-btn {
+            position: absolute; top: 10px; right: 10px; z-index: 100;
+            background: #00ff88; color: black; border: none;
+            padding: 8px 15px; font-weight: 900; font-family: var(--font-head);
+            cursor: pointer; border-radius: 4px; display: none; /* Hidden by default */
+            font-style: italic; box-shadow: 0 0 10px rgba(0,255,136,0.5);
+            transition: 0.2s;
+        }
+        .admin-edit-btn:hover { background: white; transform: scale(1.1); }
+        
+        /* Show when body has 'is-admin' class */
+        body.is-admin .admin-edit-btn { display: block; }
+
+        /* Floating Panel - UPDATED CSS */
+        #adminPanel {
+            position: fixed; bottom: 20px; left: 20px; z-index: 10000;
+            background: rgba(10, 10, 10, 0.95); /* Slight Transparency */
+            backdrop-filter: blur(10px);
+            border: 1px solid #333; 
+            padding: 20px;
+            border-radius: 12px; 
+            display: none; 
+            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+            width: 320px; /* Increased Width for better fit */
+        }
+        body.is-admin #adminPanel { display: block; }
+        
+        .admin-header { color: #00ff88; font-weight: 900; font-family: var(--font-head); font-style: italic; margin-bottom: 10px; border-bottom: 1px solid #333; padding-bottom: 5px; }
+        
+        .admin-action-btn { 
+            display: block; width: 100%; background: #222; color: #aaa; border: 1px solid #333;
+            padding: 8px; margin-bottom: 5px; cursor: pointer; text-align: left; font-size: 0.8rem;
+            transition: 0.2s; font-family: var(--font-tech);
+        }
+        .admin-action-btn:hover { background: var(--accent); color: white; border-color: var(--accent); }
+
+        /* NEW: Coupon Styles in Admin */
+        .admin-input-row { 
+            display: flex; gap: 10px; margin-bottom: 10px; /* Better spacing */
+        }
+        
+        .admin-input-sm { 
+            background: #000; border: 1px solid #333; color: white; 
+            padding: 10px; /* More padding */
+            font-family: var(--font-tech); font-size: 0.85rem; 
+            outline: none; border-radius: 6px; 
+            min-width: 0; /* Prevents overflow */
+            transition: 0.3s;
+        }
+        .admin-input-sm:focus { border-color: #00ff88; }
+        
+        .coupon-list { max-height: 120px; overflow-y: auto; margin-top: 10px; border-top: 1px dashed #333; padding-top: 5px; }
+        .coupon-item { display: flex; justify-content: space-between; align-items: center; background: #1a1a1a; padding: 5px; margin-bottom: 3px; border-radius: 4px; border: 1px solid #333; }
+        .coupon-code { color: #00ff88; font-family: var(--font-tech); font-size: 0.8rem; font-weight: bold; }
+        .coupon-disc { color: #888; font-size: 0.75rem; }
+        .coupon-del { color: #ff4444; cursor: pointer; font-weight: bold; font-family: sans-serif; padding: 0 5px; }
+        .coupon-del:hover { color: white; }
+
+        /* Edit Modal Specifics */
+        #editModal { z-index: 10001; }
+        .edit-form-group { margin-bottom: 15px; }
+        .edit-label { display: block; color: #888; font-size: 0.8rem; margin-bottom: 5px; font-family: var(--font-tech); }
+        .edit-input { width: 100%; background: #111; border: 1px solid #333; color: white; padding: 10px; border-radius: 4px; font-family: var(--font-body); }
+        .btn-save { background: #00ff88; color: black; border: none; padding: 15px; width: 100%; font-weight: 900; font-family: var(--font-head); cursor: pointer; margin-top: 10px; font-style: italic; }
+
     </style>
 </head>
 <body>
@@ -525,92 +577,32 @@
         <!-- INTROS -->
         <div id="intros" class="hidden">
             <div class="section-header"><h2 class="section-title" data-value="CUSTOM INTROS">CUSTOM <span>INTROS</span></h2></div>
-            <div class="grid">
-                <div class="card" onclick="openModal(this)" data-tilt data-tilt-glare data-tilt-max-glare="0.2">
-                    <div class="card-img-container skeleton-bg"><div class="tag">POPULAR</div><img src="product.png" class="product-img"></div>
-                    <div class="card-info"><h3 class="product-title">Simple Intro</h3><p class="price product-price">£10.00</p></div>
-                </div>
-                <div class="card" onclick="openModal(this)" data-tilt data-tilt-glare data-tilt-max-glare="0.2">
-                    <div class="card-img-container skeleton-bg"><img src="product.png" class="product-img"></div>
-                    <div class="card-info"><h3 class="product-title">Character Intro</h3><p class="price product-price">£17.00</p></div>
-                </div>
-            </div>
+            <!-- NOTE: Emptied to allow JS to render dynamic admin-editable cards -->
+            <div class="grid" id="grid-intros"></div>
         </div>
 
         <!-- CHAINS -->
         <div id="chains" class="hidden">
             <div class="section-header"><h2 class="section-title" data-value="CUSTOM CHAINS">CUSTOM <span>CHAINS</span></h2></div>
-            <div class="grid">
-                <div class="card" onclick="openModal(this)" data-tilt data-tilt-glare data-tilt-max-glare="0.2">
-                    <div class="card-img-container skeleton-bg"><div class="tag">BEST SELLER</div><img src="product.png" class="product-img"></div>
-                    <div class="card-info"><h3 class="product-title">1x Pendant Iced Chain</h3><p class="price product-price">£20.00</p></div>
-                </div>
-                <div class="card" onclick="openModal(this)" data-tilt data-tilt-glare data-tilt-max-glare="0.2">
-                    <div class="card-img-container skeleton-bg"><img src="product.png" class="product-img"></div>
-                    <div class="card-info"><h3 class="product-title">2x Pendant Iced Chain</h3><p class="price product-price">£30.00</p></div>
-                </div>
-                <div class="card" onclick="openModal(this)" data-tilt data-tilt-glare data-tilt-max-glare="0.2">
-                    <div class="card-img-container skeleton-bg"><div class="tag">NEW</div><img src="product.png" class="product-img"></div>
-                    <div class="card-info"><h3 class="product-title">3x+ Pendant Iced Chain</h3><p class="price product-price">£50.00</p></div>
-                </div>
-            </div>
+            <div class="grid" id="grid-chains"></div>
         </div>
 
         <!-- GFX -->
         <div id="gfx" class="hidden">
             <div class="section-header"><h2 class="section-title" data-value="GFX & BANNERS">GFX & <span>BANNERS</span></h2></div>
-            <div class="grid">
-                <div class="card" onclick="openModal(this)" data-tilt data-tilt-glare data-tilt-max-glare="0.2">
-                    <div class="card-img-container skeleton-bg"><img src="product.png" class="product-img"></div>
-                    <div class="card-info"><h3 class="product-title">Static GFX</h3><p class="price product-price">£10.00</p></div>
-                </div>
-                <div class="card" onclick="openModal(this)" data-tilt data-tilt-glare data-tilt-max-glare="0.2">
-                    <div class="card-img-container skeleton-bg"><div class="tag">ANIMATED</div><img src="product.png" class="product-img"></div>
-                    <div class="card-info"><h3 class="product-title">Animated GFX</h3><p class="price product-price">£15.00</p></div>
-                </div>
-                <div class="card" onclick="openModal(this)" data-tilt data-tilt-glare data-tilt-max-glare="0.2">
-                    <div class="card-img-container skeleton-bg"><img src="product.png" class="product-img"></div>
-                    <div class="card-info"><h3 class="product-title">Banner</h3><p class="price product-price">£8.00</p></div>
-                </div>
-            </div>
+            <div class="grid" id="grid-gfx"></div>
         </div>
 
         <!-- CLOTHING -->
         <div id="clothing" class="hidden">
             <div class="section-header"><h2 class="section-title" data-value="CLOTHING PACKS">CLOTHING <span>PACKS</span></h2></div>
-            <div class="grid">
-                <div class="card" onclick="openModal(this)" data-tilt data-tilt-glare data-tilt-max-glare="0.2">
-                    <div class="card-img-container skeleton-bg"><div class="tag">NEW</div><img src="product.png" class="product-img"></div>
-                    <div class="card-info"><h3 class="product-title">1x Custom Clothing</h3><p class="price product-price">£8.00</p></div>
-                </div>
-                <div class="card" onclick="openModal(this)" data-tilt data-tilt-glare data-tilt-max-glare="0.2">
-                    <div class="card-img-container skeleton-bg"><img src="product.png" class="product-img"></div>
-                    <div class="card-info"><h3 class="product-title">3x Custom Clothing</h3><p class="price product-price">£20.00</p></div>
-                </div>
-                <div class="card" onclick="openModal(this)" data-tilt data-tilt-glare data-tilt-max-glare="0.2">
-                    <div class="card-img-container skeleton-bg"><div class="tag">SALE</div><img src="product.png" class="product-img"></div>
-                    <div class="card-info"><h3 class="product-title">5x+ Clothing Bundle</h3><p class="price product-price">£45+</p></div>
-                </div>
-            </div>
+            <div class="grid" id="grid-clothing"></div>
         </div>
 
         <!-- TUTORIALS -->
         <div id="tutorials" class="hidden">
             <div class="section-header"><h2 class="section-title" data-value="PREMIUM TUTORIALS">PREMIUM <span>TUTORIALS</span></h2></div>
-            <div class="grid">
-                <div class="card" onclick="openModal(this)" data-tilt data-tilt-glare data-tilt-max-glare="0.2">
-                    <div class="card-img-container skeleton-bg"><div class="tag">MASTERCLASS</div><img src="product.png" class="product-img"></div>
-                    <div class="card-info"><h3 class="product-title">Intro Tutorials</h3><p class="price product-price">£40.00</p></div>
-                </div>
-                <div class="card" onclick="openModal(this)" data-tilt data-tilt-glare data-tilt-max-glare="0.2">
-                    <div class="card-img-container skeleton-bg"><div class="tag">IN-DEPTH</div><img src="product.png" class="product-img"></div>
-                    <div class="card-info"><h3 class="product-title">Chain Tutorials</h3><p class="price product-price">£40.00</p></div>
-                </div>
-                 <div class="card" onclick="openModal(this)" data-tilt data-tilt-glare data-tilt-max-glare="0.2">
-                    <div class="card-img-container skeleton-bg"><div class="tag">BEGINNER</div><img src="product.png" class="product-img"></div>
-                    <div class="card-info"><h3 class="product-title">Clothing Tutorials</h3><p class="price product-price">£20.00</p></div>
-                </div>
-            </div>
+            <div class="grid" id="grid-tutorials"></div>
         </div>
     </div>
 
@@ -655,7 +647,6 @@
                 <a href="https://discord.gg/Vc7fjmbXAe" target="_blank" class="social-btn"><i class="fab fa-discord"></i> Discord</a>
                 <a href="https://youtube.com/@tps_temple" target="_blank" class="social-btn"><i class="fab fa-youtube"></i> YouTube</a>
 				<a href="https://tpstools.vercel.app" target="_blank" class="social-btn"><i class="fas fa-tools"></i> TPS Tools</a>
-
             </div>
         </div>
         
@@ -664,10 +655,10 @@
         </div>
     </footer>
 
-    <!-- MODAL -->
+    <!-- PRODUCT VIEW MODAL -->
     <div class="modal-overlay" id="productModal">
         <div class="modal-content">
-            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <span class="close-btn" onclick="closeModal('productModal')">&times;</span>
             <div class="modal-img-wrapper skeleton-bg">
                 <img id="modalImg" src="" alt="Product Image">
             </div>
@@ -687,6 +678,51 @@
         </div>
     </div>
 
+    <!-- ADMIN EDIT MODAL -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal-content" style="max-width: 500px; display: block;">
+            <span class="close-btn" onclick="closeModal('editModal')">&times;</span>
+            <h2 class="modal-title" style="font-size: 2rem;">EDIT ITEM</h2>
+            <div class="edit-form-group">
+                <label class="edit-label">Title</label>
+                <input type="text" id="editTitle" class="edit-input">
+            </div>
+            <div class="edit-form-group">
+                <label class="edit-label">Price (e.g. £10.00)</label>
+                <input type="text" id="editPrice" class="edit-input">
+            </div>
+            <div class="edit-form-group">
+                <label class="edit-label">Image URL</label>
+                <input type="text" id="editImg" class="edit-input">
+            </div>
+            <div class="edit-form-group">
+                <label class="edit-label">Tag (Optional, e.g. POPULAR)</label>
+                <input type="text" id="editTag" class="edit-input">
+            </div>
+            <input type="hidden" id="editId">
+            <button class="btn-save" onclick="saveProductEdit()">SAVE CHANGES</button>
+        </div>
+    </div>
+
+    <!-- ADMIN PANEL (BOTTOM LEFT) -->
+    <div id="adminPanel">
+        <div class="admin-header">ADMIN MODE</div>
+        <button class="admin-action-btn" onclick="resetCatalog()">Reset to Default</button>
+        <button class="admin-action-btn" onclick="adminLogout()">Logout</button>
+        
+        <!-- NEW: COUPON MANAGER -->
+        <div class="admin-header" style="margin-top:15px; color:#00ff88;">COUPON MANAGER</div>
+        <div class="admin-input-row">
+            <input type="text" id="newCouponCode" placeholder="CODE (e.g. SALE)" class="admin-input-sm" style="flex:2; text-transform:uppercase;">
+            <input type="number" id="newCouponDisc" placeholder="%" class="admin-input-sm" style="flex:1;">
+        </div>
+        <button class="admin-action-btn" style="text-align:center; background:#00ff88; color:black; font-weight:900; font-style:italic;" onclick="addCoupon()">+ CREATE CODE</button>
+        
+        <div id="couponList" class="coupon-list">
+            <!-- Coupons injected here via JS -->
+        </div>
+    </div>
+
     <!-- BUNDLE WIDGET (UPDATED: NO ICONS) -->
     <div class="bundle-widget" id="bundleWidget">
         <div class="bundle-header">
@@ -703,7 +739,7 @@
     <!-- AUTH MODAL -->
     <div class="modal-overlay" id="authModal">
         <div class="modal-content" style="max-width: 500px; display: block; min-height: auto;">
-            <span class="close-btn" onclick="document.getElementById('authModal').classList.remove('active'); setTimeout(()=>document.getElementById('authModal').style.display='none',300)">&times;</span>
+            <span class="close-btn" onclick="closeModal('authModal')">&times;</span>
             
             <!-- Login/Register View -->
             <div id="authForms">
@@ -715,7 +751,7 @@
 
                 <!-- Login Form -->
                 <div class="auth-form active" id="loginForm">
-                    <input type="email" id="loginEmail" class="auth-input" placeholder="Email Address">
+                    <input type="text" id="loginEmail" class="auth-input" placeholder="Username / Email">
                     <input type="password" id="loginPass" class="auth-input" placeholder="Password">
                     <button class="auth-submit" onclick="handleLogin()">ENTER TEMPLE</button>
                 </div>
@@ -750,6 +786,37 @@
     </div>
 
     <script>
+        /* 
+           ==========================================================================
+           CATALOG DATABASE (SOURCE OF TRUTH)
+           ========================================================================== 
+        */
+        const defaultCatalog = [
+            // INTROS
+            { id: 'i1', category: 'intros', title: "Simple Intro", price: "£10.00", img: "product.png", tag: "POPULAR" },
+            { id: 'i2', category: 'intros', title: "Character Intro", price: "£17.00", img: "product.png", tag: "" },
+            // CHAINS
+            { id: 'c1', category: 'chains', title: "1x Pendant Iced Chain", price: "£20.00", img: "product.png", tag: "BEST SELLER" },
+            { id: 'c2', category: 'chains', title: "2x Pendant Iced Chain", price: "£30.00", img: "product.png", tag: "" },
+            { id: 'c3', category: 'chains', title: "3x+ Pendant Iced Chain", price: "£50.00", img: "product.png", tag: "NEW" },
+            // GFX
+            { id: 'g1', category: 'gfx', title: "Static GFX", price: "£10.00", img: "product.png", tag: "" },
+            { id: 'g2', category: 'gfx', title: "Animated GFX", price: "£15.00", img: "product.png", tag: "ANIMATED" },
+            { id: 'g3', category: 'gfx', title: "Banner", price: "£8.00", img: "product.png", tag: "" },
+            // CLOTHING
+            { id: 'cl1', category: 'clothing', title: "1x Custom Clothing", price: "£8.00", img: "product.png", tag: "NEW" },
+            { id: 'cl2', category: 'clothing', title: "3x Custom Clothing", price: "£20.00", img: "product.png", tag: "" },
+            { id: 'cl3', category: 'clothing', title: "5x+ Clothing Bundle", price: "£45+", img: "product.png", tag: "SALE" },
+            // TUTORIALS
+            { id: 't1', category: 'tutorials', title: "Intro Tutorials", price: "£40.00", img: "product.png", tag: "MASTERCLASS" },
+            { id: 't2', category: 'tutorials', title: "Chain Tutorials", price: "£40.00", img: "product.png", tag: "IN-DEPTH" },
+            { id: 't3', category: 'tutorials', title: "Clothing Tutorials", price: "£20.00", img: "product.png", tag: "BEGINNER" }
+        ];
+
+        // Load catalog from storage if available (Admin persistence), otherwise default
+        let catalog = JSON.parse(localStorage.getItem('tps_catalog')) || JSON.parse(JSON.stringify(defaultCatalog));
+
+
         window.addEventListener('load', () => {
             setTimeout(() => {
                 document.getElementById('loader').style.opacity = '0';
@@ -758,10 +825,13 @@
                     setTimeout(() => el.classList.add('blur-active'), i * 200);
                 });
             }, 1000);
+            
+            renderProducts(); // RENDER DYNAMIC CARDS
             updateCartButton();
             updateBundleProgress();
             checkLoginState();
-            loadLiveVouches(); // Load Discord Vouches
+            checkAdminStatus(); // CHECK IF ADMIN
+            loadLiveVouches(); 
         });
 
         /* --- FEATURE: BROWSER TAB TICKER --- */
@@ -770,6 +840,169 @@
             docTitle = docTitle.substring(1) + docTitle.substring(0, 1);
             document.title = docTitle;
         }, 200);
+
+        /* 
+           ==========================================================================
+           RENDER FUNCTION (REPLACES STATIC HTML CARDS)
+           ========================================================================== 
+        */
+        function renderProducts() {
+            // Clear all grid containers
+            ['intros', 'chains', 'gfx', 'clothing', 'tutorials'].forEach(cat => {
+                const el = document.getElementById('grid-'+cat);
+                if(el) el.innerHTML = '';
+            });
+
+            // Loop through catalog and create HTML
+            catalog.forEach(item => {
+                const container = document.getElementById('grid-' + item.category);
+                if(!container) return;
+
+                const tagHTML = item.tag ? `<div class="tag">${item.tag}</div>` : '';
+                
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.setAttribute('data-tilt', ''); // Tilt effect
+                card.setAttribute('data-tilt-glare', 'true');
+                card.setAttribute('data-tilt-max-glare', '0.2');
+                
+                card.innerHTML = `
+                    <div class="card-img-container skeleton-bg">
+                        ${tagHTML}
+                        <img src="${item.img}" class="product-img">
+                    </div>
+                    <div class="card-info">
+                        <h3 class="product-title">${item.title}</h3>
+                        <p class="price product-price">${item.price}</p>
+                    </div>
+                    <!-- ADMIN EDIT BUTTON (Hidden via CSS unless admin) -->
+                    <button class="admin-edit-btn" onclick="openEditModal('${item.id}', event)">EDIT</button>
+                `;
+                
+                // Click event (Show Product or Edit)
+                card.onclick = (e) => {
+                    if(e.target.classList.contains('admin-edit-btn')) return; // Ignore if clicking Edit
+                    openModal(card); // Existing Modal Open Logic
+                };
+
+                container.appendChild(card);
+            });
+
+            // Re-init Tilt.js on new elements
+            if(window.VanillaTilt) VanillaTilt.init(document.querySelectorAll(".card"), { max: 15, speed: 400, glare: true, "max-glare": 0.1 });
+        }
+
+        /* --- ADMIN LOGIC --- */
+        function checkAdminStatus() {
+            if (localStorage.getItem('tps_is_admin') === 'true') {
+                document.body.classList.add('is-admin');
+                document.querySelector('.user-btn').classList.add('admin-logged-in');
+                renderCouponList(); // Initialize coupon list if admin
+            } else {
+                document.body.classList.remove('is-admin');
+                document.querySelector('.user-btn').classList.remove('admin-logged-in');
+            }
+        }
+
+        function adminLogout() {
+            localStorage.removeItem('tps_is_admin');
+            checkAdminStatus();
+        }
+
+        function resetCatalog() {
+            if(confirm("Reset all prices/images to default? This cannot be undone.")) {
+                localStorage.removeItem('tps_catalog');
+                catalog = JSON.parse(JSON.stringify(defaultCatalog));
+                renderProducts();
+            }
+        }
+
+        /* --- EDITING (ADMIN) --- */
+        function openEditModal(id, e) {
+            e.stopPropagation(); // Prevent card opening
+            const item = catalog.find(i => i.id === id);
+            if(!item) return;
+
+            // Fill form
+            document.getElementById('editId').value = id;
+            document.getElementById('editTitle').value = item.title;
+            document.getElementById('editPrice').value = item.price;
+            document.getElementById('editImg').value = item.img;
+            document.getElementById('editTag').value = item.tag || "";
+
+            const modal = document.getElementById('editModal');
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('active'), 10);
+        }
+
+        function saveProductEdit() {
+            const id = document.getElementById('editId').value;
+            const item = catalog.find(i => i.id === id);
+            
+            if(item) {
+                // Update Local Data
+                item.title = document.getElementById('editTitle').value;
+                item.price = document.getElementById('editPrice').value;
+                item.img = document.getElementById('editImg').value;
+                item.tag = document.getElementById('editTag').value;
+
+                // Save to Storage
+                localStorage.setItem('tps_catalog', JSON.stringify(catalog));
+                
+                // Re-render UI
+                renderProducts();
+                closeModal('editModal');
+            }
+        }
+
+        /* --- NEW: COUPON MANAGER --- */
+        function getCoupons() { return JSON.parse(localStorage.getItem('tps_coupons')) || []; }
+        
+        function renderCouponList() {
+            const list = document.getElementById('couponList');
+            const coupons = getCoupons();
+            list.innerHTML = '';
+            
+            if(coupons.length === 0) list.innerHTML = '<div style="color:#666; font-size:0.7rem; padding:5px;">No active codes.</div>';
+
+            coupons.forEach((c, i) => {
+                list.innerHTML += `
+                    <div class="coupon-item">
+                        <div>
+                            <span class="coupon-code">${c.code}</span>
+                            <span class="coupon-disc">-${c.discount}%</span>
+                        </div>
+                        <span class="coupon-del" onclick="deleteCoupon(${i})">&times;</span>
+                    </div>
+                `;
+            });
+        }
+
+        function addCoupon() {
+            const code = document.getElementById('newCouponCode').value.trim().toUpperCase();
+            const disc = parseInt(document.getElementById('newCouponDisc').value);
+            
+            if(!code || isNaN(disc)) return alert("Please enter a Code and Discount %");
+            
+            const coupons = getCoupons();
+            // Remove duplicate if exists
+            const existingIdx = coupons.findIndex(c => c.code === code);
+            if(existingIdx > -1) coupons.splice(existingIdx, 1);
+            
+            coupons.push({ code: code, discount: disc });
+            localStorage.setItem('tps_coupons', JSON.stringify(coupons));
+            
+            document.getElementById('newCouponCode').value = "";
+            document.getElementById('newCouponDisc').value = "";
+            renderCouponList();
+        }
+
+        function deleteCoupon(index) {
+            const coupons = getCoupons();
+            coupons.splice(index, 1);
+            localStorage.setItem('tps_coupons', JSON.stringify(coupons));
+            renderCouponList();
+        }
 
         /* --- FEATURE: LIVE VOUCH WALL FETCH --- */
         async function loadLiveVouches() {
@@ -825,14 +1058,34 @@
         }
 
         function updateClock() {
-            const now = new Date();
-            document.getElementById('clock-time').innerText = now.toLocaleTimeString('en-GB', { hour12: false });
-            const timeZone = Intl.DateTimeFormat('en-GB', { timeZoneName: 'short' })
-                .formatToParts(now)
-                .find(part => part.type === 'timeZoneName').value;
-            document.getElementById('clock-loc').innerText = timeZone;
-        }
-        setInterval(updateClock, 1000); updateClock();
+    const now = new Date();
+    
+    // Set the Time (e.g., 10:10:43)
+    document.getElementById('clock-time').innerText = now.toLocaleTimeString([], { 
+        hour: '2-digit', 
+        minute: '2-digit', 
+        second: '2-digit', 
+        hour12: false 
+    });
+
+    // 1. Get the system's exact Time Zone ID (e.g., "America/Caracas")
+    const ianaTZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    
+    // 2. Extract only the city name and clean it up (e.g., "Caracas")
+    let region = ianaTZ.split('/').pop().replace(/_/g, ' ');
+
+    // 3. Fallback: If it fails to find a city (e.g., just "UTC"), use the short code
+    if (!ianaTZ.includes('/') || region === 'UTC' || region === 'GMT') {
+        region = Intl.DateTimeFormat([], { timeZoneName: 'short' })
+            .formatToParts(now)
+            .find(part => part.type === 'timeZoneName').value;
+    }
+
+    // Update the UI
+    document.getElementById('clock-loc').innerText = region;
+}
+setInterval(updateClock, 1000); 
+updateClock();
 
         /* PARTICLES */
         const canvas = document.getElementById('particle-canvas');
@@ -928,7 +1181,13 @@
             setTimeout(() => { modal.classList.add('active'); }, 10); 
             document.body.style.overflow = "hidden";
         }
-        function closeModal() { modal.classList.remove('active'); setTimeout(() => { modal.style.display = "none"; document.body.style.overflow = "auto"; }, 300); }
+        
+        // GENERIC MODAL CLOSE (Works for Edit Modal too)
+        function closeModal(id) { 
+            const m = id ? document.getElementById(id) : modal;
+            m.classList.remove('active'); 
+            setTimeout(() => { m.style.display = "none"; document.body.style.overflow = "auto"; }, 300); 
+        }
         window.onclick = function(event) { if (event.target == modal) closeModal(); }
 
         function updateCartButton() {
@@ -1018,7 +1277,7 @@
             }
         }
 
-        /* --- AUTH SYSTEM (MOCK) --- */
+        /* --- AUTH SYSTEM --- */
         function openAuthModal() {
             const modal = document.getElementById('authModal');
             modal.style.display = 'flex';
@@ -1049,29 +1308,31 @@
             const pass = document.getElementById('regPass').value;
             
             if(!name || !email || !pass) { alert("Please fill all fields"); return; }
-
-            // Email Validation
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) {
-                alert("Please enter a valid email address");
-                return;
-            }
+            if (!emailRegex.test(email)) { alert("Please enter a valid email address"); return; }
             
             let db = getDB();
             if(db.find(u => u.email === email)) { alert("Email already registered"); return; }
             
             const newUser = { name, email, pass, orders: [] };
-            db.push(newUser);
-            saveDB(db);
+            db.push(newUser); saveDB(db);
             
-            // Auto Login
             localStorage.setItem('tps_current_user', JSON.stringify(newUser));
             checkLoginState();
         }
 
         function handleLogin() {
-            const email = document.getElementById('loginEmail').value;
+            const email = document.getElementById('loginEmail').value; // In this modal input id is loginEmail
             const pass = document.getElementById('loginPass').value;
+
+            // --- ADMIN LOGIN LOGIC ---
+            if(email === 'mtp' && pass === 'slothman106084') {
+                localStorage.setItem('tps_is_admin', 'true');
+                checkAdminStatus();
+                closeModal('authModal');
+                alert("WELCOME BACK, BOSS.");
+                return;
+            }
             
             let db = getDB();
             const user = db.find(u => u.email === email && u.pass === pass);
@@ -1123,15 +1384,11 @@
                     user.orders.forEach(order => {
                         let totalString = order.total || "-"; 
                         let itemsHtml = '';
-                        
-                        // Build list of items
                         if(order.items && Array.isArray(order.items)) {
                             order.items.forEach(item => {
                                 itemsHtml += `<li><span>${item.title} (x${item.qty})</span> <span>${item.price}</span></li>`;
                             });
-                        } else {
-                            itemsHtml = `<li>${order.count} Items</li>`;
-                        }
+                        } else { itemsHtml = `<li>${order.count} Items</li>`; }
 
                         tbody.innerHTML += `
                             <tr class="order-row" onclick="toggleOrder(this)">
@@ -1144,11 +1401,7 @@
                                 <td><span class="status-pill">COMPLETED</span></td>
                             </tr>
                             <tr class="order-details-row" style="display:none;">
-                                <td colspan="3">
-                                    <ul class="order-items-list">
-                                        ${itemsHtml}
-                                    </ul>
-                                </td>
+                                <td colspan="3"><ul class="order-items-list">${itemsHtml}</ul></td>
                             </tr>
                         `;
                     });
@@ -1182,7 +1435,6 @@
             let scrolled = (winScroll / height) * 100;
             
             document.getElementById("scroll-progress").style.width = scrolled + "%";
-            
             updateDots(scrolled);
 
             const btn = document.querySelector('.back-to-top');
@@ -1213,25 +1465,19 @@
             });
         });
 
-        /* --- REAL RECENT SALES POPUP (UPDATED: NO LOCATION, 20s TIMER) --- */
+        /* --- REAL RECENT SALES POPUP --- */
         let lastShownIndex = -1; 
-
         async function fetchRecentSales() {
             try {
                 const res = await fetch('/api/recent-sales');
                 const data = await res.json();
-                
                 if(data.sales && data.sales.length > 0) {
                     let randomIndex = Math.floor(Math.random() * data.sales.length);
-                    
                     if (data.sales.length > 1 && randomIndex === lastShownIndex) {
                         randomIndex = (randomIndex + 1) % data.sales.length;
                     }
-                    
                     lastShownIndex = randomIndex;
                     const sale = data.sales[randomIndex];
-                    
-                    // Passing item and name only (ignoring location)
                     showSalesToast(sale.item, sale.name);
                 }
             } catch (e) { console.error("Sales fetch error", e); }
@@ -1266,9 +1512,7 @@
             `;
 
             document.body.appendChild(toast);
-
             setTimeout(() => { toast.style.transform = 'translateY(0)'; }, 100);
-
             setTimeout(() => {
                 toast.style.transform = 'translateY(100px)';
                 setTimeout(() => toast.remove(), 500);

@@ -113,12 +113,78 @@
         .remove-btn { background: none; border: none; color: #555; cursor: pointer; font-size: 1.1rem; transition: 0.2s; padding: 10px; }
         .remove-btn:hover { color: var(--accent); transform: scale(1.1); }
 
+        /* --- QUICK ADD / ADD SOMETHING ELSE --- */
+        #quick-add-wrapper {
+            margin-top: 10px;
+            margin-bottom: 30px;
+        }
+
+        .quick-add-toggle {
+            display: flex; align-items: center; gap: 10px;
+            color: #888; font-family: var(--font-head); font-weight: 700;
+            font-style: italic; cursor: pointer; transition: 0.3s;
+            user-select: none; padding: 10px 0;
+        }
+        .quick-add-toggle:hover { color: var(--accent); }
+        .quick-add-toggle i { font-size: 1.2rem; }
+
+        .quick-add-dropdown {
+            max-height: 0; overflow: hidden;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            transition: max-height 0.4s ease, padding 0.4s ease;
+        }
+        .quick-add-dropdown.open {
+            max-height: 400px;
+            padding: 20px;
+            border-color: var(--accent);
+        }
+
+        .quick-search {
+            width: 100%; background: #111; border: 1px solid #333;
+            padding: 12px; border-radius: 8px; color: white;
+            font-family: var(--font-body); margin-bottom: 15px;
+            outline: none; transition: 0.3s;
+        }
+        .quick-search:focus { border-color: var(--accent); }
+
+        .quick-list {
+            max-height: 250px; overflow-y: auto;
+            display: flex; flex-direction: column; gap: 10px;
+            padding-right: 5px;
+        }
+        /* Custom scroll for quick list */
+        .quick-list::-webkit-scrollbar { width: 5px; }
+        .quick-list::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
+
+        .quick-item {
+            display: flex; justify-content: space-between; align-items: center;
+            background: #080808; padding: 10px; border-radius: 8px;
+            border: 1px solid #222; transition: 0.2s;
+        }
+        .quick-item:hover { border-color: #444; }
+        
+        .quick-item-info { display: flex; align-items: center; gap: 10px; }
+        .quick-item-img { width: 40px; height: 40px; border-radius: 5px; background: #333; object-fit: cover; }
+        .quick-item-name { font-size: 0.9rem; font-weight: bold; }
+        .quick-item-price { font-size: 0.85rem; color: #888; font-family: var(--font-tech); }
+
+        .quick-add-btn {
+            background: transparent; border: 1px solid var(--accent);
+            color: var(--accent); padding: 5px 15px; border-radius: 4px;
+            font-weight: bold; cursor: pointer; transition: 0.2s;
+            font-family: var(--font-head); font-style: italic; font-size: 0.8rem;
+        }
+        .quick-add-btn:hover { background: var(--accent); color: white; }
+
+
         /* --- CART SUMMARY --- */
         .cart-summary {
             background: transparent;
             padding: 40px; 
             border: 1px solid var(--glass-border); 
-            margin-top: 40px; border-radius: 12px;
+            margin-top: 10px; border-radius: 12px;
             display: flex; justify-content: space-between; align-items: flex-start;
             gap: 30px;
         }
@@ -307,6 +373,19 @@
         <!-- Cart Items -->
         <div id="cartItems"></div>
 
+        <!-- QUICK ADD / ADD SOMETHING ELSE -->
+        <div id="quick-add-wrapper" style="display:none;">
+            <div class="quick-add-toggle" onclick="toggleQuickAdd()">
+                <i class="fas fa-plus-circle"></i> Add Something Else
+            </div>
+            <div class="quick-add-dropdown" id="quickAddDropdown">
+                <input type="text" id="quickSearch" class="quick-search" placeholder="Search for items (e.g., Intro, Chain, GFX)..." onkeyup="filterQuickList()">
+                <div class="quick-list" id="quickListContainer">
+                    <!-- Items populated by JS -->
+                </div>
+            </div>
+        </div>
+
         <!-- Embedded Checkout -->
         <div id="checkout-container">
             <div id="checkout"></div>
@@ -427,11 +506,22 @@
                 setTimeout(() => { document.getElementById('loader').style.display = 'none'; }, 500);
             }, 1000); 
             
+            // CHECK FOR USER *OR* ADMIN LOGIN
             const currentUser = JSON.parse(localStorage.getItem('tps_current_user'));
-            if (!currentUser) {
-                const reminder = document.getElementById('loginReminder');
-                if(reminder) reminder.style.display = 'block';
+            const isAdmin = localStorage.getItem('tps_is_admin') === 'true';
+            
+            const reminder = document.getElementById('loginReminder');
+            if (reminder) {
+                // Hide reminder if either user OR admin is logged in
+                if (!currentUser && !isAdmin) {
+                    reminder.style.display = 'block';
+                } else {
+                    reminder.style.display = 'none';
+                }
             }
+            
+            // Init quick add list
+            populateQuickList();
         });
 
         let cart = JSON.parse(localStorage.getItem('mtpCart')) || [];
@@ -442,8 +532,36 @@
         const oldPriceEl = document.getElementById('oldPrice');
         const discountMsg = document.getElementById('discountMsg');
         const checkoutBtn = document.getElementById('checkout-button');
+        const quickAddWrapper = document.getElementById('quick-add-wrapper');
         
         let activeCode = ""; 
+        let activeDiscountPercent = 0; // NEW for dynamic coupons
+
+        // --- CATALOG LOGIC (SYNCED WITH ADMIN EDITS) ---
+        const defaultCatalog = [
+            // Intros
+            { title: "Simple Intro", price: "£10.00", img: "product.png" },
+            { title: "Character Intro", price: "£17.00", img: "product.png" },
+            // Chains
+            { title: "1x Pendant Iced Chain", price: "£20.00", img: "product.png" },
+            { title: "2x Pendant Iced Chain", price: "£30.00", img: "product.png" },
+            { title: "3x+ Pendant Iced Chain", price: "£50.00", img: "product.png" },
+            // GFX
+            { title: "Static GFX", price: "£10.00", img: "product.png" },
+            { title: "Animated GFX", price: "£15.00", img: "product.png" },
+            { title: "Banner", price: "£8.00", img: "product.png" },
+            // Clothing
+            { title: "1x Custom Clothing", price: "£8.00", img: "product.png" },
+            { title: "3x Custom Clothing", price: "£20.00", img: "product.png" },
+            { title: "5x+ Clothing Bundle", price: "£45+", img: "product.png" },
+            // Tutorials
+            { title: "Intro Tutorials", price: "£40.00", img: "product.png" },
+            { title: "Chain Tutorials", price: "£40.00", img: "product.png" },
+            { title: "Clothing Tutorials", price: "£20.00", img: "product.png" }
+        ];
+
+        // Load catalog from storage if available (Admin persistence), otherwise default
+        let allProducts = JSON.parse(localStorage.getItem('tps_catalog')) || defaultCatalog;
 
         function renderCart() {
             cartContainer.innerHTML = '';
@@ -454,18 +572,22 @@
 
             if (validItems.length === 0) {
                 cartSummary.style.display = 'none';
+                quickAddWrapper.style.display = 'none'; // Hide quick add if empty
                 emptyMsg.style.display = 'block';
                 localStorage.removeItem('mtpCart');
                 return;
             } else {
                 emptyMsg.style.display = 'none';
                 cartSummary.style.display = 'flex';
+                quickAddWrapper.style.display = 'block'; // Show quick add
             }
 
             const currentUser = JSON.parse(localStorage.getItem('tps_current_user'));
+            const isAdmin = localStorage.getItem('tps_is_admin') === 'true';
+            
             const reminder = document.getElementById('loginReminder');
             if (reminder) {
-                if (!currentUser) reminder.style.display = 'block';
+                if (!currentUser && !isAdmin) reminder.style.display = 'block';
                 else reminder.style.display = 'none';
             }
 
@@ -502,8 +624,11 @@
 
             let categoryCount = (hasIntro?1:0) + (hasChain?1:0) + (hasGFX?1:0) + (hasCloth?1:0);
             let bundleActive = (categoryCount >= 3 || subtotal > 35);
+            
+            // DEFAULT DISCOUNT (BUNDLE)
             total = bundleActive ? subtotal * 0.85 : subtotal;
 
+            // --- DISCOUNT LOGIC ---
             if(activeCode === "1956") {
                 total = 0;
                 discountMsg.innerText = "DEV MODE: 100% OFF";
@@ -514,6 +639,12 @@
                 discountMsg.innerText = "STRIPE TEST (30p)";
                 discountMsg.style.display = "block";
                 discountMsg.style.color = "#ffa500";
+            } else if (activeDiscountPercent > 0) {
+                // Apply Admin Coupon Logic
+                total = subtotal - (subtotal * (activeDiscountPercent / 100));
+                discountMsg.innerText = `COUPON APPLIED: ${activeDiscountPercent}% OFF`;
+                discountMsg.style.display = "block";
+                discountMsg.style.color = "#00ff88";
             } else if(bundleActive) {
                 discountMsg.innerText = "🔥 BUNDLE UNLOCKED: 15% OFF APPLIED";
                 discountMsg.style.display = "block";
@@ -557,16 +688,102 @@
 
         function applyDiscount() {
             const input = document.getElementById('promoInput').value.trim().toUpperCase();
-            if(input === "1956" || input === "195612") activeCode = input;
-            else { alert("Invalid Code"); activeCode = ""; }
+            
+            // 1. Check Hardcoded
+            if(input === "1956" || input === "195612") {
+                activeCode = input;
+                activeDiscountPercent = 0; // Reset normal discount
+                renderCart();
+                return;
+            }
+
+            // 2. Check Dynamic Admin Coupons
+            const adminCoupons = JSON.parse(localStorage.getItem('tps_coupons')) || [];
+            const foundCoupon = adminCoupons.find(c => c.code === input);
+
+            if(foundCoupon) {
+                activeCode = input;
+                activeDiscountPercent = foundCoupon.discount;
+            } else {
+                alert("Invalid Code"); 
+                activeCode = "";
+                activeDiscountPercent = 0;
+            }
             renderCart();
         }
+
+        /* --- QUICK ADD FUNCTIONS --- */
+        function toggleQuickAdd() {
+            const el = document.getElementById('quickAddDropdown');
+            el.classList.toggle('open');
+        }
+
+        function populateQuickList() {
+            const list = document.getElementById('quickListContainer');
+            list.innerHTML = "";
+            allProducts.forEach((p, idx) => {
+                list.innerHTML += `
+                    <div class="quick-item" data-title="${p.title.toLowerCase()}">
+                        <div class="quick-item-info">
+                            <img src="${p.img}" class="quick-item-img">
+                            <div>
+                                <div class="quick-item-name">${p.title}</div>
+                                <div class="quick-item-price">${p.price}</div>
+                            </div>
+                        </div>
+                        <button class="quick-add-btn" onclick="addToCartFromQuick(${idx})">ADD</button>
+                    </div>
+                `;
+            });
+        }
+
+        function filterQuickList() {
+            const term = document.getElementById('quickSearch').value.toLowerCase();
+            const items = document.querySelectorAll('.quick-item');
+            items.forEach(item => {
+                const title = item.getAttribute('data-title');
+                if(title.includes(term)) item.style.display = 'flex';
+                else item.style.display = 'none';
+            });
+        }
+
+        function addToCartFromQuick(idx) {
+            const product = allProducts[idx];
+            // Check if exists
+            const existing = cart.find(i => i.title === product.title);
+            if(existing) {
+                existing.qty++;
+            } else {
+                cart.push({
+                    title: product.title,
+                    price: product.price,
+                    img: product.img,
+                    qty: 1
+                });
+            }
+            localStorage.setItem('mtpCart', JSON.stringify(cart));
+            renderCart();
+            
+            // Visual feedback
+            const btn = document.querySelectorAll('.quick-add-btn')[idx];
+            const originalText = btn.innerText;
+            btn.innerText = "ADDED";
+            btn.style.background = "#00ff88";
+            btn.style.color = "black";
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.style.background = "transparent";
+                btn.style.color = "#ff1f1f";
+            }, 1000);
+        }
+
 
         async function cancelCheckout() {
             if (embeddedCheckout) await embeddedCheckout.destroy();
             document.getElementById('checkout-container').style.display = 'none';
             document.getElementById('cartItems').style.display = 'block';
             document.getElementById('cartSummary').style.display = 'flex';
+            document.getElementById('quick-add-wrapper').style.display = 'block';
             
             // --- BUTTON RESET FIX ---
             checkoutBtn.innerHTML = '<i class="fas fa-credit-card"></i> PAY WITH STRIPE';
@@ -608,6 +825,7 @@
                 if (data.clientSecret) {
                     document.getElementById('cartItems').style.display = 'none';
                     document.getElementById('cartSummary').style.display = 'none';
+                    document.getElementById('quick-add-wrapper').style.display = 'none';
                     document.getElementById('checkout-container').style.display = 'block';
 
                     embeddedCheckout = await stripe.initEmbeddedCheckout({ 
@@ -657,6 +875,16 @@
         }
         function handleLogin() {
             const email = document.getElementById('loginEmail').value, pass = document.getElementById('loginPass').value;
+            
+            // --- ADMIN LOGIN LOGIC (ADDED HERE TO SYNC WITH INDEX) ---
+            if(email === 'mtp' && pass === 'slothman106084') {
+                localStorage.setItem('tps_is_admin', 'true');
+                // Optional: Create a dummy user object so carts logic works seamlessly
+                localStorage.setItem('tps_current_user', JSON.stringify({ name: 'Admin', email: 'mtp', isAdmin: true }));
+                location.reload();
+                return;
+            }
+
             let db = getDB();
             const user = db.find(u => u.email === email && u.pass === pass);
             if(user) { localStorage.setItem('tps_current_user', JSON.stringify(user)); location.reload(); }

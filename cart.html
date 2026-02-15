@@ -500,27 +500,64 @@
         const stripe = Stripe('pk_live_51LDw4PLHs0w9JjR8nBwavRWVfCsKh1Tz7YJfkjwjNN9edtqvpnVZ8axuOTVQfUAquAgdksq9jBHX8VKXll5Ft6ss008lzh2Gq3');
         let embeddedCheckout = null;
 
+        // =====================================================================
+        // =====================================================================
+        //              ⚙️  EASY CONFIGURATION SECTION  ⚙️
+        // =====================================================================
+        // =====================================================================
+
+        const CONFIG = {
+            
+            // ------------------------------------
+            // 1. ADD YOUR COUPONS HERE
+            // ------------------------------------
+            coupons: [
+                { code: "1956",     discount: 100 }, // Keep 100% for Dev/Owner Bypass
+                { code: "195612",   discount: 0   }, // Test Mode (Visual only)
+                
+                // --- ADD NEW CODES BELOW THIS LINE ---
+                { code: "VALENTINE", discount: 50 },
+                { code: "WELCOME",  discount: 10 },
+                // -------------------------------------
+            ],
+
+            // ------------------------------------
+            // 2. PRODUCT LIST (For Search/Quick Add)
+            // ------------------------------------
+            products: [
+                { title: "Simple Intro", price: "£10.00", img: "product.png" },
+                { title: "Character Intro", price: "£17.00", img: "product.png" },
+                { title: "1x Pendant Iced Chain", price: "£20.00", img: "product.png" },
+                { title: "2x Pendant Iced Chain", price: "£30.00", img: "product.png" },
+                { title: "3x+ Pendant Iced Chain", price: "£50.00", img: "product.png" },
+                { title: "Static GFX", price: "£10.00", img: "product.png" },
+                { title: "Animated GFX", price: "£15.00", img: "product.png" },
+                { title: "Banner", price: "£8.00", img: "product.png" },
+                { title: "1x Custom Clothing", price: "£8.00", img: "product.png" },
+                { title: "3x Custom Clothing", price: "£20.00", img: "product.png" },
+                { title: "5x+ Clothing Bundle", price: "£45+", img: "product.png" },
+                { title: "Intro Tutorials", price: "£40.00", img: "product.png" },
+                { title: "Chain Tutorials", price: "£40.00", img: "product.png" },
+                { title: "Clothing Tutorials", price: "£20.00", img: "product.png" }
+            ]
+        };
+
+        // =====================================================================
+        //                  END OF CONFIGURATION 
+        // =====================================================================
+
         window.addEventListener('load', () => {
             setTimeout(() => {
                 document.getElementById('loader').style.opacity = '0';
                 setTimeout(() => { document.getElementById('loader').style.display = 'none'; }, 500);
             }, 1000); 
             
-            // CHECK FOR USER *OR* ADMIN LOGIN
             const currentUser = JSON.parse(localStorage.getItem('tps_current_user'));
-            const isAdmin = localStorage.getItem('tps_is_admin') === 'true';
-            
             const reminder = document.getElementById('loginReminder');
             if (reminder) {
-                // Hide reminder if either user OR admin is logged in
-                if (!currentUser && !isAdmin) {
-                    reminder.style.display = 'block';
-                } else {
-                    reminder.style.display = 'none';
-                }
+                if (!currentUser) reminder.style.display = 'block';
+                else reminder.style.display = 'none';
             }
-            
-            // Init quick add list
             populateQuickList();
         });
 
@@ -535,33 +572,7 @@
         const quickAddWrapper = document.getElementById('quick-add-wrapper');
         
         let activeCode = ""; 
-        let activeDiscountPercent = 0; // NEW for dynamic coupons
-
-        // --- CATALOG LOGIC (SYNCED WITH ADMIN EDITS) ---
-        const defaultCatalog = [
-            // Intros
-            { title: "Simple Intro", price: "£10.00", img: "product.png" },
-            { title: "Character Intro", price: "£17.00", img: "product.png" },
-            // Chains
-            { title: "1x Pendant Iced Chain", price: "£20.00", img: "product.png" },
-            { title: "2x Pendant Iced Chain", price: "£30.00", img: "product.png" },
-            { title: "3x+ Pendant Iced Chain", price: "£50.00", img: "product.png" },
-            // GFX
-            { title: "Static GFX", price: "£10.00", img: "product.png" },
-            { title: "Animated GFX", price: "£15.00", img: "product.png" },
-            { title: "Banner", price: "£8.00", img: "product.png" },
-            // Clothing
-            { title: "1x Custom Clothing", price: "£8.00", img: "product.png" },
-            { title: "3x Custom Clothing", price: "£20.00", img: "product.png" },
-            { title: "5x+ Clothing Bundle", price: "£45+", img: "product.png" },
-            // Tutorials
-            { title: "Intro Tutorials", price: "£40.00", img: "product.png" },
-            { title: "Chain Tutorials", price: "£40.00", img: "product.png" },
-            { title: "Clothing Tutorials", price: "£20.00", img: "product.png" }
-        ];
-
-        // Load catalog from storage if available (Admin persistence), otherwise default
-        let allProducts = JSON.parse(localStorage.getItem('tps_catalog')) || defaultCatalog;
+        let activeDiscountPercent = 0; 
 
         function renderCart() {
             cartContainer.innerHTML = '';
@@ -572,22 +583,20 @@
 
             if (validItems.length === 0) {
                 cartSummary.style.display = 'none';
-                quickAddWrapper.style.display = 'none'; // Hide quick add if empty
+                quickAddWrapper.style.display = 'none'; 
                 emptyMsg.style.display = 'block';
                 localStorage.removeItem('mtpCart');
                 return;
             } else {
                 emptyMsg.style.display = 'none';
                 cartSummary.style.display = 'flex';
-                quickAddWrapper.style.display = 'block'; // Show quick add
+                quickAddWrapper.style.display = 'block'; 
             }
 
             const currentUser = JSON.parse(localStorage.getItem('tps_current_user'));
-            const isAdmin = localStorage.getItem('tps_is_admin') === 'true';
-            
             const reminder = document.getElementById('loginReminder');
             if (reminder) {
-                if (!currentUser && !isAdmin) reminder.style.display = 'block';
+                if (!currentUser) reminder.style.display = 'block';
                 else reminder.style.display = 'none';
             }
 
@@ -625,11 +634,11 @@
             let categoryCount = (hasIntro?1:0) + (hasChain?1:0) + (hasGFX?1:0) + (hasCloth?1:0);
             let bundleActive = (categoryCount >= 3 || subtotal > 35);
             
-            // DEFAULT DISCOUNT (BUNDLE)
+            // DEFAULT CALCULATION
             total = bundleActive ? subtotal * 0.85 : subtotal;
 
-            // --- DISCOUNT LOGIC ---
-            if(activeCode === "1956") {
+            // --- DISCOUNT LOGIC (Using CONFIG) ---
+            if (activeCode === "1956") {
                 total = 0;
                 discountMsg.innerText = "DEV MODE: 100% OFF";
                 discountMsg.style.display = "block";
@@ -640,9 +649,8 @@
                 discountMsg.style.display = "block";
                 discountMsg.style.color = "#ffa500";
             } else if (activeDiscountPercent > 0) {
-                // Apply Admin Coupon Logic
                 total = subtotal - (subtotal * (activeDiscountPercent / 100));
-                discountMsg.innerText = `COUPON APPLIED: ${activeDiscountPercent}% OFF`;
+                discountMsg.innerText = `COUPON '${activeCode}' APPLIED: ${activeDiscountPercent}% OFF`;
                 discountMsg.style.display = "block";
                 discountMsg.style.color = "#00ff88";
             } else if(bundleActive) {
@@ -662,6 +670,7 @@
             
             totalEl.innerText = '£' + total.toFixed(2);
 
+            // Button Styles
             if(activeCode === "1956") {
                 checkoutBtn.innerHTML = '<i class="fas fa-lock-open"></i> DEV BYPASS';
                 checkoutBtn.style.background = "#00ff88"; checkoutBtn.style.color = "#000";
@@ -689,21 +698,14 @@
         function applyDiscount() {
             const input = document.getElementById('promoInput').value.trim().toUpperCase();
             
-            // 1. Check Hardcoded
-            if(input === "1956" || input === "195612") {
-                activeCode = input;
-                activeDiscountPercent = 0; // Reset normal discount
-                renderCart();
-                return;
-            }
-
-            // 2. Check Dynamic Admin Coupons
-            const adminCoupons = JSON.parse(localStorage.getItem('tps_coupons')) || [];
-            const foundCoupon = adminCoupons.find(c => c.code === input);
+            // Check Config List
+            const foundCoupon = CONFIG.coupons.find(c => c.code === input);
 
             if(foundCoupon) {
-                activeCode = input;
+                activeCode = foundCoupon.code;
                 activeDiscountPercent = foundCoupon.discount;
+                // Special check for Test Mode code to reset percentage so logic handles it
+                if(activeCode === "195612") activeDiscountPercent = 0; 
             } else {
                 alert("Invalid Code"); 
                 activeCode = "";
@@ -721,7 +723,7 @@
         function populateQuickList() {
             const list = document.getElementById('quickListContainer');
             list.innerHTML = "";
-            allProducts.forEach((p, idx) => {
+            CONFIG.products.forEach((p, idx) => {
                 list.innerHTML += `
                     <div class="quick-item" data-title="${p.title.toLowerCase()}">
                         <div class="quick-item-info">
@@ -748,7 +750,7 @@
         }
 
         function addToCartFromQuick(idx) {
-            const product = allProducts[idx];
+            const product = CONFIG.products[idx];
             // Check if exists
             const existing = cart.find(i => i.title === product.title);
             if(existing) {
@@ -875,16 +877,6 @@
         }
         function handleLogin() {
             const email = document.getElementById('loginEmail').value, pass = document.getElementById('loginPass').value;
-            
-            // --- ADMIN LOGIN LOGIC (ADDED HERE TO SYNC WITH INDEX) ---
-            if(email === 'mtp' && pass === 'slothman106084') {
-                localStorage.setItem('tps_is_admin', 'true');
-                // Optional: Create a dummy user object so carts logic works seamlessly
-                localStorage.setItem('tps_current_user', JSON.stringify({ name: 'Admin', email: 'mtp', isAdmin: true }));
-                location.reload();
-                return;
-            }
-
             let db = getDB();
             const user = db.find(u => u.email === email && u.pass === pass);
             if(user) { localStorage.setItem('tps_current_user', JSON.stringify(user)); location.reload(); }

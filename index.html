@@ -366,7 +366,6 @@
         .ctx-line { height: 1px; background: #333; margin: 5px 0; }
 
         /* --- AUTH MODAL & DISCORD LOGIN --- */
-        /* Overrides for Auth Modal specifics */
         #authModal .modal-content {
             background: #0a0a0a; 
             background-image: linear-gradient(to bottom, rgba(255,255,255,0.03), rgba(0,0,0,0.8));
@@ -424,6 +423,51 @@
         }
 
         @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+
+        /* --- NEW PROFILE STYLES --- */
+        .user-badge {
+            color: #5865F2; font-size: 0.75rem; font-weight: bold; letter-spacing: 1px;
+            margin-top: 5px; display: inline-flex; align-items: center; gap: 5px;
+            background: rgba(88, 101, 242, 0.1); padding: 4px 8px; border-radius: 4px;
+        }
+        .user-id { color: #666; font-size: 0.7rem; margin-top: 3px; font-family: var(--font-tech); }
+
+        /* Stats Grid */
+        .profile-stats-grid {
+            display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;
+            margin: 20px 0; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .stat-box { background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; text-align: center; }
+        .stat-label { font-size: 0.65rem; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+        .stat-value { font-size: 1rem; font-weight: 900; color: white; margin-top: 5px; font-family: var(--font-tech); }
+
+        /* Order Table */
+        .orders-section h4 { color: var(--accent); font-family: var(--font-tech); font-size: 0.9rem; margin-bottom: 15px; }
+        .table-container { max-height: 200px; overflow-y: auto; }
+        .table-container::-webkit-scrollbar { width: 5px; }
+
+        .order-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left; }
+        .order-table th { color: #666; font-weight: 600; padding-bottom: 10px; border-bottom: 1px solid #333; }
+        .order-table td { padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); color: #ddd; }
+        .order-id-cell { font-family: var(--font-tech); color: white; }
+
+        /* Status Badges */
+        .status-pill { padding: 3px 8px; border-radius: 10px; font-size: 0.7rem; font-weight: bold; }
+        .status-pill.complete { background: rgba(0,255,136,0.15); color: #00ff88; }
+        .status-pill.pending { background: rgba(255, 165, 0, 0.15); color: orange; }
+
+        .no-orders { text-align: center; color: #555; font-size: 0.8rem; padding: 20px; font-style: italic; }
+
+        /* Buttons */
+        .profile-actions { display: flex; gap: 10px; margin-top: 20px; }
+        .action-btn { 
+            flex: 1; padding: 12px; border: none; border-radius: 8px; cursor: pointer;
+            font-weight: 700; font-size: 0.8rem; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .action-btn:hover { transform: translateY(-2px); }
+        .action-btn { background: #222; color: white; border: 1px solid #333; }
+        .action-btn.logout { background: rgba(255, 31, 31, 0.1); color: #ff4444; border: 1px solid rgba(255, 31, 31, 0.2); }
+        .action-btn.logout:hover { background: #ff4444; color: white; }
 
         /* --- BUNDLE BUILDER WIDGET --- */
         .bundle-widget {
@@ -501,7 +545,7 @@
             <a href="#tutorials">TUTORIALS</a>
             <a href="https://discord.gg/Vc7fjmbXAe" target="_blank" style="color:var(--accent);">DISCORD</a>
             
-            <!-- NEW USER ICON -->
+            <!-- USER ICON -->
             <a onclick="openAuthModal()" class="user-btn"><i class="fas fa-user"></i></a>
 
             <a onclick="goToCart(event)" class="cart-link" id="cartNavBtn">CART <i class="fas fa-shopping-cart"></i></a>
@@ -669,13 +713,61 @@
 
             <!-- PROFILE VIEW (LOGGED IN) -->
             <div class="profile-view" id="profileView">
+                <!-- Header -->
                 <div class="profile-header">
                     <div class="profile-avatar" id="userAvatar"></div>
                     <div>
-                        <h3 style="margin:0; font-family:var(--font-head); font-style:italic; font-size: 1.2rem;" id="userNameDisplay">USERNAME</h3>
-                        <div style="color:#5865F2; font-size:0.75rem; font-weight:bold; letter-spacing:1px; margin-top:2px;">VERIFIED MEMBER</div>
-                        <a onclick="handleLogout()" style="color:#ff4444; font-size:0.8rem; cursor:pointer; font-weight:bold;">Disconnect</a>
+                        <h3 id="userNameDisplay">USERNAME</h3>
+                        <div class="user-badge"><i class="fab fa-discord"></i> VERIFIED MEMBER</div>
+                        <div class="user-id" id="userIdDisplay">ID: 000000</div>
                     </div>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="profile-stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-label">Total Orders</div>
+                        <div class="stat-value" id="orderCount">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Member Since</div>
+                        <div class="stat-value">2025</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Status</div>
+                        <div class="stat-value" style="color:#00ff88;">Active</div>
+                    </div>
+                </div>
+
+                <!-- Order History Section -->
+                <div class="orders-section">
+                    <h4>ORDER HISTORY</h4>
+                    <div class="table-container">
+                        <table class="order-table">
+                            <thead>
+                                <tr>
+                                    <th>Order</th>
+                                    <th>Date</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="orderTableBody">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="noOrdersMsg" class="no-orders" style="display:none;">No orders found on this device.</div>
+                </div>
+
+                <!-- Actions -->
+                <div class="profile-actions">
+                    <button class="action-btn" onclick="window.open('https://discord.gg/Vc7fjmbXAe')">
+                        <i class="fas fa-ticket-alt"></i> Open Support Ticket
+                    </button>
+                    <button class="action-btn logout" onclick="handleLogout()">
+                        <i class="fas fa-sign-out-alt"></i> Disconnect
+                    </button>
                 </div>
             </div>
         </div>
@@ -684,7 +776,7 @@
     <script>
         /* 
            ==========================================================================
-           ⚠️ CONFIGURATION - REPLACED WITH YOUR CLIENT ID
+           ⚠️ CONFIGURATION
            ========================================================================== 
         */
         const CLIENT_ID = "1473005938876092416"; 
@@ -742,7 +834,6 @@
             renderProducts(); 
             updateCartButton();
             updateBundleProgress();
-            checkLoginState();
             loadLiveVouches(); 
         });
 
@@ -1100,20 +1191,63 @@
                 if(forms) forms.style.display = 'none';
                 if(profile) {
                     profile.style.display = 'block';
-                    profile.classList.add('active');
+                    setTimeout(() => profile.classList.add('active'), 10);
                 }
                 
+                // Update User Info
                 if(document.getElementById('userNameDisplay')) document.getElementById('userNameDisplay').innerText = user.username.toUpperCase();
+                if(document.getElementById('userIdDisplay')) document.getElementById('userIdDisplay').innerText = `ID: ${user.id}`;
                 if(document.getElementById('userAvatar')) document.getElementById('userAvatar').style.backgroundImage = `url('${user.avatar}')`;
-                
                 if(userBtn) userBtn.classList.remove('user-attention'); 
+
+                // --- RENDER FAKE ORDERS (DEMO PURPOSE) ---
+                const orderTable = document.getElementById('orderTableBody');
+                const noOrders = document.getElementById('noOrdersMsg');
+                const countDisplay = document.getElementById('orderCount');
+                
+                // Check local storage for dummy orders or create one if empty for demo
+                let myOrders = JSON.parse(localStorage.getItem('tps_orders_' + user.id)) || [];
+                
+                // DEMO LOGIC: If user has NO history, create a fake "Welcome Gift"
+                if(myOrders.length === 0) {
+                    myOrders.push({
+                        id: "TPS-8821",
+                        date: new Date().toLocaleDateString(),
+                        total: "£0.00",
+                        status: "COMPLETED",
+                        items: "Welcome Gift"
+                    });
+                }
+
+                if(orderTable) orderTable.innerHTML = '';
+                if(myOrders.length > 0) {
+                    if(countDisplay) countDisplay.innerText = myOrders.length;
+                    if(noOrders) noOrders.style.display = 'none';
+                    
+                    myOrders.forEach(order => {
+                        let statusClass = order.status === 'COMPLETED' ? 'complete' : 'pending';
+                        if(orderTable) {
+                            orderTable.innerHTML += `
+                                <tr>
+                                    <td class="order-id-cell">#${order.id}</td>
+                                    <td>${order.date}</td>
+                                    <td style="color:var(--accent); font-weight:bold;">${order.total}</td>
+                                    <td><span class="status-pill ${statusClass}">${order.status}</span></td>
+                                </tr>
+                            `;
+                        }
+                    });
+                } else {
+                    if(countDisplay) countDisplay.innerText = "0";
+                    if(noOrders) noOrders.style.display = 'block';
+                }
+
             } else {
                 if(forms) forms.style.display = 'block';
                 if(profile) {
                     profile.classList.remove('active');
                     profile.style.display = 'none';
                 }
-                
                 if(userBtn) userBtn.classList.add('user-attention'); 
             }
         }

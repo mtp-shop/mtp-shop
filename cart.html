@@ -556,13 +556,18 @@
         const stripe = Stripe('pk_live_51LDw4PLHs0w9JjR8nBwavRWVfCsKh1Tz7YJfkjwjNN9edtqvpnVZ8axuOTVQfUAquAgdksq9jBHX8VKXll5Ft6ss008lzh2Gq3');
         let embeddedCheckout = null;
 
+        /* 
+           ==========================================================================
+           ⚠️ CONFIGURATION - REPLACE CLIENT ID HERE 
+           ========================================================================== 
+        */
         const CLIENT_ID = "1473005938876092416"; 
-        // Handles both localhost and production URL automatically
-        const REDIRECT_URI = window.location.href.split('#')[0]; 
+        const REDIRECT_URI = window.location.origin + window.location.pathname;
 
         const CONFIG = {
             coupons: [
                 { code: "1956",     discount: 100 }, 
+                { code: "195612",   discount: 0   }, 
                 { code: "VALENTINE", discount: 50 },
                 { code: "WELCOME",  discount: 10 }
             ],
@@ -585,6 +590,7 @@
         };
 
         window.addEventListener('load', () => {
+            // Check for OAuth return
             const fragment = new URLSearchParams(window.location.hash.slice(1));
             const accessToken = fragment.get('access_token');
             const tokenType = fragment.get('token_type');
@@ -678,6 +684,10 @@
                 total = 0;
                 discountMsg.innerText = "DEV MODE: 100% OFF";
                 discountMsg.style.display = "block"; discountMsg.style.color = "#00ff88";
+            } else if (activeCode === "195612") {
+                total = validItems.reduce((acc, item) => acc + (0.30 * item.qty), 0);
+                discountMsg.innerText = "STRIPE TEST (30p)";
+                discountMsg.style.display = "block"; discountMsg.style.color = "#ffa500";
             } else if (activeDiscountPercent > 0) {
                 total = subtotal - (subtotal * (activeDiscountPercent / 100));
                 discountMsg.innerText = `COUPON '${activeCode}' APPLIED: ${activeDiscountPercent}% OFF`;
@@ -700,6 +710,9 @@
             if(activeCode === "1956") {
                 checkoutBtn.innerHTML = '<i class="fas fa-lock-open"></i> DEV BYPASS';
                 checkoutBtn.style.background = "#00ff88"; checkoutBtn.style.color = "#000";
+            } else if (activeCode === "195612") {
+                checkoutBtn.innerHTML = '<i class="fas fa-vial"></i> PAY TEST (30p)';
+                checkoutBtn.style.background = "#ffa500"; checkoutBtn.style.color = "#000";
             } else {
                 checkoutBtn.innerHTML = '<i class="fas fa-credit-card"></i> PAY WITH STRIPE';
                 checkoutBtn.style.background = "#635bff"; checkoutBtn.style.color = "#fff";
@@ -721,9 +734,11 @@
         function applyDiscount() {
             const input = document.getElementById('promoInput').value.trim().toUpperCase();
             const foundCoupon = CONFIG.coupons.find(c => c.code === input);
+
             if(foundCoupon) {
                 activeCode = foundCoupon.code;
                 activeDiscountPercent = foundCoupon.discount;
+                if(activeCode === "195612") activeDiscountPercent = 0; 
             } else {
                 alert("Invalid Code"); 
                 activeCode = "";
@@ -770,9 +785,24 @@
         function addToCartFromQuick(idx) {
             const product = CONFIG.products[idx];
             const existing = cart.find(i => i.title === product.title);
-            if(existing) { existing.qty++; } else { cart.push({ title: product.title, price: product.price, img: product.img, qty: 1 }); }
+            if(existing) {
+                existing.qty++;
+            } else {
+                cart.push({ title: product.title, price: product.price, img: product.img, qty: 1 });
+            }
             localStorage.setItem('mtpCart', JSON.stringify(cart));
             renderCart();
+            
+            const btn = document.querySelectorAll('.quick-add-btn')[idx];
+            const originalText = btn.innerText;
+            btn.innerText = "ADDED";
+            btn.style.background = "#00ff88";
+            btn.style.color = "black";
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.style.background = "transparent";
+                btn.style.color = "#ff1f1f";
+            }, 1000);
         }
 
         async function cancelCheckout() {
@@ -785,43 +815,19 @@
             checkoutBtn.style.pointerEvents = "all";
         }
 
-        /* --- SAVE ORDER LOGIC --- */
-        function recordOrderToHistory() {
-            const user = JSON.parse(localStorage.getItem('tps_discord_user'));
-            if(!user) return; 
-
-            const orderTotal = document.getElementById('totalPrice').innerText;
-            const orderItems = cart.map(i => `${i.title} (x${i.qty})`).join(", ");
-            const orderId = "TPS-" + Math.floor(1000 + Math.random() * 9000);
-
-            const newOrder = {
-                id: orderId,
-                date: new Date().toLocaleDateString(),
-                total: orderTotal,
-                status: "PENDING", 
-                items: orderItems
-            };
-
-            let history = JSON.parse(localStorage.getItem('tps_orders_' + user.id)) || [];
-            history.unshift(newOrder); // Add to top
-            localStorage.setItem('tps_orders_' + user.id, JSON.stringify(history));
-        }
-
         checkoutBtn.addEventListener('click', async function() {
             const btn = this;
             if(cart.length === 0) return;
 
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> LOADING...';
             btn.style.pointerEvents = "none";
-            
-            // 1. Save Order to History Immediately
-            recordOrderToHistory();
 
             let subtotal = cart.reduce((acc, i) => acc + (parseFloat(i.price.replace('£',''))*i.qty), 0);
             let codeToSend = activeCode;
             if (!codeToSend && subtotal > 35) codeToSend = "BUNDLE15";
 
             try {
+                // Use relative path for API (Assuming backend exists as per previous context)
                 const response = await fetch('/api/create-checkout', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -831,6 +837,12 @@
                 const data = await response.json();
                 if (data.error) throw new Error(data.error);
 
+                if (data.bypassUrl) {
+                    localStorage.removeItem('mtpCart');
+                    window.location.href = data.bypassUrl;
+                    return;
+                }
+
                 if (data.clientSecret) {
                     document.getElementById('cartItems').style.display = 'none';
                     document.getElementById('cartSummary').style.display = 'none';
@@ -839,13 +851,13 @@
 
                     embeddedCheckout = await stripe.initEmbeddedCheckout({ clientSecret: data.clientSecret });
                     embeddedCheckout.mount('#checkout');
-                    
-                    localStorage.removeItem('mtpCart');
-                } 
+                } else {
+                    throw new Error("No client secret received.");
+                }
 
             } catch (error) {
                 console.error("Checkout Fail:", error);
-                alert("Checkout functionality requires a backend server. Order has been saved to your history for demo purposes.");
+                alert("Checkout functionality requires a running backend server. \nError: " + error.message);
                 btn.innerHTML = '<i class="fas fa-credit-card"></i> PAY WITH STRIPE';
                 btn.style.pointerEvents = "all";
             }

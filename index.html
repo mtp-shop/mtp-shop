@@ -30,6 +30,8 @@
             --glass-border: rgba(255, 255, 255, 0.08);
             --accent: #ff1f1f;       
             --accent-glow: rgba(255, 31, 31, 0.6);
+            --discord: #5865F2;
+            --discord-dark: #4752c4;
             --accent-gradient: linear-gradient(135deg, #ff1f1f 0%, #b30000 100%);
             --text-main: #eeeeee;
             --text-dim: #9ca3af;
@@ -37,6 +39,20 @@
             --font-wide: 'Syncopate', sans-serif;
             --font-body: 'Poppins', sans-serif;
             --font-tech: 'Space Mono', monospace; 
+        }
+        
+        /* --- LOGIN ATTENTION ANIMATION --- */
+        @keyframes user-pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 31, 31, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(255, 31, 31, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 31, 31, 0); }
+        }
+
+        .user-attention {
+            animation: user-pulse 2s infinite;
+            background: rgba(255, 31, 31, 0.1); 
+            border-radius: 50%;
+            color: var(--accent) !important;
         }
 
         * { box-sizing: border-box; }
@@ -349,35 +365,65 @@
         .ctx-item:hover { background: rgba(255,255,255,0.05); color: var(--accent); border-left-color: var(--accent); }
         .ctx-line { height: 1px; background: #333; margin: 5px 0; }
 
-        /* --- AUTH & USER STYLES --- */
-        .auth-tabs { display: flex; border-bottom: 1px solid #333; margin-bottom: 20px; }
-        .auth-tab { flex: 1; padding: 15px; text-align: center; cursor: pointer; color: #666; font-family: var(--font-head); font-weight: 700; transition: 0.3s; }
-        .auth-tab.active { color: white; border-bottom: 2px solid var(--accent); }
-        .auth-form { display: none; flex-direction: column; gap: 15px; }
-        .auth-form.active { display: flex; }
-        .auth-input { background: #111; border: 1px solid #333; padding: 15px; color: white; border-radius: 8px; font-family: var(--font-body); outline: none; transition: 0.3s; }
-        .auth-input:focus { border-color: var(--accent); }
-        .auth-submit { background: var(--accent); color: white; border: none; padding: 15px; border-radius: 8px; font-weight: 900; font-family: var(--font-head); cursor: pointer; transition: 0.3s; }
-        .auth-submit:hover { background: white; color: black; }
-
-        /* PROFILE VIEW */
-        .profile-view { display: none; }
-        .profile-view.active { display: block; }
-        .profile-header { display: flex; align-items: center; gap: 20px; margin-bottom: 30px; }
-        .profile-avatar { width: 60px; height: 60px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 900; color: white; }
-        .order-history { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        /* --- AUTH MODAL & DISCORD LOGIN --- */
+        /* Overrides for Auth Modal specifics */
+        #authModal .modal-content {
+            background: #0a0a0a; 
+            background-image: linear-gradient(to bottom, rgba(255,255,255,0.03), rgba(0,0,0,0.8));
+            width: 100%; max-width: 450px; 
+            padding: 50px 40px; 
+            border-radius: 24px; 
+            border: 1px solid rgba(255,255,255,0.08); 
+            display: block; /* Override grid */
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.05); 
+            text-align: center;
+        }
         
-        .order-history th { text-align: left; padding: 10px; color: #888; font-size: 0.8rem; border-bottom: 1px solid #333; }
-        .order-history td { padding: 15px 10px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.9rem; }
-        .status-pill { padding: 5px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; background: rgba(0,255,136,0.1); color: #00ff88; border: 1px solid #00ff88; }
+        #authModal .close-btn { 
+            top: 20px; right: 25px; 
+            font-size: 1.5rem; color: #555; 
+        }
 
-        .order-row { cursor: pointer; transition: background 0.2s; }
-        .order-row:hover { background: rgba(255,255,255,0.03); }
-        .order-details-row { background: rgba(0,0,0,0.3); }
-        .order-items-list { list-style: none; padding: 10px 20px; margin: 0; color: #aaa; font-size: 0.85rem; }
-        .order-items-list li { margin-bottom: 5px; display: flex; justify-content: space-between; border-bottom: 1px dashed #333; padding-bottom: 5px; }
-        .order-chevron { transition: transform 0.3s; }
-        .order-row.expanded .order-chevron { transform: rotate(180deg); }
+        /* Discord Specific Styles */
+        .auth-header-icon {
+            font-size: 3rem; color: #5865F2; margin-bottom: 20px;
+            filter: drop-shadow(0 0 20px rgba(88, 101, 242, 0.4));
+        }
+
+        .auth-title { font-size: 2rem; font-family: var(--font-head); font-weight: 900; font-style: italic; margin: 0 0 10px 0; letter-spacing: -1px; }
+        .auth-sub { color: #888; font-size: 0.9rem; margin-bottom: 30px; line-height: 1.5; }
+
+        .discord-btn {
+            width: 100%; padding: 18px;
+            background: #5865F2; color: white;
+            font-family: var(--font-head); font-weight: 800; font-style: italic; letter-spacing: 0.5px;
+            border: none; border-radius: 12px; cursor: pointer;
+            display: flex; justify-content: center; align-items: center; gap: 12px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(88, 101, 242, 0.3);
+            font-size: 1rem;
+        }
+        .discord-btn:hover { 
+            background: #4752c4; 
+            transform: translateY(-2px); 
+            box-shadow: 0 8px 25px rgba(88, 101, 242, 0.5); 
+        }
+        .discord-btn i { font-size: 1.2rem; }
+
+        /* Profile View Styling Updates */
+        .profile-view { display: none; text-align: left; }
+        .profile-view.active { display: block; animation: fadeIn 0.5s ease; }
+        .profile-header { 
+            background: rgba(255,255,255,0.03); padding: 20px; border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; gap: 20px; 
+        }
+        .profile-avatar { 
+            width: 60px; height: 60px; border-radius: 50%; 
+            background-size: cover; background-position: center;
+            border: 2px solid #5865F2; box-shadow: 0 0 15px rgba(88, 101, 242, 0.4);
+        }
+
+        @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
 
         /* --- BUNDLE BUILDER WIDGET --- */
         .bundle-widget {
@@ -590,7 +636,7 @@
         </div>
     </div>
 
-    <!-- BUNDLE WIDGET (UPDATED: NO ICONS) -->
+    <!-- BUNDLE WIDGET -->
     <div class="bundle-widget" id="bundleWidget">
         <div class="bundle-header">
             <div class="bundle-title">BUILD A BUNDLE</div>
@@ -605,54 +651,45 @@
 
     <!-- AUTH MODAL -->
     <div class="modal-overlay" id="authModal">
-        <div class="modal-content" style="max-width: 500px; display: block; min-height: auto;">
-            <span class="close-btn" onclick="closeModal('authModal')">&times;</span>
+        <div class="modal-content">
+            <span class="close-btn" onclick="document.getElementById('authModal').classList.remove('active'); setTimeout(()=>document.getElementById('authModal').style.display='none',300)">&times;</span>
             
-            <!-- Login/Register View -->
+            <!-- DISCORD LOGIN VIEW -->
             <div id="authForms">
-                <h2 class="modal-title" style="font-size: 2rem; margin-bottom: 20px;">TPS ACCOUNT</h2>
-                <div class="auth-tabs">
-                    <div class="auth-tab active" onclick="switchTab('login')">LOGIN</div>
-                    <div class="auth-tab" onclick="switchTab('register')">REGISTER</div>
+                <div class="auth-header-icon">
+                    <i class="fab fa-discord"></i>
                 </div>
+                <h2 class="auth-title">TEMPLE ACCESS</h2>
+                <p class="auth-sub">Sign in with Discord to track your orders, access support, and manage your assets.</p>
 
-                <!-- Login Form -->
-                <div class="auth-form active" id="loginForm">
-                    <input type="text" id="loginEmail" class="auth-input" placeholder="Username / Email">
-                    <input type="password" id="loginPass" class="auth-input" placeholder="Password">
-                    <button class="auth-submit" onclick="handleLogin()">ENTER TEMPLE</button>
-                </div>
-
-                <!-- Register Form -->
-                <div class="auth-form" id="registerForm">
-                    <input type="text" id="regName" class="auth-input" placeholder="Username">
-                    <input type="email" id="regEmail" class="auth-input" placeholder="Email Address">
-                    <input type="password" id="regPass" class="auth-input" placeholder="Password">
-                    <button class="auth-submit" onclick="handleRegister()">CREATE ACCOUNT</button>
-                </div>
+                <button class="discord-btn" onclick="initiateDiscordLogin()">
+                    <i class="fab fa-discord"></i> CONNECT DISCORD
+                </button>
             </div>
 
-            <!-- Logged In Profile View -->
+            <!-- PROFILE VIEW (LOGGED IN) -->
             <div class="profile-view" id="profileView">
                 <div class="profile-header">
-                    <div class="profile-avatar" id="userAvatar">U</div>
+                    <div class="profile-avatar" id="userAvatar"></div>
                     <div>
-                        <h3 style="margin:0; font-family:var(--font-head); font-style:italic;" id="userNameDisplay">USERNAME</h3>
-                        <a href="#" onclick="handleLogout()" style="color:#666; font-size:0.8rem; text-decoration:none;">Logout</a>
+                        <h3 style="margin:0; font-family:var(--font-head); font-style:italic; font-size: 1.2rem;" id="userNameDisplay">USERNAME</h3>
+                        <div style="color:#5865F2; font-size:0.75rem; font-weight:bold; letter-spacing:1px; margin-top:2px;">VERIFIED MEMBER</div>
+                        <a onclick="handleLogout()" style="color:#ff4444; font-size:0.8rem; cursor:pointer; font-weight:bold;">Disconnect</a>
                     </div>
                 </div>
-                <h4 style="color:var(--accent); font-family:var(--font-tech);">ORDER HISTORY</h4>
-                <table class="order-history">
-                    <thead><tr><th>ORDER ID</th><th>PRODUCTS</th><th>TOTAL</th><th>STATUS</th></tr></thead>
-                    <tbody id="orderTableBody">
-                        <!-- Populated by JS -->
-                    </tbody>
-                </table>
             </div>
         </div>
     </div>
 
     <script>
+        /* 
+           ==========================================================================
+           ⚠️ CONFIGURATION - REPLACED WITH YOUR CLIENT ID
+           ========================================================================== 
+        */
+        const CLIENT_ID = "1473005938876092416"; 
+        const REDIRECT_URI = window.location.origin + window.location.pathname;
+
         /* 
            ==========================================================================
            CATALOG DATABASE (EDIT HERE TO CHANGE PRODUCTS)
@@ -680,17 +717,20 @@
             { id: 't3', category: 'tutorials', title: "Clothing Tutorials", price: "£20.00", img: "product.png", tag: "BEGINNER" }
         ];
 
-        /* 
-           ==========================================================================
-           COUPONS (EDIT HERE TO ADD CODES)
-           ========================================================================== 
-        */
-        const coupons = [
-            // Example: { code: "WELCOME10", discount: 10 }
-        ];
-
-
         window.addEventListener('load', () => {
+            // Check for OAuth return
+            const fragment = new URLSearchParams(window.location.hash.slice(1));
+            const accessToken = fragment.get('access_token');
+            const tokenType = fragment.get('token_type');
+
+            if (accessToken) {
+                window.history.replaceState(null, null, ' ');
+                fetchDiscordUser(accessToken, tokenType);
+                openAuthModal(); // Open modal to show logged in state
+            } else {
+                checkLoginState();
+            }
+
             setTimeout(() => {
                 document.getElementById('loader').style.opacity = '0';
                 setTimeout(() => { document.getElementById('loader').style.display = 'none'; }, 500);
@@ -815,34 +855,21 @@
         }
 
         function updateClock() {
-    const now = new Date();
-    
-    // Set the Time (e.g., 10:10:43)
-    document.getElementById('clock-time').innerText = now.toLocaleTimeString([], { 
-        hour: '2-digit', 
-        minute: '2-digit', 
-        second: '2-digit', 
-        hour12: false 
-    });
-
-    // 1. Get the system's exact Time Zone ID (e.g., "America/Caracas")
-    const ianaTZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    
-    // 2. Extract only the city name and clean it up (e.g., "Caracas")
-    let region = ianaTZ.split('/').pop().replace(/_/g, ' ');
-
-    // 3. Fallback: If it fails to find a city (e.g., just "UTC"), use the short code
-    if (!ianaTZ.includes('/') || region === 'UTC' || region === 'GMT') {
-        region = Intl.DateTimeFormat([], { timeZoneName: 'short' })
-            .formatToParts(now)
-            .find(part => part.type === 'timeZoneName').value;
-    }
-
-    // Update the UI
-    document.getElementById('clock-loc').innerText = region;
-}
-setInterval(updateClock, 1000); 
-updateClock();
+            const now = new Date();
+            document.getElementById('clock-time').innerText = now.toLocaleTimeString([], { 
+                hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false 
+            });
+            const ianaTZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            let region = ianaTZ.split('/').pop().replace(/_/g, ' ');
+            if (!ianaTZ.includes('/') || region === 'UTC' || region === 'GMT') {
+                region = Intl.DateTimeFormat([], { timeZoneName: 'short' })
+                    .formatToParts(now)
+                    .find(part => part.type === 'timeZoneName').value;
+            }
+            document.getElementById('clock-loc').innerText = region;
+        }
+        setInterval(updateClock, 1000); 
+        updateClock();
 
         /* PARTICLES */
         const canvas = document.getElementById('particle-canvas');
@@ -1042,122 +1069,52 @@ updateClock();
             checkLoginState();
         }
 
-        function switchTab(tab) {
-            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
-            
-            if(tab === 'login') {
-                document.querySelectorAll('.auth-tab')[0].classList.add('active');
-                document.getElementById('loginForm').classList.add('active');
-            } else {
-                document.querySelectorAll('.auth-tab')[1].classList.add('active');
-                document.getElementById('registerForm').classList.add('active');
-            }
+        function initiateDiscordLogin() {
+            const authUrl = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify`;
+            window.location.href = authUrl;
         }
 
-        // MOCK DATABASE
-        function getDB() { return JSON.parse(localStorage.getItem('tps_users_db')) || []; }
-        function saveDB(db) { localStorage.setItem('tps_users_db', JSON.stringify(db)); }
-
-        function handleRegister() {
-            const name = document.getElementById('regName').value;
-            const email = document.getElementById('regEmail').value;
-            const pass = document.getElementById('regPass').value;
-            
-            if(!name || !email || !pass) { alert("Please fill all fields"); return; }
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) { alert("Please enter a valid email address"); return; }
-            
-            let db = getDB();
-            if(db.find(u => u.email === email)) { alert("Email already registered"); return; }
-            
-            const newUser = { name, email, pass, orders: [] };
-            db.push(newUser); saveDB(db);
-            
-            localStorage.setItem('tps_current_user', JSON.stringify(newUser));
-            checkLoginState();
-        }
-
-        function handleLogin() {
-            const email = document.getElementById('loginEmail').value; // In this modal input id is loginEmail
-            const pass = document.getElementById('loginPass').value;
-            
-            let db = getDB();
-            const user = db.find(u => u.email === email && u.pass === pass);
-            
-            if(user) {
-                localStorage.setItem('tps_current_user', JSON.stringify(user));
+        function fetchDiscordUser(token, type) {
+            fetch('https://discord.com/api/users/@me', { headers: { authorization: `${type} ${token}` }})
+            .then(res => res.json())
+            .then(data => {
+                const userData = { id: data.id, username: data.username, avatar: `https://cdn.discordapp.com/avatars/${data.id}/${data.avatar}.png` };
+                localStorage.setItem('tps_discord_user', JSON.stringify(userData));
                 checkLoginState();
-            } else {
-                alert("Invalid Credentials");
-            }
+            })
+            .catch(err => console.error("Discord Auth Error:", err));
         }
 
         function handleLogout() {
-            localStorage.removeItem('tps_current_user');
+            localStorage.removeItem('tps_discord_user');
             checkLoginState();
         }
 
-        function toggleOrder(row) {
-            const detailsRow = row.nextElementSibling;
-            if(detailsRow && detailsRow.classList.contains('order-details-row')) {
-                row.classList.toggle('expanded');
-                if(detailsRow.style.display === 'none') {
-                    detailsRow.style.display = 'table-row';
-                } else {
-                    detailsRow.style.display = 'none';
-                }
-            }
-        }
-
         function checkLoginState() {
-            const user = JSON.parse(localStorage.getItem('tps_current_user'));
+            const user = JSON.parse(localStorage.getItem('tps_discord_user'));
             const forms = document.getElementById('authForms');
             const profile = document.getElementById('profileView');
             const userBtn = document.querySelector('.user-btn');
             
             if(user) {
-                forms.style.display = 'none';
-                profile.classList.add('active');
-                document.getElementById('userNameDisplay').innerText = user.name.toUpperCase();
-                document.getElementById('userAvatar').innerText = user.name.charAt(0).toUpperCase();
-                userBtn.classList.remove('user-attention'); // Remove animation
-                
-                // Render Orders
-                const tbody = document.getElementById('orderTableBody');
-                tbody.innerHTML = '';
-                if(user.orders.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#444;">No orders found.</td></tr>';
-                } else {
-                    user.orders.forEach(order => {
-                        let totalString = order.total || "-"; 
-                        let itemsHtml = '';
-                        if(order.items && Array.isArray(order.items)) {
-                            order.items.forEach(item => {
-                                itemsHtml += `<li><span>${item.title} (x${item.qty})</span> <span>${item.price}</span></li>`;
-                            });
-                        } else { itemsHtml = `<li>${order.count} Items</li>`; }
-
-                        tbody.innerHTML += `
-                            <tr class="order-row" onclick="toggleOrder(this)">
-                                <td>
-                                    <span style="font-family:var(--font-tech); font-weight:bold;">#${order.id}</span>
-                                    <i class="fas fa-chevron-down order-chevron" style="font-size:0.7rem; margin-left:5px;"></i><br>
-                                    <span style="font-size:0.7rem; color:#666;">${order.date}</span>
-                                </td>
-                                <td>${totalString}</td>
-                                <td><span class="status-pill">COMPLETED</span></td>
-                            </tr>
-                            <tr class="order-details-row" style="display:none;">
-                                <td colspan="3"><ul class="order-items-list">${itemsHtml}</ul></td>
-                            </tr>
-                        `;
-                    });
+                if(forms) forms.style.display = 'none';
+                if(profile) {
+                    profile.style.display = 'block';
+                    profile.classList.add('active');
                 }
+                
+                if(document.getElementById('userNameDisplay')) document.getElementById('userNameDisplay').innerText = user.username.toUpperCase();
+                if(document.getElementById('userAvatar')) document.getElementById('userAvatar').style.backgroundImage = `url('${user.avatar}')`;
+                
+                if(userBtn) userBtn.classList.remove('user-attention'); 
             } else {
-                forms.style.display = 'block';
-                profile.classList.remove('active');
-                userBtn.classList.add('user-attention'); // Add animation
+                if(forms) forms.style.display = 'block';
+                if(profile) {
+                    profile.classList.remove('active');
+                    profile.style.display = 'none';
+                }
+                
+                if(userBtn) userBtn.classList.add('user-attention'); 
             }
         }
 
@@ -1270,6 +1227,28 @@ updateClock();
         // Run every 20 seconds
         setTimeout(fetchRecentSales, 4000);
         setInterval(fetchRecentSales, 20000);
+		
+		/* --- TPS TEMPLE SINGLE CLICK SFX --- */
+        const tpsSfx = new Audio('click.mp3');
+        tpsSfx.preload = 'auto';
+
+        document.addEventListener('mousedown', (e) => {
+            const target = e.target;
+            const style = window.getComputedStyle(target);
+            if (
+                target.tagName === 'A' || 
+                target.tagName === 'BUTTON' || 
+                target.closest('.card') || 
+                target.closest('.qty-btn') ||
+                target.closest('.auth-tab') ||
+                target.closest('.user-btn') ||
+                style.cursor === 'pointer'
+            ) {
+                const soundClone = tpsSfx.cloneNode();
+                soundClone.volume = 0.04;
+                soundClone.play().catch(() => {});
+            }
+        });
     </script>
 </body>
 </html>

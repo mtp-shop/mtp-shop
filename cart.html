@@ -10,8 +10,6 @@
     <!-- PWA / MOBILE APP FEEL -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#050505">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="logo.png">
     
     <!-- FONTS -->
@@ -30,6 +28,8 @@
             --glass-border: rgba(255, 255, 255, 0.15);
             --accent: #ff1f1f;
             --accent-glow: rgba(255, 31, 31, 0.4);
+            --discord: #5865F2; /* DISCORD BLURPLE */
+            --discord-dark: #4752c4;
             --text-main: #ffffff;
             --font-head: 'Montserrat', sans-serif;
             --font-body: 'Poppins', sans-serif;
@@ -238,8 +238,8 @@
 
         /* LOGIN REMINDER */
         .login-reminder {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(88, 101, 242, 0.1); /* Discord Tint */
+            border: 1px solid rgba(88, 101, 242, 0.3);
             padding: 10px;
             border-radius: 8px;
             margin-bottom: 10px;
@@ -250,7 +250,7 @@
             display: none; 
         }
         .login-reminder strong { color: white; display:block; margin-bottom:5px; }
-        .login-reminder a { color: var(--accent); text-decoration: none; font-weight: bold; cursor: pointer; }
+        .login-reminder a { color: var(--discord); text-decoration: none; font-weight: bold; cursor: pointer; }
 
         /* EMPTY STATE */
         .empty-container {
@@ -308,23 +308,75 @@
             border-top: 1px solid #111; font-size: 0.8rem; padding-top: 20px; 
         }
 
-        /* --- AUTH MODAL --- */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); backdrop-filter: blur(20px); z-index: 9999; display: none; justify-content: center; align-items: center; padding: 20px; opacity: 0; transition: opacity 0.3s ease; }
+        /* --- AUTH MODAL & DISCORD LOGIN --- */
+        .modal-overlay { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); 
+            z-index: 9999; display: none; justify-content: center; align-items: center; 
+            padding: 20px; opacity: 0; transition: opacity 0.3s ease; 
+        }
         .modal-overlay.active { opacity: 1; }
-        .modal-content { background: #080808; width: 100%; max-width: 500px; padding: 40px; border-radius: 20px; border: 1px solid #222; position: relative; box-shadow: 0 0 100px rgba(0,0,0,1); transform: translateY(50px); transition: 0.4s ease; }
+
+        .modal-content { 
+            background: #0a0a0a; 
+            background-image: linear-gradient(to bottom, rgba(255,255,255,0.03), rgba(0,0,0,0.8));
+            width: 100%; max-width: 450px; 
+            padding: 50px 40px; 
+            border-radius: 24px; 
+            border: 1px solid rgba(255,255,255,0.08); 
+            position: relative; 
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.05); 
+            transform: translateY(50px); transition: 0.4s cubic-bezier(0.19, 1, 0.22, 1); 
+            text-align: center;
+        }
         .modal-overlay.active .modal-content { transform: translateY(0); }
-        .close-btn { position: absolute; top: 20px; right: 25px; font-size: 2.5rem; color: #555; cursor: pointer; transition: 0.2s; line-height: 0.8; }
-        .close-btn:hover { color: var(--accent); }
-        
-        .auth-tabs { display: flex; border-bottom: 1px solid #333; margin-bottom: 20px; }
-        .auth-tab { flex: 1; padding: 15px; text-align: center; cursor: pointer; color: #666; font-family: var(--font-head); font-weight: 700; transition: 0.3s; }
-        .auth-tab.active { color: white; border-bottom: 2px solid var(--accent); }
-        .auth-form { display: none; flex-direction: column; gap: 15px; }
-        .auth-form.active { display: flex; }
-        .auth-input { background: #111; border: 1px solid #333; padding: 15px; color: white; border-radius: 8px; font-family: var(--font-body); outline: none; transition: 0.3s; }
-        .auth-input:focus { border-color: var(--accent); }
-        .auth-submit { background: var(--accent); color: white; border: none; padding: 15px; border-radius: 8px; font-weight: 900; font-family: var(--font-head); cursor: pointer; transition: 0.3s; }
-        .auth-submit:hover { background: white; color: black; }
+
+        .close-btn { 
+            position: absolute; top: 20px; right: 25px; 
+            font-size: 1.5rem; color: #555; cursor: pointer; transition: 0.2s; 
+        }
+        .close-btn:hover { color: white; }
+
+        /* Discord Specific Styles */
+        .auth-header-icon {
+            font-size: 3rem; color: var(--discord); margin-bottom: 20px;
+            filter: drop-shadow(0 0 20px rgba(88, 101, 242, 0.4));
+        }
+
+        .auth-title { font-size: 2rem; font-family: var(--font-head); font-weight: 900; font-style: italic; margin: 0 0 10px 0; letter-spacing: -1px; }
+        .auth-sub { color: #888; font-size: 0.9rem; margin-bottom: 30px; line-height: 1.5; }
+
+        .discord-btn {
+            width: 100%; padding: 18px;
+            background: var(--discord); color: white;
+            font-family: var(--font-head); font-weight: 800; font-style: italic; letter-spacing: 0.5px;
+            border: none; border-radius: 12px; cursor: pointer;
+            display: flex; justify-content: center; align-items: center; gap: 12px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(88, 101, 242, 0.3);
+            font-size: 1rem;
+        }
+        .discord-btn:hover { 
+            background: var(--discord-dark); 
+            transform: translateY(-2px); 
+            box-shadow: 0 8px 25px rgba(88, 101, 242, 0.5); 
+        }
+        .discord-btn i { font-size: 1.2rem; }
+
+        /* Profile View Styling Updates */
+        .profile-view { display: none; text-align: left; }
+        .profile-view.active { display: block; animation: fadeIn 0.5s ease; }
+        .profile-header { 
+            background: rgba(255,255,255,0.03); padding: 20px; border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; gap: 20px; 
+        }
+        .profile-avatar { 
+            width: 60px; height: 60px; border-radius: 50%; 
+            background-size: cover; background-position: center;
+            border: 2px solid var(--discord); box-shadow: 0 0 15px rgba(88, 101, 242, 0.4);
+        }
+
+        @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
 
         /* --- MOBILE RESPONSIVE FIXES --- */
         @media (max-width: 768px) {
@@ -406,7 +458,7 @@
                 <!-- LOGIN REMINDER -->
                 <div class="login-reminder" id="loginReminder">
                     <strong>Not Signed In?</strong>
-                    <a href="#" onclick="openAuthModal(); return false;">Create Account</a> to track order<br>
+                    <a href="#" onclick="openAuthModal(); return false;">Connect Discord</a> to track order<br>
                     or continue as Guest.
                 </div>
 
@@ -473,24 +525,28 @@
         <div class="modal-content">
             <span class="close-btn" onclick="document.getElementById('authModal').classList.remove('active'); setTimeout(()=>document.getElementById('authModal').style.display='none',300)">&times;</span>
             
+            <!-- DISCORD LOGIN VIEW -->
             <div id="authForms">
-                <h2 class="modal-title" style="font-size: 2rem; margin-bottom: 20px;">TPS ACCOUNT</h2>
-                <div class="auth-tabs">
-                    <div class="auth-tab active" onclick="switchTab('login')">LOGIN</div>
-                    <div class="auth-tab" onclick="switchTab('register')">REGISTER</div>
+                <div class="auth-header-icon">
+                    <i class="fab fa-discord"></i>
                 </div>
+                <h2 class="auth-title">TEMPLE ACCESS</h2>
+                <p class="auth-sub">Sign in with Discord to track your orders, access support, and manage your assets.</p>
 
-                <div class="auth-form active" id="loginForm">
-                    <input type="email" id="loginEmail" class="auth-input" placeholder="Email Address">
-                    <input type="password" id="loginPass" class="auth-input" placeholder="Password">
-                    <button class="auth-submit" onclick="handleLogin()">ENTER TEMPLE</button>
-                </div>
+                <button class="discord-btn" onclick="initiateDiscordLogin()">
+                    <i class="fab fa-discord"></i> CONNECT DISCORD
+                </button>
+            </div>
 
-                <div class="auth-form" id="registerForm">
-                    <input type="text" id="regName" class="auth-input" placeholder="Username">
-                    <input type="email" id="regEmail" class="auth-input" placeholder="Email Address">
-                    <input type="password" id="regPass" class="auth-input" placeholder="Password">
-                    <button class="auth-submit" onclick="handleRegister()">CREATE ACCOUNT</button>
+            <!-- PROFILE VIEW (LOGGED IN) -->
+            <div class="profile-view" id="profileView">
+                <div class="profile-header">
+                    <div class="profile-avatar" id="userAvatar"></div>
+                    <div>
+                        <h3 style="margin:0; font-family:var(--font-head); font-style:italic; font-size: 1.2rem;" id="userNameDisplay">USERNAME</h3>
+                        <div style="color:var(--discord); font-size:0.75rem; font-weight:bold; letter-spacing:1px; margin-top:2px;">VERIFIED MEMBER</div>
+                        <a onclick="handleLogout()" style="color:#ff4444; font-size:0.8rem; cursor:pointer; font-weight:bold;">Disconnect</a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -500,30 +556,21 @@
         const stripe = Stripe('pk_live_51LDw4PLHs0w9JjR8nBwavRWVfCsKh1Tz7YJfkjwjNN9edtqvpnVZ8axuOTVQfUAquAgdksq9jBHX8VKXll5Ft6ss008lzh2Gq3');
         let embeddedCheckout = null;
 
-        // =====================================================================
-        // =====================================================================
-        //              ⚙️  EASY CONFIGURATION SECTION  ⚙️
-        // =====================================================================
-        // =====================================================================
+        /* 
+           ==========================================================================
+           ⚠️ CONFIGURATION - REPLACE CLIENT ID HERE 
+           ========================================================================== 
+        */
+        const CLIENT_ID = "PASTE_YOUR_CLIENT_ID_HERE"; 
+        const REDIRECT_URI = window.location.origin + window.location.pathname;
 
         const CONFIG = {
-            
-            // ------------------------------------
-            // 1. ADD YOUR COUPONS HERE
-            // ------------------------------------
             coupons: [
-                { code: "1956",     discount: 100 }, // Keep 100% for Dev/Owner Bypass
-                { code: "195612",   discount: 0   }, // Test Mode (Visual only)
-                
-                // --- ADD NEW CODES BELOW THIS LINE ---
+                { code: "1956",     discount: 100 }, 
+                { code: "195612",   discount: 0   }, 
                 { code: "VALENTINE", discount: 50 },
-                { code: "WELCOME",  discount: 10 },
-                // -------------------------------------
+                { code: "WELCOME",  discount: 10 }
             ],
-
-            // ------------------------------------
-            // 2. PRODUCT LIST (For Search/Quick Add)
-            // ------------------------------------
             products: [
                 { title: "Simple Intro", price: "£10.00", img: "product.png" },
                 { title: "Character Intro", price: "£17.00", img: "product.png" },
@@ -542,22 +589,24 @@
             ]
         };
 
-        // =====================================================================
-        //                  END OF CONFIGURATION 
-        // =====================================================================
-
         window.addEventListener('load', () => {
+            // Check for OAuth return
+            const fragment = new URLSearchParams(window.location.hash.slice(1));
+            const accessToken = fragment.get('access_token');
+            const tokenType = fragment.get('token_type');
+
+            if (accessToken) {
+                window.history.replaceState(null, null, ' ');
+                fetchDiscordUser(accessToken, tokenType);
+            } else {
+                checkLoginState();
+            }
+
             setTimeout(() => {
                 document.getElementById('loader').style.opacity = '0';
                 setTimeout(() => { document.getElementById('loader').style.display = 'none'; }, 500);
             }, 1000); 
             
-            const currentUser = JSON.parse(localStorage.getItem('tps_current_user'));
-            const reminder = document.getElementById('loginReminder');
-            if (reminder) {
-                if (!currentUser) reminder.style.display = 'block';
-                else reminder.style.display = 'none';
-            }
             populateQuickList();
         });
 
@@ -593,12 +642,7 @@
                 quickAddWrapper.style.display = 'block'; 
             }
 
-            const currentUser = JSON.parse(localStorage.getItem('tps_current_user'));
-            const reminder = document.getElementById('loginReminder');
-            if (reminder) {
-                if (!currentUser) reminder.style.display = 'block';
-                else reminder.style.display = 'none';
-            }
+            checkLoginState();
 
             validItems.forEach((item, index) => {
                 let priceString = item.price.toString().replace('£', '').replace('+', '').trim();
@@ -634,33 +678,26 @@
             let categoryCount = (hasIntro?1:0) + (hasChain?1:0) + (hasGFX?1:0) + (hasCloth?1:0);
             let bundleActive = (categoryCount >= 3 || subtotal > 35);
             
-            // DEFAULT CALCULATION
             total = bundleActive ? subtotal * 0.85 : subtotal;
 
-            // --- DISCOUNT LOGIC (Using CONFIG) ---
             if (activeCode === "1956") {
                 total = 0;
                 discountMsg.innerText = "DEV MODE: 100% OFF";
-                discountMsg.style.display = "block";
-                discountMsg.style.color = "#00ff88";
+                discountMsg.style.display = "block"; discountMsg.style.color = "#00ff88";
             } else if (activeCode === "195612") {
                 total = validItems.reduce((acc, item) => acc + (0.30 * item.qty), 0);
                 discountMsg.innerText = "STRIPE TEST (30p)";
-                discountMsg.style.display = "block";
-                discountMsg.style.color = "#ffa500";
+                discountMsg.style.display = "block"; discountMsg.style.color = "#ffa500";
             } else if (activeDiscountPercent > 0) {
                 total = subtotal - (subtotal * (activeDiscountPercent / 100));
                 discountMsg.innerText = `COUPON '${activeCode}' APPLIED: ${activeDiscountPercent}% OFF`;
-                discountMsg.style.display = "block";
-                discountMsg.style.color = "#00ff88";
+                discountMsg.style.display = "block"; discountMsg.style.color = "#00ff88";
             } else if(bundleActive) {
                 discountMsg.innerText = "🔥 BUNDLE UNLOCKED: 15% OFF APPLIED";
-                discountMsg.style.display = "block";
-                discountMsg.style.color = "#00ff88"; 
+                discountMsg.style.display = "block"; discountMsg.style.color = "#00ff88"; 
             } else {
                 discountMsg.innerText = `Spend £${(35 - subtotal).toFixed(2)} more for 15% OFF`;
-                discountMsg.style.display = "block";
-                discountMsg.style.color = "#aaa";
+                discountMsg.style.display = "block"; discountMsg.style.color = "#aaa";
             }
 
             if(subtotal !== total) {
@@ -670,7 +707,6 @@
             
             totalEl.innerText = '£' + total.toFixed(2);
 
-            // Button Styles
             if(activeCode === "1956") {
                 checkoutBtn.innerHTML = '<i class="fas fa-lock-open"></i> DEV BYPASS';
                 checkoutBtn.style.background = "#00ff88"; checkoutBtn.style.color = "#000";
@@ -697,14 +733,11 @@
 
         function applyDiscount() {
             const input = document.getElementById('promoInput').value.trim().toUpperCase();
-            
-            // Check Config List
             const foundCoupon = CONFIG.coupons.find(c => c.code === input);
 
             if(foundCoupon) {
                 activeCode = foundCoupon.code;
                 activeDiscountPercent = foundCoupon.discount;
-                // Special check for Test Mode code to reset percentage so logic handles it
                 if(activeCode === "195612") activeDiscountPercent = 0; 
             } else {
                 alert("Invalid Code"); 
@@ -751,22 +784,15 @@
 
         function addToCartFromQuick(idx) {
             const product = CONFIG.products[idx];
-            // Check if exists
             const existing = cart.find(i => i.title === product.title);
             if(existing) {
                 existing.qty++;
             } else {
-                cart.push({
-                    title: product.title,
-                    price: product.price,
-                    img: product.img,
-                    qty: 1
-                });
+                cart.push({ title: product.title, price: product.price, img: product.img, qty: 1 });
             }
             localStorage.setItem('mtpCart', JSON.stringify(cart));
             renderCart();
             
-            // Visual feedback
             const btn = document.querySelectorAll('.quick-add-btn')[idx];
             const originalText = btn.innerText;
             btn.innerText = "ADDED";
@@ -779,18 +805,14 @@
             }, 1000);
         }
 
-
         async function cancelCheckout() {
             if (embeddedCheckout) await embeddedCheckout.destroy();
             document.getElementById('checkout-container').style.display = 'none';
             document.getElementById('cartItems').style.display = 'block';
             document.getElementById('cartSummary').style.display = 'flex';
             document.getElementById('quick-add-wrapper').style.display = 'block';
-            
-            // --- BUTTON RESET FIX ---
             checkoutBtn.innerHTML = '<i class="fas fa-credit-card"></i> PAY WITH STRIPE';
             checkoutBtn.style.pointerEvents = "all";
-            checkoutBtn.style.opacity = "1";
         }
 
         checkoutBtn.addEventListener('click', async function() {
@@ -800,15 +822,12 @@
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> LOADING...';
             btn.style.pointerEvents = "none";
 
-            localStorage.setItem('mtpPendingOrder', JSON.stringify({
-                items: cart, total: totalEl.innerText, date: new Date().toLocaleDateString()
-            }));
-
             let subtotal = cart.reduce((acc, i) => acc + (parseFloat(i.price.replace('£',''))*i.qty), 0);
             let codeToSend = activeCode;
             if (!codeToSend && subtotal > 35) codeToSend = "BUNDLE15";
 
             try {
+                // Use relative path for API (Assuming backend exists as per previous context)
                 const response = await fetch('/api/create-checkout', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -830,18 +849,15 @@
                     document.getElementById('quick-add-wrapper').style.display = 'none';
                     document.getElementById('checkout-container').style.display = 'block';
 
-                    embeddedCheckout = await stripe.initEmbeddedCheckout({ 
-                        clientSecret: data.clientSecret
-                    });
-                    
+                    embeddedCheckout = await stripe.initEmbeddedCheckout({ clientSecret: data.clientSecret });
                     embeddedCheckout.mount('#checkout');
                 } else {
-                    throw new Error("No client secret received from server.");
+                    throw new Error("No client secret received.");
                 }
 
             } catch (error) {
                 console.error("Checkout Fail:", error);
-                alert("Checkout Error: " + error.message);
+                alert("Checkout functionality requires a running backend server. \nError: " + error.message);
                 btn.innerHTML = '<i class="fas fa-credit-card"></i> PAY WITH STRIPE';
                 btn.style.pointerEvents = "all";
             }
@@ -853,37 +869,66 @@
             modal.style.display = 'flex';
             setTimeout(() => modal.classList.add('active'), 10);
         }
-        function switchTab(tab) {
-            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
-            if(tab === 'login') {
-                document.querySelectorAll('.auth-tab')[0].classList.add('active');
-                document.getElementById('loginForm').classList.add('active');
+
+        function initiateDiscordLogin() {
+            const authUrl = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify`;
+            window.location.href = authUrl;
+        }
+
+        function fetchDiscordUser(token, type) {
+            fetch('https://discord.com/api/users/@me', { headers: { authorization: `${type} ${token}` }})
+            .then(res => res.json())
+            .then(data => {
+                const userData = { id: data.id, username: data.username, avatar: `https://cdn.discordapp.com/avatars/${data.id}/${data.avatar}.png` };
+                localStorage.setItem('tps_discord_user', JSON.stringify(userData));
+                checkLoginState();
+            })
+            .catch(err => console.error("Discord Auth Error:", err));
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('tps_discord_user');
+            checkLoginState();
+        }
+
+        function checkLoginState() {
+            const user = JSON.parse(localStorage.getItem('tps_discord_user'));
+            const forms = document.getElementById('authForms');
+            const profile = document.getElementById('profileView');
+            const reminder = document.getElementById('loginReminder');
+            
+            if(user) {
+                if(forms) forms.style.display = 'none';
+                if(profile) {
+                    profile.style.display = 'block';
+                    profile.classList.add('active');
+                }
+                
+                if(document.getElementById('userNameDisplay')) document.getElementById('userNameDisplay').innerText = user.username;
+                if(document.getElementById('userAvatar')) document.getElementById('userAvatar').style.backgroundImage = `url('${user.avatar}')`;
+                
+                if(reminder) reminder.style.display = 'none';
             } else {
-                document.querySelectorAll('.auth-tab')[1].classList.add('active');
-                document.getElementById('registerForm').classList.add('active');
+                if(forms) forms.style.display = 'block';
+                if(profile) {
+                    profile.classList.remove('active');
+                    profile.style.display = 'none';
+                }
+                
+                if(reminder && cart.length > 0) reminder.style.display = 'block';
+                else if(reminder) reminder.style.display = 'none';
             }
-        }
-        function getDB() { return JSON.parse(localStorage.getItem('tps_users_db')) || []; }
-        function saveDB(db) { localStorage.setItem('tps_users_db', JSON.stringify(db)); }
-        function handleRegister() {
-            const name = document.getElementById('regName').value, email = document.getElementById('regEmail').value, pass = document.getElementById('regPass').value;
-            if(!name || !email || !pass) return alert("Fill all fields");
-            let db = getDB();
-            if(db.find(u => u.email === email)) return alert("Already registered");
-            const newUser = { name, email, pass, orders: [] };
-            db.push(newUser); saveDB(db); localStorage.setItem('tps_current_user', JSON.stringify(newUser));
-            location.reload();
-        }
-        function handleLogin() {
-            const email = document.getElementById('loginEmail').value, pass = document.getElementById('loginPass').value;
-            let db = getDB();
-            const user = db.find(u => u.email === email && u.pass === pass);
-            if(user) { localStorage.setItem('tps_current_user', JSON.stringify(user)); location.reload(); }
-            else alert("Invalid Credentials");
         }
 
         renderCart();
+		
+		/* --- SFX --- */
+        const tpsSfx = new Audio('click.mp3');
+        document.addEventListener('mousedown', (e) => {
+            if (e.target.closest('a, button, .qty-btn, .remove-btn')) {
+                const s = tpsSfx.cloneNode(); s.volume = 0.04; s.play().catch(() => {});
+            }
+        });
     </script>
 </body>
 </html>

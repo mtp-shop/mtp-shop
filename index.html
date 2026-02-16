@@ -369,11 +369,11 @@
         #authModal .modal-content {
             background: #0a0a0a; 
             background-image: linear-gradient(to bottom, rgba(255,255,255,0.03), rgba(0,0,0,0.8));
-            width: 100%; max-width: 600px; /* WIDER FOR HISTORY */
+            width: 100%; max-width: 600px;
             padding: 50px 40px; 
             border-radius: 24px; 
             border: 1px solid rgba(255,255,255,0.08); 
-            display: block; /* Override grid */
+            display: block; 
             box-shadow: 0 25px 50px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.05); 
             text-align: center;
         }
@@ -441,22 +441,52 @@
         .stat-label { font-size: 0.65rem; color: #888; text-transform: uppercase; letter-spacing: 1px; }
         .stat-value { font-size: 1rem; font-weight: 900; color: white; margin-top: 5px; font-family: var(--font-tech); }
 
-        /* Order Table */
-        .orders-section h4 { color: var(--accent); font-family: var(--font-tech); font-size: 0.9rem; margin-bottom: 15px; }
-        .table-container { max-height: 250px; overflow-y: auto; overflow-x: auto; }
-        .table-container::-webkit-scrollbar { width: 5px; height: 5px; }
+        /* --- IMPROVED ORDER TABLE STYLES --- */
+        .orders-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .orders-section h4 { color: var(--accent); font-family: var(--font-tech); font-size: 0.9rem; margin: 0; }
+        
+        .clear-history-btn {
+            background: transparent; border: none; color: #444; font-size: 0.75rem;
+            cursor: pointer; font-family: var(--font-tech); text-transform: uppercase;
+            display: flex; align-items: center; gap: 5px; transition: 0.2s;
+        }
+        .clear-history-btn:hover { color: var(--accent); }
+
+        .table-container { 
+            max-height: 250px; overflow-y: auto; overflow-x: hidden; 
+            background: rgba(0,0,0,0.2); border-radius: 8px; padding: 5px;
+        }
+        .table-container::-webkit-scrollbar { width: 4px; }
         .table-container::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
 
-        .order-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left; min-width: 500px; }
-        .order-table th { color: #666; font-weight: 600; padding-bottom: 10px; border-bottom: 1px solid #333; text-transform: uppercase; font-size: 0.75rem; }
-        .order-table td { padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); color: #ddd; vertical-align: middle; }
-        .order-id-cell { font-family: var(--font-tech); color: #fff; font-size: 0.75rem; }
-        .order-items-cell { color: #aaa; font-size: 0.8rem; font-style: italic; max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .order-table { 
+            width: 100%; border-collapse: collapse; table-layout: fixed; 
+            font-size: 0.85rem; text-align: left; 
+        }
+        .order-table th { 
+            color: #666; font-weight: 600; padding: 10px; 
+            border-bottom: 1px solid #333; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 1px; 
+        }
+        .order-table td { 
+            padding: 12px 10px; border-bottom: 1px solid rgba(255,255,255,0.03); 
+            color: #ddd; vertical-align: middle; 
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+
+        /* Column Widths */
+        .col-id { width: 18%; }
+        .col-items { width: 35%; }
+        .col-date { width: 22%; }
+        .col-total { width: 15%; text-align: right; }
+        .col-status { width: 10%; text-align: right; }
+
+        .order-id-cell { font-family: var(--font-tech); color: #fff; font-size: 0.75rem; opacity: 0.8; }
+        .order-items-cell { color: #aaa; font-size: 0.8rem; font-style: italic; }
 
         /* Status Badges */
-        .status-pill { padding: 4px 10px; border-radius: 12px; font-size: 0.7rem; font-weight: 900; font-family: var(--font-head); font-style: italic; }
-        .status-pill.complete { background: rgba(0,255,136,0.15); color: #00ff88; box-shadow: 0 0 10px rgba(0,255,136,0.1); }
-        .status-pill.pending { background: rgba(255, 165, 0, 0.15); color: orange; }
+        .status-pill { padding: 4px 0; border-radius: 12px; font-size: 0.7rem; font-weight: 900; font-family: var(--font-head); font-style: italic; display: block; text-align: right; }
+        .status-pill.complete { color: #00ff88; text-shadow: 0 0 10px rgba(0,255,136,0.2); }
+        .status-pill.pending { color: orange; }
 
         .no-orders { text-align: center; color: #555; font-size: 0.8rem; padding: 20px; font-style: italic; }
 
@@ -743,16 +773,22 @@
 
                 <!-- Order History Section -->
                 <div class="orders-section">
-                    <h4>ORDER HISTORY</h4>
+                    <div class="orders-header">
+                        <h4>ORDER HISTORY</h4>
+                        <button class="clear-history-btn" onclick="clearHistory()">
+                            <i class="fas fa-trash"></i> Clear
+                        </button>
+                    </div>
+                    
                     <div class="table-container">
                         <table class="order-table">
                             <thead>
                                 <tr>
-                                    <th>Order #</th>
-                                    <th>Items</th>
-                                    <th>Date</th>
-                                    <th>Total</th>
-                                    <th>Status</th>
+                                    <th class="col-id">Order #</th>
+                                    <th class="col-items">Items</th>
+                                    <th class="col-date">Date</th>
+                                    <th class="col-total">Total</th>
+                                    <th class="col-status">Status</th>
                                 </tr>
                             </thead>
                             <tbody id="orderTableBody">
@@ -1184,6 +1220,16 @@
             checkLoginState();
         }
 
+        function clearHistory() {
+            const user = JSON.parse(localStorage.getItem('tps_discord_user'));
+            if(user) {
+                if(confirm("Are you sure you want to clear your order history?")) {
+                    localStorage.removeItem('tps_orders_' + user.id);
+                    checkLoginState(); // Re-render table
+                }
+            }
+        }
+
         function checkLoginState() {
             const user = JSON.parse(localStorage.getItem('tps_discord_user'));
             const forms = document.getElementById('authForms');
@@ -1216,12 +1262,11 @@
                     if(noOrders) noOrders.style.display = 'none';
                     
                     myOrders.forEach(order => {
-                        // FIX: Logic to handle missing status. If it's in history, assume PAID unless marked otherwise.
                         let statusText = order.status ? order.status.toUpperCase() : 'PAID';
                         let statusClass = (statusText === 'PAID' || statusText === 'COMPLETED' || statusText === 'DELIVERED') ? 'complete' : 'pending';
                         if (statusText === 'PENDING') statusClass = 'pending';
 
-                        // FIX: Item summary logic
+                        // Item summary logic
                         let itemSummary = '';
                         if (Array.isArray(order.items)) {
                             itemSummary = order.items.map(i => `${i.qty}x ${i.title}`).join(', ');
@@ -1230,6 +1275,9 @@
                         } else {
                             itemSummary = 'Custom Order';
                         }
+
+                        // Determine price color
+                        let priceColor = (statusClass === 'complete') ? '#00ff88' : '#fff';
                         
                         // Render Row
                         if(orderTable) {
@@ -1238,7 +1286,7 @@
                                     <td class="order-id-cell">#${order.id || '---'}</td>
                                     <td class="order-items-cell" title="${itemSummary}">${itemSummary}</td>
                                     <td>${order.date || 'Unknown'}</td>
-                                    <td style="color:var(--accent); font-weight:bold;">${order.total || '£0.00'}</td>
+                                    <td style="color:${priceColor}; font-weight:bold; text-align:right;">${order.total || '£0.00'}</td>
                                     <td><span class="status-pill ${statusClass}">${statusText}</span></td>
                                 </tr>
                             `;

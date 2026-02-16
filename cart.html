@@ -819,6 +819,17 @@
             const btn = this;
             if(cart.length === 0) return;
 
+            // --- IMPORTANT FIX: SAVE PENDING ORDER BEFORE STRIPE/BYPASS ---
+            const totalText = document.getElementById('totalPrice').innerText;
+            const pendingOrder = {
+                items: cart,
+                total: totalText,
+                date: new Date().toLocaleDateString('en-GB'),
+                id: "ORD-" + Math.floor(100000 + Math.random() * 900000)
+            };
+            localStorage.setItem('mtpPendingOrder', JSON.stringify(pendingOrder));
+            // -------------------------------------------------------------
+
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> LOADING...';
             btn.style.pointerEvents = "none";
 

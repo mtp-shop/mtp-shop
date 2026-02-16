@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Payment Successful | TPS TEMPLE</title>
+    
     <link rel="icon" type="image/png" href="logo.png">
+    <meta name="theme-color" content="#050505">
     
     <!-- FONTS -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15,9 +17,9 @@
     <style>
         :root {
             --bg-dark: #050505;
-            --glass-border: rgba(255, 255, 255, 0.15);
-            --accent: #00ff88; /* Green for success */
-            --accent-glow: rgba(0, 255, 136, 0.4);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --accent-success: #00ff88;
+            --accent-glow: rgba(0, 255, 136, 0.3);
             --text-main: #ffffff;
             --font-head: 'Montserrat', sans-serif;
             --font-body: 'Poppins', sans-serif;
@@ -27,145 +29,199 @@
         body {
             margin: 0; font-family: var(--font-body); color: var(--text-main);
             background-color: #050505;
-            background-image: linear-gradient(to bottom, rgba(0,0,0,0.8), rgba(0,0,0,0.95)), url('background.png'); 
-            background-size: cover; background-attachment: fixed; min-height: 100vh;
+            background-image: linear-gradient(to bottom, rgba(0,0,0,0.85), rgba(0,0,0,0.98)), url('background.png'); 
+            background-size: cover; min-height: 100vh;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
 
-        .success-container {
+        .success-card {
             max-width: 600px; width: 90%;
-            background: rgba(5, 5, 5, 0.6); backdrop-filter: blur(20px);
+            background: rgba(10, 10, 10, 0.6); backdrop-filter: blur(20px);
             border: 1px solid var(--glass-border);
-            border-radius: 20px; padding: 40px; text-align: center;
-            box-shadow: 0 0 50px rgba(0,255,136,0.1);
-            animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border-radius: 24px; padding: 50px 40px; text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+            animation: slideUp 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
         }
+        @keyframes slideUp { 0% { opacity: 0; transform: translateY(40px) scale(0.95); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
 
-        @keyframes popIn { 0% { opacity:0; transform: scale(0.8); } 100% { opacity:1; transform: scale(1); } }
-
-        .icon-circle {
-            width: 100px; height: 100px; background: rgba(0,255,136,0.1);
-            border: 2px solid var(--accent); border-radius: 50%;
+        .check-icon {
+            width: 90px; height: 90px;
+            background: rgba(0, 255, 136, 0.1);
+            border: 2px solid var(--accent-success);
+            border-radius: 50%;
             display: flex; justify-content: center; align-items: center;
-            margin: 0 auto 30px; box-shadow: 0 0 30px var(--accent-glow);
+            margin: 0 auto 30px;
+            box-shadow: 0 0 30px var(--accent-glow);
+            animation: pulseSuccess 2s infinite;
         }
-        .icon-circle i { font-size: 3rem; color: var(--accent); }
+        @keyframes pulseSuccess { 0% { box-shadow: 0 0 20px var(--accent-glow); } 50% { box-shadow: 0 0 40px var(--accent-glow); } 100% { box-shadow: 0 0 20px var(--accent-glow); } }
+        .check-icon i { font-size: 2.5rem; color: var(--accent-success); }
 
         h1 {
             font-family: var(--font-head); font-weight: 900; font-style: italic;
-            font-size: 2.5rem; margin: 0 0 10px 0; text-transform: uppercase;
-            background: linear-gradient(to right, #fff, #aaa); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            font-size: 2.8rem; margin: 0 0 10px 0; text-transform: uppercase;
+            letter-spacing: -1px;
+            background: linear-gradient(to right, #ffffff, #888888);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
 
-        p { color: #aaa; margin-bottom: 30px; line-height: 1.6; }
-        
-        .order-summary {
-            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 12px; padding: 20px; margin-bottom: 30px; text-align: left;
+        .status-msg { color: #888; margin-bottom: 30px; font-size: 1.1rem; }
+
+        /* RECEIPT BOX */
+        .order-box {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px; padding: 25px;
+            margin-bottom: 40px; text-align: left;
         }
-        
-        .summary-title { font-family: var(--font-tech); color: #888; font-size: 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; }
-        
-        .order-item { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.95rem; }
-        .item-name { font-weight: 700; color: white; }
-        .item-price { font-family: var(--font-tech); color: var(--accent); }
-
-        .total-row { border-top: 1px dashed rgba(255,255,255,0.2); margin-top: 10px; padding-top: 10px; display: flex; justify-content: space-between; font-weight: 900; font-family: var(--font-head); font-style: italic; font-size: 1.1rem; }
-
-        .action-btn {
-            display: inline-block; padding: 15px 40px;
-            background: var(--accent); color: black;
-            font-family: var(--font-head); font-weight: 900; font-style: italic;
-            text-decoration: none; border-radius: 50px;
-            transition: 0.3s; box-shadow: 0 0 20px var(--accent-glow);
+        .summary-header {
+            font-family: var(--font-tech); color: #555;
+            font-size: 0.75rem; text-transform: uppercase;
+            letter-spacing: 2px; border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 10px; margin-bottom: 15px;
+            display: flex; justify-content: space-between;
         }
-        .action-btn:hover { transform: translateY(-5px); box-shadow: 0 10px 40px var(--accent-glow); background: white; }
+        .order-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 0.95rem; }
+        .item-name { font-weight: 700; color: #eee; font-family: var(--font-head); font-style: italic; }
+        .item-price { font-family: var(--font-tech); color: var(--accent-success); }
+        .total-row {
+            margin-top: 15px; padding-top: 15px;
+            border-top: 1px dashed rgba(255, 255, 255, 0.1);
+            display: flex; justify-content: space-between;
+            font-family: var(--font-head); font-weight: 900; font-size: 1.2rem;
+        }
 
-        .discord-note { margin-top: 20px; font-size: 0.8rem; color: #666; }
-        .discord-note i { color: #5865F2; }
+        .discord-btn {
+            display: inline-flex; align-items: center; gap: 12px;
+            background: var(--accent-success); color: #000;
+            text-decoration: none; padding: 18px 40px;
+            border-radius: 50px; font-family: var(--font-head);
+            font-weight: 900; font-style: italic; text-transform: uppercase;
+            transition: 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+            box-shadow: 0 10px 30px var(--accent-glow);
+        }
+        .discord-btn:hover { background: #ffffff; transform: translateY(-5px) scale(1.02); box-shadow: 0 15px 40px rgba(255,255,255,0.2); }
+        .back-link { display: block; margin-top: 25px; color: #444; text-decoration: none; font-size: 0.85rem; font-weight: 700; transition: 0.2s; }
+        .back-link:hover { color: #888; }
+        .confetti { position: fixed; width: 10px; height: 10px; background-color: var(--accent-success); top: -10px; z-index: 9999; pointer-events: none; animation: fall 3s linear forwards; }
+        @keyframes fall { to { transform: translateY(100vh) rotate(360deg); opacity: 0; } }
     </style>
 </head>
 <body>
 
-    <div class="success-container">
-        <div class="icon-circle"><i class="fas fa-check"></i></div>
-        <h1>Payment Confirmed</h1>
-        <p>Thank you for your purchase. Please Open a Ticket To Continue.</p>
+    <div class="success-card">
+        <div class="check-icon"><i class="fas fa-check"></i></div>
+        <h1>PAYMENT SUCCESS</h1>
+        <p class="status-msg">Your transaction was completed successfully.</p>
 
-        <div class="order-summary" id="orderSummary">
-            <div class="summary-title"><span>ORDER SUMMARY</span> <span id="orderDate"></span></div>
-            <div id="itemsList">
-                <!-- Items injected via JS -->
+        <div class="order-box">
+            <div class="summary-header">
+                <span>Items Purchased</span>
+                <span id="orderDate">00/00/0000</span>
+            </div>
+            <div id="itemsContainer">
+                <!-- Javascript will put items here -->
             </div>
             <div class="total-row">
                 <span>TOTAL PAID</span>
-                <span id="orderTotal" style="color:var(--accent)">£0.00</span>
+                <span id="orderTotal">£0.00</span>
             </div>
+            <div id="orderIdDisplay" style="margin-top:10px; font-size:0.8rem; color:#666; font-family:'Space Mono'; text-align:right;"></div>
         </div>
 
-        <a href="https://discord.gg/Vc7fjmbXAe" target="_blank" class="action-btn">OPEN TICKET (DISCORD)</a>
-        <div class="discord-note"><i class="fab fa-discord"></i> Please open a ticket to claim your assets.</div>
-        <br>
-        <a href="index.html" style="color: #666; text-decoration: none; font-size: 0.9rem;">Return to Shop</a>
+        <a href="https://discord.gg/Vc7fjmbXAe" target="_blank" class="discord-btn">
+            <i class="fab fa-discord"></i> Open Ticket to Claim
+        </a>
+
+        <a href="index.html" class="back-link">Return to Shop</a>
     </div>
 
     <script>
-        // Retrieve the temporary order object { items: [], total: "...", date: "..." }
-        const pendingOrder = JSON.parse(localStorage.getItem('mtpPendingOrder'));
-        const itemsList = document.getElementById('itemsList');
-        const orderTotalEl = document.getElementById('orderTotal');
-        const orderDateEl = document.getElementById('orderDate');
-
-        if (pendingOrder && pendingOrder.items) {
-            // 1. Display Order Details
-            orderTotalEl.innerText = pendingOrder.total;
-            orderDateEl.innerText = pendingOrder.date;
-
-            pendingOrder.items.forEach(item => {
-                const div = document.createElement('div');
-                div.className = 'order-item';
-                div.innerHTML = `
-                    <span class="item-name">${item.qty}x ${item.title}</span>
-                    <span class="item-price">${item.price}</span>
-                `;
-                itemsList.appendChild(div);
-            });
-
-            // 2. Save Order to User History (Database Simulation)
-            const currentUser = JSON.parse(localStorage.getItem('tps_current_user'));
-            
-            if (currentUser) {
-                const usersDB = JSON.parse(localStorage.getItem('tps_users_db')) || [];
-                const userIndex = usersDB.findIndex(u => u.email === currentUser.email);
-                
-                if (userIndex > -1) {
-                    const newOrder = {
-                        id: Math.floor(Math.random() * 90000) + 10000,
-                        date: pendingOrder.date || new Date().toLocaleDateString(),
-                        count: pendingOrder.items.length,
-                        total: pendingOrder.total,
-                        items: pendingOrder.items // Save detailed items
-                    };
-                    
-                    // Add to History (Top of list)
-                    usersDB[userIndex].orders.unshift(newOrder);
-                    currentUser.orders.unshift(newOrder);
-                    
-                    // Save back to LocalStorage
-                    localStorage.setItem('tps_users_db', JSON.stringify(usersDB));
-                    localStorage.setItem('tps_current_user', JSON.stringify(currentUser));
+        window.addEventListener('load', () => {
+            // 1. CREATE CONFETTI
+            function createConfetti() {
+                for(let i=0; i<50; i++) {
+                    const c = document.createElement('div');
+                    c.className = 'confetti';
+                    c.style.left = Math.random() * 100 + 'vw';
+                    c.style.backgroundColor = Math.random() > 0.5 ? '#00ff88' : '#ffffff';
+                    c.style.animationDelay = Math.random() * 2 + 's';
+                    c.style.opacity = Math.random();
+                    document.body.appendChild(c);
+                    setTimeout(() => c.remove(), 4000);
                 }
             }
-            
-            // 3. Clear Cart & Pending Order (Prevent duplicates on refresh)
-            localStorage.removeItem('mtpCart');
-            localStorage.removeItem('mtpPendingOrder');
+            createConfetti();
 
-        } else {
-            // Fallback if accessed directly without an order
-            document.querySelector('.order-summary').style.display = 'none';
-            document.querySelector('p').innerText = "Session expired or order already processed.";
-        }
+            // 2. RETRIEVE DATA
+            let pending = JSON.parse(localStorage.getItem('mtpPendingOrder'));
+            const user = JSON.parse(localStorage.getItem('tps_discord_user'));
+            
+            // --- FAILSAFE: If no pending order, check if cart exists and build one ---
+            if (!pending || !pending.items) {
+                const fallbackCart = JSON.parse(localStorage.getItem('mtpCart'));
+                if (fallbackCart && fallbackCart.length > 0) {
+                    pending = {
+                        items: fallbackCart,
+                        total: "PAID",
+                        date: new Date().toLocaleDateString('en-GB'),
+                        id: "ORD-" + Math.floor(100000 + Math.random() * 900000),
+                        status: "COMPLETED"
+                    };
+                }
+            }
+            // ---------------------------------------------------------------------
+
+            const container = document.getElementById('itemsContainer');
+            const totalEl = document.getElementById('orderTotal');
+            const dateEl = document.getElementById('orderDate');
+            const idEl = document.getElementById('orderIdDisplay');
+
+            if (pending && pending.items) {
+                // RENDER RECEIPT
+                pending.items.forEach(item => {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'order-item';
+                    itemDiv.innerHTML = `
+                        <span class="item-name">${item.qty}x ${item.title}</span>
+                        <span class="item-price">${item.price}</span>
+                    `;
+                    container.appendChild(itemDiv);
+                });
+
+                totalEl.innerText = pending.total;
+                dateEl.innerText = pending.date || new Date().toLocaleDateString('en-GB');
+                if(pending.id) idEl.innerText = "ORDER ID: " + pending.id;
+
+                // 3. SAVE TO HISTORY (CRITICAL STEP)
+                // Set status to COMPLETED so it shows green in the table
+                pending.status = "COMPLETED";
+
+                if (user && user.id) {
+                    // Get existing history for THIS user
+                    let userHistory = JSON.parse(localStorage.getItem('tps_orders_' + user.id)) || [];
+                    
+                    // Prevent duplicate saves (check by ID)
+                    const exists = userHistory.find(o => o.id === pending.id);
+                    
+                    if (!exists) {
+                        userHistory.unshift(pending); // Add new order to top
+                        localStorage.setItem('tps_orders_' + user.id, JSON.stringify(userHistory));
+                        console.log("Order saved to history for user " + user.id);
+                    }
+                } else {
+                    console.log("No user logged in, order not saved to profile history.");
+                }
+
+                // 4. CLEAR CART
+                localStorage.removeItem('mtpCart');
+                // We keep 'mtpPendingOrder' briefly so a refresh doesn't error out, 
+                // but usually you might clear it too. We'll leave it for receipt persistence on reload.
+                
+            } else {
+                container.innerHTML = '<p style="color:#666; font-style:italic;">No recent order found.</p>';
+            }
+        });
     </script>
 </body>
 </html>

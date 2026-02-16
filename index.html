@@ -369,7 +369,7 @@
         #authModal .modal-content {
             background: #0a0a0a; 
             background-image: linear-gradient(to bottom, rgba(255,255,255,0.03), rgba(0,0,0,0.8));
-            width: 100%; max-width: 450px; 
+            width: 100%; max-width: 600px; /* WIDER FOR HISTORY */
             padding: 50px 40px; 
             border-radius: 24px; 
             border: 1px solid rgba(255,255,255,0.08); 
@@ -443,17 +443,19 @@
 
         /* Order Table */
         .orders-section h4 { color: var(--accent); font-family: var(--font-tech); font-size: 0.9rem; margin-bottom: 15px; }
-        .table-container { max-height: 200px; overflow-y: auto; }
-        .table-container::-webkit-scrollbar { width: 5px; }
+        .table-container { max-height: 250px; overflow-y: auto; overflow-x: auto; }
+        .table-container::-webkit-scrollbar { width: 5px; height: 5px; }
+        .table-container::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
 
-        .order-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left; }
-        .order-table th { color: #666; font-weight: 600; padding-bottom: 10px; border-bottom: 1px solid #333; }
-        .order-table td { padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); color: #ddd; }
-        .order-id-cell { font-family: var(--font-tech); color: white; }
+        .order-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left; min-width: 500px; }
+        .order-table th { color: #666; font-weight: 600; padding-bottom: 10px; border-bottom: 1px solid #333; text-transform: uppercase; font-size: 0.75rem; }
+        .order-table td { padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); color: #ddd; vertical-align: middle; }
+        .order-id-cell { font-family: var(--font-tech); color: #fff; font-size: 0.75rem; }
+        .order-items-cell { color: #aaa; font-size: 0.8rem; font-style: italic; max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
         /* Status Badges */
-        .status-pill { padding: 3px 8px; border-radius: 10px; font-size: 0.7rem; font-weight: bold; }
-        .status-pill.complete { background: rgba(0,255,136,0.15); color: #00ff88; }
+        .status-pill { padding: 4px 10px; border-radius: 12px; font-size: 0.7rem; font-weight: 900; font-family: var(--font-head); font-style: italic; }
+        .status-pill.complete { background: rgba(0,255,136,0.15); color: #00ff88; box-shadow: 0 0 10px rgba(0,255,136,0.1); }
         .status-pill.pending { background: rgba(255, 165, 0, 0.15); color: orange; }
 
         .no-orders { text-align: center; color: #555; font-size: 0.8rem; padding: 20px; font-style: italic; }
@@ -746,7 +748,8 @@
                         <table class="order-table">
                             <thead>
                                 <tr>
-                                    <th>Order</th>
+                                    <th>Order #</th>
+                                    <th>Items</th>
                                     <th>Date</th>
                                     <th>Total</th>
                                     <th>Status</th>
@@ -1200,39 +1203,43 @@
                 if(document.getElementById('userAvatar')) document.getElementById('userAvatar').style.backgroundImage = `url('${user.avatar}')`;
                 if(userBtn) userBtn.classList.remove('user-attention'); 
 
-                // --- RENDER FAKE ORDERS (DEMO PURPOSE) ---
+                // --- RENDER HISTORY ORDERS ---
                 const orderTable = document.getElementById('orderTableBody');
                 const noOrders = document.getElementById('noOrdersMsg');
                 const countDisplay = document.getElementById('orderCount');
                 
-                // Check local storage for dummy orders or create one if empty for demo
                 let myOrders = JSON.parse(localStorage.getItem('tps_orders_' + user.id)) || [];
                 
-                // DEMO LOGIC: If user has NO history, create a fake "Welcome Gift"
-                if(myOrders.length === 0) {
-                    myOrders.push({
-                        id: "TPS-8821",
-                        date: new Date().toLocaleDateString(),
-                        total: "£0.00",
-                        status: "COMPLETED",
-                        items: "Welcome Gift"
-                    });
-                }
-
                 if(orderTable) orderTable.innerHTML = '';
                 if(myOrders.length > 0) {
                     if(countDisplay) countDisplay.innerText = myOrders.length;
                     if(noOrders) noOrders.style.display = 'none';
                     
                     myOrders.forEach(order => {
-                        let statusClass = order.status === 'COMPLETED' ? 'complete' : 'pending';
+                        // FIX: Logic to handle missing status. If it's in history, assume PAID unless marked otherwise.
+                        let statusText = order.status ? order.status.toUpperCase() : 'PAID';
+                        let statusClass = (statusText === 'PAID' || statusText === 'COMPLETED' || statusText === 'DELIVERED') ? 'complete' : 'pending';
+                        if (statusText === 'PENDING') statusClass = 'pending';
+
+                        // FIX: Item summary logic
+                        let itemSummary = '';
+                        if (Array.isArray(order.items)) {
+                            itemSummary = order.items.map(i => `${i.qty}x ${i.title}`).join(', ');
+                        } else if (typeof order.items === 'string') {
+                            itemSummary = order.items;
+                        } else {
+                            itemSummary = 'Custom Order';
+                        }
+                        
+                        // Render Row
                         if(orderTable) {
                             orderTable.innerHTML += `
                                 <tr>
-                                    <td class="order-id-cell">#${order.id}</td>
-                                    <td>${order.date}</td>
-                                    <td style="color:var(--accent); font-weight:bold;">${order.total}</td>
-                                    <td><span class="status-pill ${statusClass}">${order.status}</span></td>
+                                    <td class="order-id-cell">#${order.id || '---'}</td>
+                                    <td class="order-items-cell" title="${itemSummary}">${itemSummary}</td>
+                                    <td>${order.date || 'Unknown'}</td>
+                                    <td style="color:var(--accent); font-weight:bold;">${order.total || '£0.00'}</td>
+                                    <td><span class="status-pill ${statusClass}">${statusText}</span></td>
                                 </tr>
                             `;
                         }
